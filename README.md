@@ -10,9 +10,29 @@ Nothing is generated, redrawn or substituted.
 game/     the game — source, art, tests, build
 docs/     the requirements dossier this build implements (1,168 requirements)
 tools/    the manifest builder and the browser acceptance harness
+agents/   the five master bots that built it
 ```
 
 ---
+
+## The five master bots
+
+The game was assembled by five agents working in parallel, each owning a
+disjoint slice of the source tree. Their definitions are in [`agents/`](agents/)
+and were installed to `~/.minimax/agents/`.
+
+| Bot | Owns | Delivers |
+|---|---|---|
+| `sc-asset-curator` | `game/src/data/`, `game/public/assets/` | the 3D manifest, the curated 2D art and its manifest, the licence texts |
+| `sc-world-content` | `game/src/world/`, `game/src/buildings/`, `game/src/data/` | terrain, water, nature scatter, the building catalogue, placement rules, library-model integration |
+| `sc-simulation` | `game/src/economy/`, `game/src/mobility/`, `game/src/population/`, `game/src/services/` | treasury and budget cycle, road network and traffic, citizens and happiness, service coverage |
+| `sc-interface` | `game/src/ui/`, `game/src/studio/` | the HUD, the camera rig, the tools, the building shop, the SCC Studio voxel editor |
+| `sc-integration` | `game/src/main.js`, `game/src/core/`, `game/src/render/`, the build, the harnesses | the bootstrap, the frame loop, the input dispatch, the cross-domain wiring, the build, the acceptance harness |
+
+`game/src/core/CONTRACT.md` is the binding contract between them: it defines
+the shared `ctx`, the event bus, the asset and renderer services, and the exact
+public API of every domain. Nobody changes another domain's public API.
+
 
 ## Run it
 

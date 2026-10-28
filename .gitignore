@@ -27,3 +27,6 @@ game/public/assets/*.zip
 .DS_Store
 *.log
 Thumbs.db
+
+# Tool runtime state, not project content.
+.serena/
