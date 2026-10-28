@@ -7,7 +7,7 @@
   },
   "images": {
     "tool.inspect": {
-      "file": "/assets/ui/tool-inspect.png",
+      "file": "assets/ui/tool-inspect.png",
       "role": "icon",
       "slot": "tool.inspect",
       "w": 32,
@@ -20,7 +20,7 @@
       "disposition": "use"
     },
     "tool.build": {
-      "file": "/assets/ui/tool-build.png",
+      "file": "assets/ui/tool-build.png",
       "role": "icon",
       "slot": "tool.build",
       "w": 64,
@@ -33,7 +33,7 @@
       "disposition": "use"
     },
     "tool.bulldoze": {
-      "file": "/assets/ui/tool-bulldoze.png",
+      "file": "assets/ui/tool-bulldoze.png",
       "role": "icon",
       "slot": "tool.bulldoze",
       "w": 64,
@@ -46,7 +46,7 @@
       "disposition": "use"
     },
     "tool.road": {
-      "file": "/assets/ui/tool-road.png",
+      "file": "assets/ui/tool-road.png",
       "role": "icon",
       "slot": "tool.road",
       "w": 11,
@@ -54,12 +54,12 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "EPS_Clipart",
-      "title": "Traffic light \u00b7 SL927C~1",
+      "title": "Traffic light · SL927C~1",
       "style": "pixel-art-noisy-bg",
       "disposition": "use"
     },
     "tool.terraform": {
-      "file": "/assets/ui/tool-terraform.png",
+      "file": "assets/ui/tool-terraform.png",
       "role": "icon",
       "slot": "tool.terraform",
       "w": 55,
@@ -67,13 +67,13 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Samples",
-      "title": "Man with shovel \u00b7 g0215572",
+      "title": "Man with shovel · g0215572",
       "style": "pixel-art",
       "disposition": "use",
       "backdropRemoved": 1925
     },
     "tool.paint": {
-      "file": "/assets/ui/tool-paint.png",
+      "file": "assets/ui/tool-paint.png",
       "role": "icon",
       "slot": "tool.paint",
       "w": 62,
@@ -86,7 +86,7 @@
       "disposition": "use"
     },
     "tool.voxel": {
-      "file": "/assets/ui/tool-voxel.png",
+      "file": "assets/ui/tool-voxel.png",
       "role": "icon",
       "slot": "tool.voxel",
       "w": 64,
@@ -94,13 +94,13 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Brick laying \u00b7 j0084528",
+      "title": "Brick laying · j0084528",
       "style": "pixel-art",
       "disposition": "use",
       "backdropRemoved": 978
     },
     "tool.place": {
-      "file": "/assets/ui/tool-place.png",
+      "file": "assets/ui/tool-place.png",
       "role": "icon",
       "slot": "tool.place",
       "w": 64,
@@ -108,13 +108,13 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Pixel art \u00b7 SL00638_",
+      "title": "Pixel art · SL00638_",
       "style": "pixel-art",
       "disposition": "reslot",
       "backdropRemoved": 1179
     },
     "cat.residential": {
-      "file": "/assets/ui/cat-residential.png",
+      "file": "assets/ui/cat-residential.png",
       "role": "icon",
       "slot": "category.residential",
       "w": 64,
@@ -122,13 +122,13 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Home icon \u00b7 BL00130_",
+      "title": "Home icon · BL00130_",
       "style": "pixel-art",
       "disposition": "use",
       "backdropRemoved": 1026
     },
     "cat.commercial": {
-      "file": "/assets/ui/cat-commercial.png",
+      "file": "assets/ui/cat-commercial.png",
       "role": "icon",
       "slot": "category.commercial",
       "w": 64,
@@ -136,13 +136,13 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Home icon \u00b7 BS00401_",
+      "title": "Home icon · BS00401_",
       "style": "pixel-art",
       "disposition": "use",
       "backdropRemoved": 770
     },
     "cat.industrial": {
-      "file": "/assets/ui/cat-industrial.png",
+      "file": "assets/ui/cat-industrial.png",
       "role": "icon",
       "slot": "category.industrial",
       "w": 64,
@@ -150,13 +150,13 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Home icon \u00b7 IN00691_",
+      "title": "Home icon · IN00691_",
       "style": "pixel-art",
       "disposition": "use",
       "backdropRemoved": 911
     },
     "cat.energy": {
-      "file": "/assets/ui/cat-energy.png",
+      "file": "assets/ui/cat-energy.png",
       "role": "icon",
       "slot": "category.energy",
       "w": 64,
@@ -164,13 +164,13 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Home icon \u00b7 IN00671_",
+      "title": "Home icon · IN00671_",
       "style": "pixel-art",
       "disposition": "use",
       "backdropRemoved": 759
     },
     "cat.water": {
-      "file": "/assets/ui/cat-water.png",
+      "file": "assets/ui/cat-water.png",
       "role": "icon",
       "slot": "category.water",
       "w": 64,
@@ -183,7 +183,7 @@
       "disposition": "use"
     },
     "cat.food": {
-      "file": "/assets/ui/cat-food.png",
+      "file": "assets/ui/cat-food.png",
       "role": "icon",
       "slot": "category.food",
       "w": 48,
@@ -191,12 +191,12 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Farm \u00b7 BL00364A",
+      "title": "Farm · BL00364A",
       "style": "pixel-art",
       "disposition": "use"
     },
     "cat.waste": {
-      "file": "/assets/ui/cat-waste.png",
+      "file": "assets/ui/cat-waste.png",
       "role": "icon",
       "slot": "category.waste",
       "w": 64,
@@ -209,7 +209,7 @@
       "disposition": "use"
     },
     "cat.health": {
-      "file": "/assets/ui/cat-health.png",
+      "file": "assets/ui/cat-health.png",
       "role": "icon",
       "slot": "category.health",
       "w": 64,
@@ -217,13 +217,13 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Samples",
-      "title": "Medical symbol \u00b7 g0131413",
+      "title": "Medical symbol · g0131413",
       "style": "pixel-art",
       "disposition": "use",
       "backdropRemoved": 234
     },
     "cat.police": {
-      "file": "/assets/ui/cat-police.png",
+      "file": "assets/ui/cat-police.png",
       "role": "icon",
       "slot": "category.police",
       "w": 48,
@@ -231,12 +231,12 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Pixel art \u00b7 TN00738A",
+      "title": "Pixel art · TN00738A",
       "style": "pixel-art",
       "disposition": "use"
     },
     "cat.fire": {
-      "file": "/assets/ui/cat-fire.png",
+      "file": "assets/ui/cat-fire.png",
       "role": "icon",
       "slot": "category.fire",
       "w": 46,
@@ -244,13 +244,13 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Firefighter \u00b7 j0350609",
+      "title": "Firefighter · j0350609",
       "style": "pixel-art",
       "disposition": "use",
       "backdropRemoved": 396
     },
     "cat.education": {
-      "file": "/assets/ui/cat-education.png",
+      "file": "assets/ui/cat-education.png",
       "role": "icon",
       "slot": "category.education",
       "w": 64,
@@ -263,7 +263,7 @@
       "disposition": "use"
     },
     "cat.transit": {
-      "file": "/assets/ui/cat-transit.png",
+      "file": "assets/ui/cat-transit.png",
       "role": "icon",
       "slot": "category.transit",
       "w": 48,
@@ -271,13 +271,13 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Bus \u00b7 j0079138",
+      "title": "Bus · j0079138",
       "style": "pixel-art",
       "disposition": "use",
       "backdropRemoved": 861
     },
     "cat.parks": {
-      "file": "/assets/ui/cat-parks.png",
+      "file": "assets/ui/cat-parks.png",
       "role": "icon",
       "slot": "category.parks",
       "w": 64,
@@ -290,7 +290,7 @@
       "disposition": "use"
     },
     "cat.decoration": {
-      "file": "/assets/ui/cat-decoration.png",
+      "file": "assets/ui/cat-decoration.png",
       "role": "icon",
       "slot": "category.decoration",
       "w": 64,
@@ -304,7 +304,7 @@
       "backdropRemoved": 2138
     },
     "cat.special": {
-      "file": "/assets/ui/cat-special.png",
+      "file": "assets/ui/cat-special.png",
       "role": "icon",
       "slot": "category.special",
       "w": 48,
@@ -312,12 +312,12 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Trophy \u00b7 BS00841A",
+      "title": "Trophy · BS00841A",
       "style": "pixel-art",
       "disposition": "use"
     },
     "cat.infrastructure": {
-      "file": "/assets/ui/cat-infrastructure.png",
+      "file": "assets/ui/cat-infrastructure.png",
       "role": "icon",
       "slot": "category.infrastructure",
       "w": 55,
@@ -330,7 +330,7 @@
       "disposition": "use"
     },
     "hud.treasury": {
-      "file": "/assets/ui/hud-treasury.png",
+      "file": "assets/ui/hud-treasury.png",
       "role": "icon",
       "slot": "hud.treasury",
       "w": 64,
@@ -343,7 +343,7 @@
       "disposition": "use"
     },
     "hud.population": {
-      "file": "/assets/ui/hud-population.png",
+      "file": "assets/ui/hud-population.png",
       "role": "icon",
       "slot": "hud.population",
       "w": 64,
@@ -356,7 +356,7 @@
       "disposition": "use"
     },
     "hud.happiness": {
-      "file": "/assets/ui/hud-happiness.png",
+      "file": "assets/ui/hud-happiness.png",
       "role": "icon",
       "slot": "hud.happiness",
       "w": 45,
@@ -364,12 +364,12 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Pixel art \u00b7 AG00310_",
+      "title": "Pixel art · AG00310_",
       "style": "pixel-art",
       "disposition": "use"
     },
     "hud.celebration": {
-      "file": "/assets/ui/hud-celebration.png",
+      "file": "assets/ui/hud-celebration.png",
       "role": "icon",
       "slot": "hud.celebration",
       "w": 64,
@@ -382,7 +382,7 @@
       "disposition": "reslot"
     },
     "hud.loyalty": {
-      "file": "/assets/ui/hud-loyalty.png",
+      "file": "assets/ui/hud-loyalty.png",
       "role": "icon",
       "slot": "hud.loyalty",
       "w": 48,
@@ -390,12 +390,12 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Pixel art \u00b7 BS00868A",
+      "title": "Pixel art · BS00868A",
       "style": "pixel-art",
       "disposition": "use"
     },
     "hud.approval": {
-      "file": "/assets/ui/hud-loyalty.png",
+      "file": "assets/ui/hud-loyalty.png",
       "role": "icon",
       "slot": "hud.approval",
       "w": 48,
@@ -403,12 +403,12 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Pixel art \u00b7 BS00868A",
+      "title": "Pixel art · BS00868A",
       "style": "pixel-art",
       "disposition": "reslot"
     },
     "hud.survey": {
-      "file": "/assets/ui/hud-survey.png",
+      "file": "assets/ui/hud-survey.png",
       "role": "icon",
       "slot": "hud.survey",
       "w": 41,
@@ -416,13 +416,13 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Samples",
-      "title": "Antenna \u00b7 g0404990",
+      "title": "Antenna · g0404990",
       "style": "vector-illustration",
       "disposition": "reslot",
       "backdropRemoved": 1545
     },
     "hud.announce": {
-      "file": "/assets/ui/hud-announce.png",
+      "file": "assets/ui/hud-announce.png",
       "role": "icon",
       "slot": "hud.announce",
       "w": 38,
@@ -435,7 +435,7 @@
       "disposition": "use"
     },
     "hud.status": {
-      "file": "/assets/ui/hud-status.png",
+      "file": "assets/ui/hud-status.png",
       "role": "icon",
       "slot": "hud.status",
       "w": 32,
@@ -443,12 +443,12 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "10000.HighDefinition.PNG.Icon.Pack",
-      "title": "Warning icon \u00b7 !",
+      "title": "Warning icon · !",
       "style": "glossy-3d",
       "disposition": "use"
     },
     "hud.save": {
-      "file": "/assets/ui/hud-save.png",
+      "file": "assets/ui/hud-save.png",
       "role": "icon",
       "slot": "hud.save",
       "w": 32,
@@ -456,12 +456,12 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "10000.HighDefinition.PNG.Icon.Pack",
-      "title": "Floppy disk \u00b7 0",
+      "title": "Floppy disk · 0",
       "style": "glossy-3d",
       "disposition": "use"
     },
     "hud.load": {
-      "file": "/assets/ui/hud-load.png",
+      "file": "assets/ui/hud-load.png",
       "role": "icon",
       "slot": "hud.load",
       "w": 32,
@@ -474,7 +474,7 @@
       "disposition": "reslot"
     },
     "hud.settings": {
-      "file": "/assets/ui/hud-settings.png",
+      "file": "assets/ui/hud-settings.png",
       "role": "icon",
       "slot": "hud.settings",
       "w": 54,
@@ -487,7 +487,7 @@
       "disposition": "use"
     },
     "hud.play": {
-      "file": "/assets/ui/hud-speed-play.png",
+      "file": "assets/ui/hud-speed-play.png",
       "role": "icon",
       "slot": "hud.play",
       "w": 100,
@@ -495,12 +495,12 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Pixel art \u00b7 BD14843_",
+      "title": "Pixel art · BD14843_",
       "style": "pixel-art",
       "disposition": "use"
     },
     "hud.pause": {
-      "file": "/assets/ui/hud-speed-pause.png",
+      "file": "assets/ui/hud-speed-pause.png",
       "role": "icon",
       "slot": "hud.pause",
       "w": 95,
@@ -508,12 +508,12 @@
       "alpha": false,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Pixel art \u00b7 BD14758_",
+      "title": "Pixel art · BD14758_",
       "style": "pixel-art",
       "disposition": "use"
     },
     "hud.score": {
-      "file": "/assets/ui/cat-special.png",
+      "file": "assets/ui/cat-special.png",
       "role": "icon",
       "slot": "hud.score",
       "w": 48,
@@ -521,12 +521,12 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Trophy \u00b7 BS00841A",
+      "title": "Trophy · BS00841A",
       "style": "pixel-art",
       "disposition": "use"
     },
     "hud.shop": {
-      "file": "/assets/ui/cat-commercial.png",
+      "file": "assets/ui/cat-commercial.png",
       "role": "icon",
       "slot": "hud.shop",
       "w": 64,
@@ -534,13 +534,13 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Home icon \u00b7 BS00401_",
+      "title": "Home icon · BS00401_",
       "style": "pixel-art",
       "disposition": "use",
       "backdropRemoved": 770
     },
     "hud.day": {
-      "file": "/assets/ui/bg-sky.png",
+      "file": "assets/ui/bg-sky.png",
       "role": "icon",
       "slot": "hud.day",
       "w": 488,
@@ -548,12 +548,12 @@
       "alpha": false,
       "licence": "unverified",
       "pack": "Samples",
-      "title": "Pixel art \u00b7 g0106143",
+      "title": "Pixel art · g0106143",
       "style": "pixel-art",
       "disposition": "use"
     },
     "hud.government": {
-      "file": "/assets/ui/cat-special.png",
+      "file": "assets/ui/cat-special.png",
       "role": "icon",
       "slot": "hud.government",
       "w": 48,
@@ -561,12 +561,12 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Trophy \u00b7 BS00841A",
+      "title": "Trophy · BS00841A",
       "style": "pixel-art",
       "disposition": "use"
     },
     "hud.minimap": {
-      "file": "/assets/ui/bg-title.png",
+      "file": "assets/ui/bg-title.png",
       "role": "icon",
       "slot": "hud.minimap",
       "w": 482,
@@ -574,12 +574,12 @@
       "alpha": false,
       "licence": "unverified",
       "pack": "Samples",
-      "title": "Pixel art \u00b7 g0106185",
+      "title": "Pixel art · g0106185",
       "style": "pixel-art",
       "disposition": "use"
     },
     "reward.coins": {
-      "file": "/assets/ui/reward-coins.png",
+      "file": "assets/ui/reward-coins.png",
       "role": "icon",
       "slot": "reward.coins",
       "w": 48,
@@ -587,12 +587,12 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Pixel art \u00b7 j0336379",
+      "title": "Pixel art · j0336379",
       "style": "pixel-art",
       "disposition": "use"
     },
     "ui.panel": {
-      "file": "/assets/ui/ui-panel.png",
+      "file": "assets/ui/ui-panel.png",
       "role": "panel",
       "slot": "ui.panel",
       "w": 1024,
@@ -605,7 +605,7 @@
       "disposition": "use"
     },
     "ui.panel.alt": {
-      "file": "/assets/ui/ui-panel-alt.png",
+      "file": "assets/ui/ui-panel-alt.png",
       "role": "panel",
       "slot": "ui.panel.alt",
       "w": 762,
@@ -618,7 +618,7 @@
       "disposition": "use"
     },
     "ui.button": {
-      "file": "/assets/ui/ui-button.png",
+      "file": "assets/ui/ui-button.png",
       "role": "button",
       "slot": "ui.button",
       "w": 64,
@@ -631,7 +631,7 @@
       "disposition": "use"
     },
     "ui.tab": {
-      "file": "/assets/ui/ui-tab.png",
+      "file": "assets/ui/ui-tab.png",
       "role": "panel",
       "slot": "ui.tab",
       "w": 1024,
@@ -644,7 +644,7 @@
       "disposition": "use"
     },
     "ui.slider": {
-      "file": "/assets/ui/ui-slider.png",
+      "file": "assets/ui/ui-slider.png",
       "role": "button",
       "slot": "ui.slider",
       "w": 100,
@@ -652,12 +652,12 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Pixel art \u00b7 BD15104_",
+      "title": "Pixel art · BD15104_",
       "style": "pixel-art",
       "disposition": "use"
     },
     "ui.slider.alt": {
-      "file": "/assets/ui/ui-slider-alt.png",
+      "file": "assets/ui/ui-slider-alt.png",
       "role": "button",
       "slot": "ui.slider.alt",
       "w": 100,
@@ -665,12 +665,12 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Pixel art \u00b7 BD21539_",
+      "title": "Pixel art · BD21539_",
       "style": "pixel-art",
       "disposition": "use"
     },
     "ui.progress": {
-      "file": "/assets/ui/ui-progress.png",
+      "file": "assets/ui/ui-progress.png",
       "role": "button",
       "slot": "ui.progress",
       "w": 100,
@@ -678,12 +678,12 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Pixel art \u00b7 BD15118_",
+      "title": "Pixel art · BD15118_",
       "style": "pixel-art",
       "disposition": "use"
     },
     "ui.fill-bar": {
-      "file": "/assets/ui/hud-speed-play.png",
+      "file": "assets/ui/hud-speed-play.png",
       "role": "button",
       "slot": "ui.fill-bar",
       "w": 100,
@@ -691,12 +691,12 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Pixel art \u00b7 BD14843_",
+      "title": "Pixel art · BD14843_",
       "style": "pixel-art",
       "disposition": "reslot"
     },
     "ui.fill-bar-alt": {
-      "file": "/assets/ui/hud-speed-pause.png",
+      "file": "assets/ui/hud-speed-pause.png",
       "role": "button",
       "slot": "ui.fill-bar-alt",
       "w": 95,
@@ -704,12 +704,12 @@
       "alpha": false,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Pixel art \u00b7 BD14758_",
+      "title": "Pixel art · BD14758_",
       "style": "pixel-art",
       "disposition": "reslot"
     },
     "ui.checkbox": {
-      "file": "/assets/ui/ui-checkbox.png",
+      "file": "assets/ui/ui-checkbox.png",
       "role": "button",
       "slot": "ui.checkbox",
       "w": 32,
@@ -722,7 +722,7 @@
       "disposition": "use"
     },
     "panel.search": {
-      "file": "/assets/ui/tool-inspect.png",
+      "file": "assets/ui/tool-inspect.png",
       "role": "icon",
       "slot": "panel.search",
       "w": 32,
@@ -735,7 +735,7 @@
       "disposition": "use"
     },
     "toast.info": {
-      "file": "/assets/ui/hud-info.png",
+      "file": "assets/ui/hud-info.png",
       "role": "icon",
       "slot": "toast.info",
       "w": 32,
@@ -748,7 +748,7 @@
       "disposition": "use"
     },
     "toast.success": {
-      "file": "/assets/ui/ui-checkbox.png",
+      "file": "assets/ui/ui-checkbox.png",
       "role": "icon",
       "slot": "toast.success",
       "w": 32,
@@ -761,7 +761,7 @@
       "disposition": "use"
     },
     "toast.warn": {
-      "file": "/assets/ui/hud-status.png",
+      "file": "assets/ui/hud-status.png",
       "role": "icon",
       "slot": "toast.warn",
       "w": 32,
@@ -769,12 +769,12 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "10000.HighDefinition.PNG.Icon.Pack",
-      "title": "Warning icon \u00b7 !",
+      "title": "Warning icon · !",
       "style": "glossy-3d",
       "disposition": "use"
     },
     "toast.error": {
-      "file": "/assets/ui/effect-dust.png",
+      "file": "assets/ui/effect-dust.png",
       "role": "icon",
       "slot": "toast.error",
       "w": 64,
@@ -787,7 +787,7 @@
       "disposition": "use"
     },
     "bg.sky": {
-      "file": "/assets/ui/bg-sky.png",
+      "file": "assets/ui/bg-sky.png",
       "role": "background",
       "slot": "bg.sky",
       "w": 488,
@@ -795,12 +795,12 @@
       "alpha": false,
       "licence": "unverified",
       "pack": "Samples",
-      "title": "Pixel art \u00b7 g0106143",
+      "title": "Pixel art · g0106143",
       "style": "pixel-art",
       "disposition": "use"
     },
     "bg.ground": {
-      "file": "/assets/ui/bg-ground.png",
+      "file": "assets/ui/bg-ground.png",
       "role": "background",
       "slot": "bg.ground",
       "w": 483,
@@ -808,12 +808,12 @@
       "alpha": false,
       "licence": "unverified",
       "pack": "Samples",
-      "title": "Pixel art \u00b7 g0106206",
+      "title": "Pixel art · g0106206",
       "style": "pixel-art",
       "disposition": "use"
     },
     "bg.water": {
-      "file": "/assets/ui/bg-water.png",
+      "file": "assets/ui/bg-water.png",
       "role": "background",
       "slot": "bg.water",
       "w": 483,
@@ -821,12 +821,12 @@
       "alpha": false,
       "licence": "unverified",
       "pack": "Samples",
-      "title": "Pixel art \u00b7 g0106160",
+      "title": "Pixel art · g0106160",
       "style": "pixel-art",
       "disposition": "use"
     },
     "bg.title": {
-      "file": "/assets/ui/bg-title.png",
+      "file": "assets/ui/bg-title.png",
       "role": "background",
       "slot": "bg.title",
       "w": 482,
@@ -834,12 +834,12 @@
       "alpha": false,
       "licence": "unverified",
       "pack": "Samples",
-      "title": "Pixel art \u00b7 g0106185",
+      "title": "Pixel art · g0106185",
       "style": "pixel-art",
       "disposition": "use"
     },
     "bg.menu": {
-      "file": "/assets/ui/bg-menu.png",
+      "file": "assets/ui/bg-menu.png",
       "role": "background",
       "slot": "bg.menu",
       "w": 482,
@@ -847,12 +847,12 @@
       "alpha": false,
       "licence": "unverified",
       "pack": "Samples",
-      "title": "Pixel art \u00b7 g0106218",
+      "title": "Pixel art · g0106218",
       "style": "pixel-art",
       "disposition": "use"
     },
     "bg.desert": {
-      "file": "/assets/ui/bg-desert.png",
+      "file": "assets/ui/bg-desert.png",
       "role": "background",
       "slot": "bg.desert",
       "w": 200,
@@ -860,12 +860,12 @@
       "alpha": false,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Sand \u00b7 j0157683",
+      "title": "Sand · j0157683",
       "style": "vector-illustration",
       "disposition": "reslot"
     },
     "bg.lake": {
-      "file": "/assets/ui/bg-lake.png",
+      "file": "assets/ui/bg-lake.png",
       "role": "background",
       "slot": "bg.lake",
       "w": 452,
@@ -873,12 +873,12 @@
       "alpha": false,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Lake \u00b7 j0194850",
+      "title": "Lake · j0194850",
       "style": "photographic",
       "disposition": "reslot"
     },
     "portrait.c3": {
-      "file": "/assets/ui/portrait-c3.png",
+      "file": "assets/ui/portrait-c3.png",
       "role": "portrait",
       "slot": "portrait.citizen.3",
       "w": 86,
@@ -886,13 +886,13 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Samples",
-      "title": "Pixel art \u00b7 g0140482",
+      "title": "Pixel art · g0140482",
       "style": "pixel-art",
       "disposition": "use",
       "backdropRemoved": 3633
     },
     "portrait.c4": {
-      "file": "/assets/ui/portrait-c4.png",
+      "file": "assets/ui/portrait-c4.png",
       "role": "portrait",
       "slot": "portrait.citizen.4",
       "w": 90,
@@ -900,13 +900,13 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Samples",
-      "title": "Pixel art \u00b7 g0211383",
+      "title": "Pixel art · g0211383",
       "style": "pixel-art",
       "disposition": "use",
       "backdropRemoved": 4623
     },
     "portrait.c5": {
-      "file": "/assets/ui/portrait-c5.png",
+      "file": "assets/ui/portrait-c5.png",
       "role": "portrait",
       "slot": "portrait.citizen.5",
       "w": 68,
@@ -914,13 +914,13 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Pixel art \u00b7 j0195522",
+      "title": "Pixel art · j0195522",
       "style": "pixel-art",
       "disposition": "use",
       "backdropRemoved": 2501
     },
     "portrait.c6": {
-      "file": "/assets/ui/portrait-c6.png",
+      "file": "assets/ui/portrait-c6.png",
       "role": "portrait",
       "slot": "portrait.citizen.6",
       "w": 109,
@@ -928,13 +928,13 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Pixel art \u00b7 BD05881_",
+      "title": "Pixel art · BD05881_",
       "style": "pixel-art",
       "disposition": "use",
       "backdropRemoved": 6350
     },
     "portrait.c7": {
-      "file": "/assets/ui/portrait-c7.png",
+      "file": "assets/ui/portrait-c7.png",
       "role": "portrait",
       "slot": "portrait.citizen.7",
       "w": 89,
@@ -942,13 +942,13 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Samples",
-      "title": "Pixel art \u00b7 g0211379",
+      "title": "Pixel art · g0211379",
       "style": "pixel-art",
       "disposition": "use",
       "backdropRemoved": 3461
     },
     "sprite.citizen.1": {
-      "file": "/assets/ui/sprite-citizen-1.png",
+      "file": "assets/ui/sprite-citizen-1.png",
       "role": "portrait",
       "slot": "sprite.citizen.1",
       "w": 81,
@@ -956,13 +956,13 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Samples",
-      "title": "Pixel art \u00b7 g0215587",
+      "title": "Pixel art · g0215587",
       "style": "illustration",
       "disposition": "use",
       "backdropRemoved": 7029
     },
     "sprite.citizen.2": {
-      "file": "/assets/ui/sprite-citizen-2.png",
+      "file": "assets/ui/sprite-citizen-2.png",
       "role": "portrait",
       "slot": "sprite.citizen.2",
       "w": 79,
@@ -970,13 +970,13 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Samples",
-      "title": "Pixel art \u00b7 g0220133",
+      "title": "Pixel art · g0220133",
       "style": "illustration",
       "disposition": "use",
       "backdropRemoved": 902
     },
     "effect.smoke": {
-      "file": "/assets/ui/effect-smoke.png",
+      "file": "assets/ui/effect-smoke.png",
       "role": "effect",
       "slot": "effect.smoke",
       "w": 41,
@@ -989,7 +989,7 @@
       "disposition": "use"
     },
     "effect.happy": {
-      "file": "/assets/ui/hud-happiness.png",
+      "file": "assets/ui/hud-happiness.png",
       "role": "effect",
       "slot": "effect.happy",
       "w": 45,
@@ -997,12 +997,12 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Pixel art \u00b7 AG00310_",
+      "title": "Pixel art · AG00310_",
       "style": "pixel-art",
       "disposition": "reslot"
     },
     "effect.sad": {
-      "file": "/assets/ui/effect-sad.png",
+      "file": "assets/ui/effect-sad.png",
       "role": "effect",
       "slot": "effect.sad",
       "w": 45,
@@ -1010,12 +1010,12 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Pixel art \u00b7 AG00309_",
+      "title": "Pixel art · AG00309_",
       "style": "pixel-art",
       "disposition": "reslot"
     },
     "fx.ink": {
-      "file": "/assets/ui/effect-dust.png",
+      "file": "assets/ui/effect-dust.png",
       "role": "effect",
       "slot": "fx.ink",
       "w": 64,
@@ -1028,7 +1028,7 @@
       "disposition": "reslot"
     },
     "special.crest": {
-      "file": "/assets/ui/special-crest.png",
+      "file": "assets/ui/special-crest.png",
       "role": "effect",
       "slot": "special.crest",
       "w": 48,
@@ -1036,13 +1036,13 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Samples",
-      "title": "Pixel art \u00b7 g0134011",
+      "title": "Pixel art · g0134011",
       "style": "pixel-art",
       "disposition": "reslot",
       "backdropRemoved": 636
     },
     "tile.grass": {
-      "file": "/assets/ui/tile-grass.png",
+      "file": "assets/ui/tile-grass.png",
       "role": "tile",
       "slot": "tile.grass",
       "w": 140,
@@ -1050,12 +1050,12 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Pixel art \u00b7 BD10321_",
+      "title": "Pixel art · BD10321_",
       "style": "pixel-art",
       "disposition": "use"
     },
     "tile.sand": {
-      "file": "/assets/ui/tile-sand.png",
+      "file": "assets/ui/tile-sand.png",
       "role": "tile",
       "slot": "tile.sand",
       "w": 140,
@@ -1063,12 +1063,12 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Pixel art \u00b7 BD10316_",
+      "title": "Pixel art · BD10316_",
       "style": "pixel-art",
       "disposition": "use"
     },
     "tile.stone": {
-      "file": "/assets/ui/tile-stone.png",
+      "file": "assets/ui/tile-stone.png",
       "role": "tile",
       "slot": "tile.stone",
       "w": 140,
@@ -1076,12 +1076,12 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Pixel art \u00b7 BD14783_",
+      "title": "Pixel art · BD14783_",
       "style": "pixel-art",
       "disposition": "use"
     },
     "tile.water": {
-      "file": "/assets/ui/tile-water.png",
+      "file": "assets/ui/tile-water.png",
       "role": "tile",
       "slot": "tile.water",
       "w": 100,
@@ -1089,7 +1089,7 @@
       "alpha": true,
       "licence": "unverified",
       "pack": "Clipart",
-      "title": "Pixel art \u00b7 BD10305_",
+      "title": "Pixel art · BD10305_",
       "style": "pixel-art",
       "disposition": "use"
     },
@@ -1102,7 +1102,7 @@
       "alpha": false,
       "licence": "unverified",
       "pack": "Samples",
-      "title": "Pixel art \u00b7 g0211384",
+      "title": "Pixel art · g0211384",
       "style": "anime",
       "disposition": "exclude",
       "note": "anime-style portrait - stylistically incompatible with the 16-bit HUD"
@@ -1116,7 +1116,7 @@
       "alpha": false,
       "licence": "unverified",
       "pack": "Samples",
-      "title": "Face - female \u00b7 g0140409",
+      "title": "Face - female · g0140409",
       "style": "anime",
       "disposition": "exclude",
       "note": "anime-style portrait - stylistically incompatible with the 16-bit HUD"

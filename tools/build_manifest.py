@@ -307,7 +307,7 @@ def main() -> int:
                 cells_x = max(1, math.ceil(sw / CELL - 0.02))
                 cells_z = max(1, math.ceil(sd / CELL - 0.02))
                 rec = {
-                    "file": f"/assets/models/{family}/{f.name}",
+                    "file": f"assets/models/{family}/{f.name}",
                     "family": family,
                     "licence": PACKS[family][1],
                     "srcBBox": {

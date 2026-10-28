@@ -227,8 +227,10 @@ describe('no placeholder or generated art', () => {
     for (const f of files) {
       if (f.includes('data/manifest.json')) continue;
       const src = readFileSync(f, 'utf8');
-      // A hard-coded "/assets/models/..." literal bypasses the manifest.
-      const m = src.match(/['"]\/assets\/models\/[^'"]+['"]/g);
+      // A hard-coded "assets/models/..." literal bypasses the manifest.
+      // Both the absolute and the relative form are caught: the paths are
+      // relative to the page, so the game also runs under a sub-path.
+      const m = src.match(/['"](?:\/)?assets\/models\/[^'"]+['"]/g);
       if (m) offenders.push(`${relative(SRC, f)}: ${m.join(', ')}`);
     }
     assert.deepEqual(offenders, [],
@@ -241,12 +243,13 @@ describe('no placeholder or generated art', () => {
     for (const f of files) {
       const src = readFileSync(f, 'utf8');
       // Allowed: the 3D model bundle, the 2D UI bundle, and the 2D manifest
-      // that the UI domain loads at runtime.
-      const m = src.match(/['"]\/assets\/(?!models\/|ui\/|ui-assets\.json)[^'"]+['"]/g);
+      // that the UI domain loads at runtime. Both the absolute and the
+      // relative form are allowed; anything else is an outside reference.
+      const m = src.match(/['"](?:\/)?assets\/(?!models\/|ui\/|ui-assets\.json)[^'"]+['"]/g);
       if (m) offenders.push(`${relative(SRC, f)}: ${m.join(', ')}`);
     }
     assert.deepEqual(offenders, [],
-      'asset references must stay inside /assets/models/, /assets/ui/ or /assets/ui-assets.json');
+      'asset references must stay inside assets/models/, assets/ui/ or assets/ui-assets.json');
   });
 });
 
@@ -425,7 +428,10 @@ describe('the curated 2D art reaches the HUD', () => {
   test('the 2D art is served as static files under public/assets/ui', { skip: !manifestPath && 'no 2D manifest published yet' }, () => {
     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
     const files = Object.values(manifest.images).map((r) => r?.file).filter(Boolean);
-    const outside = files.filter((f) => !f.startsWith('/assets/ui/'));
+    // The icons must live under the ui folder. The path may be absolute or
+    // relative to the page — the game runs at a host root and under a
+    // sub-path — but it must be under assets/ui/.
+    const outside = files.filter((f) => !/^\/?assets\/ui\//.test(f));
     assert.deepEqual(outside, [], `icons must live under /assets/ui/: ${outside.slice(0, 3).join(', ')}`);
     assert.ok(existsSync(join(PUBLIC, 'assets', 'ui')), 'public/assets/ui must exist');
   });

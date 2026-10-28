@@ -35,12 +35,14 @@ import { ensureStyles } from './styles.js';
 
 /** Where the curated 2D manifest may live. None of these are required. */
 export const UI_ASSET_CANDIDATES = Object.freeze([
-  // The PUBLIC copy is the one that exists in BOTH the dev server and the
-  // built bundle, so it is tried first: with the dev-server path first, every
-  // production boot logged a 404 for a file that only exists in development.
-  '/assets/ui-assets.json',    // public/ — the dev server and the build
-  '/src/data/ui-assets.json',  // a dev server without the public copy
-  './ui-assets.json',          // next to the bundle
+  // The RELATIVE path is tried first: it resolves against the page, so the
+  // game works at the root of a host AND under a sub-path (a GitHub Pages
+  // project site serves at /<repo>/). The absolute candidates stay as
+  // fallbacks for a host that mounts the assets at the server root.
+  'assets/ui-assets.json',    // relative to the page — works at any base
+  '/assets/ui-assets.json',   // public/ — the dev server and the build
+  '/src/data/ui-assets.json', // a dev server without the public copy
+  './ui-assets.json',         // next to the bundle
 ]);
 
 /** The icon slots the HUD knows how to consume. */
