@@ -543,9 +543,13 @@ try {
   const art = await page.evaluate(async () => {
     const icons = [...document.querySelectorAll('#ui-root img.sc-icon')];
     const srcs = [...new Set(icons.map((i) => i.getAttribute('src')).filter(Boolean))];
-    // Which manifest can be reached?
+    // Which manifest can be reached? The SAME candidates the HUD tries, in
+    // the same order: the relative path first, so a deployment under a
+    // sub-path (a GitHub Pages project site serves at /<repo>/) is found
+    // too. Probing only the absolute paths made a full build look like a
+    // cleared one.
     let manifest = null;
-    for (const candidate of ['/assets/ui-assets.json', '/src/data/ui-assets.json']) {
+    for (const candidate of ['assets/ui-assets.json', '/assets/ui-assets.json', '/src/data/ui-assets.json']) {
       try {
         const res = await fetch(candidate, { cache: 'no-cache' });
         if (!res.ok) continue;
@@ -568,8 +572,8 @@ try {
   evidence.sections.art = art;
   if (!art.manifest) {
     skip('the 2D HUD art is applied and its files resolve',
-      'no 2D manifest found at /assets/ui-assets.json or /src/data/ui-assets.json — '
-      + 'the asset curator has not published it yet');
+      'no 2D manifest found at assets/ui-assets.json, /assets/ui-assets.json or '
+      + '/src/data/ui-assets.json — the asset curator has not published it yet');
     // The CLEARED build (npm run build:cleared) deliberately ships no 2D art.
     // The HUD must still be COMPLETE and CORRECT: every control present, and
     // the licence line hidden (there is no art to disclaim).
@@ -587,7 +591,7 @@ try {
       };
     });
     check('the HUD is complete and correct with ZERO 2D images',
-      bare.buttons >= 80 && bare.labelled >= 40 && bare.licenceHidden === true,
+      bare.buttons >= 80 && bare.labelled >= 40 && bare.licenceHidden === true && bare.images === 0,
       `${bare.buttons} buttons, ${bare.labelled} labelled, ${bare.images} images, `
       + `licence line hidden: ${bare.licenceHidden}`);
     evidence.sections.bareHud = bare;

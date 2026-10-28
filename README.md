@@ -3,6 +3,12 @@
 A retro 16-bit-palette **voxel city builder** for the browser. Three.js 0.169 +
 Vite 5, ES modules, no TypeScript.
 
+## ▶ Play it
+
+**https://atiffhussainkhan.github.io/SuperCitycon/**
+
+Click the link, and the city is live in your browser. Nothing to install.
+
 Every piece of art and animation comes from the owner's own asset library.
 Nothing is generated, redrawn or substituted.
 

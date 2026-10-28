@@ -1,0 +1,452 @@
+{
+  "url": "https://atiffhussainkhan.github.io/SuperCitycon/",
+  "label": "https://atiffhussainkhan.github.io/SuperCitycon/",
+  "sections": {
+    "boot": {
+      "log": [
+        "preloaded 128/128 models (0 failures)",
+        "domain \"wld\" ready",
+        "domain \"buildings\" ready",
+        "domain \"economy\" ready",
+        "domain \"mobility\" ready",
+        "domain \"population\" ready",
+        "domain \"services\" ready",
+        "domain \"studio\" ready",
+        "domain \"ui\" ready",
+        "boot complete"
+      ],
+      "domains": [
+        "wld",
+        "buildings",
+        "economy",
+        "mobility",
+        "population",
+        "services",
+        "studio",
+        "ui"
+      ],
+      "core": [
+        "stage",
+        "save",
+        "modes"
+      ],
+      "fatalVisible": false
+    },
+    "world": {
+      "cells": 4096,
+      "scenery": 798,
+      "waterLevel": 0
+    },
+    "multiSlot": {
+      "ok": true,
+      "required": 2,
+      "total": 1,
+      "used": 0,
+      "placed": false,
+      "reason": "not-enough-slots",
+      "toasts": [
+        "No construction slot free — Monorail Station needs 2 slots (1 free)."
+      ]
+    },
+    "gate": {
+      "speedOk": true,
+      "cell": {
+        "cx": 22,
+        "cz": 24
+      },
+      "steps": [],
+      "slots": {
+        "total": 1,
+        "used": 1,
+        "free": 0
+      },
+      "toasts": [
+        {
+          "message": "No construction slot free — Monorail Station needs 2 slots (1 free).",
+          "kind": "warn"
+        },
+        {
+          "message": "No construction slot free — House needs 1 slot (0 free).",
+          "kind": "warn"
+        }
+      ],
+      "before": {
+        "treasury": 25000,
+        "builds": 0
+      },
+      "afterFirst": {
+        "treasury": 24880,
+        "builds": 1
+      },
+      "afterSecond": {
+        "treasury": 24880,
+        "builds": 1
+      },
+      "first": {
+        "ok": true,
+        "reason": null
+      },
+      "second": {
+        "ok": false,
+        "reason": "not-enough-slots"
+      },
+      "instances": 1
+    },
+    "scenery": {
+      "ok": true,
+      "cx": 5,
+      "cz": 0,
+      "placed": true,
+      "reason": null,
+      "model": "mdvl_nature_bank_01"
+    },
+    "build": {
+      "placed": 17,
+      "failed": [
+        "trn.monorail_station@36,34: slot-timeout"
+      ],
+      "roads": 9,
+      "slotWaits": 226,
+      "types": {
+        "res.house": 1,
+        "res.apartment": 1,
+        "res.terrace_house": 1,
+        "res.semi_detached": 1,
+        "res.low_rise_flats": 1,
+        "res.mid_rise_flats": 1,
+        "com.grocery": 1,
+        "com.cafe": 1,
+        "com.office_block": 1,
+        "ind.warehouse": 1,
+        "ind.vehicle_garage": 1,
+        "hea.medical_center": 1,
+        "fir.station": 1,
+        "edu.bus_station": 1,
+        "eng.solar": 1,
+        "wat.tower": 1,
+        "prk.park": 1
+      },
+      "instances": 19,
+      "models": 19
+    },
+    "sim": {
+      "population": 602,
+      "happiness": 64.94308077171102,
+      "treasury": 25249,
+      "day": 3,
+      "vehicles": 60,
+      "congestion": 1,
+      "citizens": 25,
+      "citizensInState": 0,
+      "coverage": 10,
+      "elapsed": 92
+    },
+    "hud": {
+      "children": 2,
+      "html": 21905,
+      "buttons": 86,
+      "text": "MAYOR — TREASURY $22,732 RESIDENTS 560 HAPPINESS 60% LOYALTY 50% DAY 1 12:00 DAY 1 II S N F U RESIDENTIAL 100% COMMERCIAL 100% INDUSTRIAL 100% ENERGY 100% WATER 100% FOOD 100% WASTE 100% BUILT HEA.MEDICAL_CENTER AT 33,30 TREASURY UPDATED POPULATION 560 COVERAGE CHANGED INSPECT 1 BUILD 2 BULLDOZE 3 ROAD 4 TERRAFORM 5 PAINT 6 STUDIO 7 RESIDENTIAL 12 COMMERCIAL 10 INDUSTRIAL 4 ENERGY 5 WATER 4 FOOD &"
+    },
+    "art": {
+      "manifest": {
+        "url": "assets/ui-assets.json",
+        "images": 84
+      },
+      "iconCount": 45,
+      "srcs": [
+        "assets/ui/hud-treasury.png",
+        "assets/ui/hud-population.png",
+        "assets/ui/hud-happiness.png",
+        "assets/ui/hud-loyalty.png",
+        "assets/ui/bg-sky.png",
+        "assets/ui/hud-speed-pause.png",
+        "assets/ui/hud-speed-play.png",
+        "assets/ui/tool-inspect.png",
+        "assets/ui/tool-build.png",
+        "assets/ui/tool-bulldoze.png",
+        "assets/ui/tool-road.png",
+        "assets/ui/tool-terraform.png",
+        "assets/ui/tool-paint.png",
+        "assets/ui/tool-voxel.png",
+        "assets/ui/cat-residential.png",
+        "assets/ui/cat-commercial.png",
+        "assets/ui/cat-industrial.png",
+        "assets/ui/cat-energy.png",
+        "assets/ui/cat-water.png",
+        "assets/ui/cat-food.png",
+        "assets/ui/cat-health.png",
+        "assets/ui/cat-police.png",
+        "assets/ui/cat-fire.png",
+        "assets/ui/cat-education.png",
+        "assets/ui/cat-transit.png",
+        "assets/ui/cat-parks.png",
+        "assets/ui/cat-decoration.png",
+        "assets/ui/cat-infrastructure.png",
+        "assets/ui/cat-waste.png",
+        "assets/ui/cat-special.png"
+      ],
+      "fetches": [
+        {
+          "src": "assets/ui/hud-treasury.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/hud-population.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/hud-happiness.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/hud-loyalty.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/bg-sky.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/hud-speed-pause.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/hud-speed-play.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/tool-inspect.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/tool-build.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/tool-bulldoze.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/tool-road.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/tool-terraform.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/tool-paint.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/tool-voxel.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/cat-residential.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/cat-commercial.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/cat-industrial.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/cat-energy.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/cat-water.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/cat-food.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/cat-health.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/cat-police.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/cat-fire.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/cat-education.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/cat-transit.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/cat-parks.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/cat-decoration.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/cat-infrastructure.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/cat-waste.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        },
+        {
+          "src": "assets/ui/cat-special.png",
+          "status": 200,
+          "ok": true,
+          "type": "image/png"
+        }
+      ]
+    },
+    "pointer": {
+      "ok": true,
+      "detail": "tool=build type=res.house cell=(46,31) instances 19->20 models 19->20 (a slot was free)",
+      "target": {
+        "cx": 46,
+        "cz": 31,
+        "x": 220,
+        "y": 160
+      },
+      "before": {
+        "tool": "inspect",
+        "instances": 19,
+        "models": 19
+      },
+      "afterTool": "build",
+      "selection": {
+        "selectedType": "res.house",
+        "selection": "res.house"
+      },
+      "afterClick": {
+        "instances": 20,
+        "models": 20,
+        "toasts": [
+          "No construction slot free — Monorail Station needs 2 slots (1 free).",
+          "No construction slot free — Monorail Station needs 2 slots (1 free).",
+          "No construction slot free — Monorail Station needs 2 slots (1 free).",
+          "No construction slot free — Monorail Station needs 2 slots (1 free).",
+          "No construction slot free — Monorail Station needs 2 slots (1 free).",
+          "No construction slot free — Monorail Station needs 2 slots (1 free).",
+          "No construction slot free — Monorail Station needs 2 slots (1 free)."
+        ],
+        "buildingHere": "ok"
+      }
+    },
+    "render": {
+      "calls": 405,
+      "tris": 1028617,
+      "sceneMeshes": 682
+    },
+    "flatness": {
+      "distinct": 657,
+      "meanLuma": 111.19816666666667
+    },
+    "studio": {
+      "ok": true,
+      "isOpen": true,
+      "before": 0,
+      "after": 2,
+      "paint1": {
+        "ok": true,
+        "reason": null
+      },
+      "paint2": {
+        "ok": true,
+        "reason": null
+      },
+      "objType": "string",
+      "objLength": 761,
+      "objHead": "# SuperCitycon SCC Studio export\n# format sccasset/1 (voxel material indices)\n# voxels 2\no scc-studio-model\n# material table (index = colour)\n# m1 void #0d0f1c\n# m2 ink #1a1c2c\n# m3 night #232844\n# m4 slate #2e3457\n# m5 steel #4b5280\n# m6 mist #9aa3d4\n# m7 snow #e8ecff\n# m8 gold #ffd166\n# m9 amber #",
+      "hasVertices": true,
+      "hasFaces": true
+    },
+    "save": {
+      "ok": true,
+      "wrote": true,
+      "instances": 20,
+      "listed": [
+        "scenario"
+      ]
+    },
+    "reload": {
+      "restored": true,
+      "before": 0,
+      "after": 20,
+      "instances": 20,
+      "treasury": 25129,
+      "models": 0,
+      "modelsAfter": 20,
+      "pageErrors": []
+    }
+  }
+}
