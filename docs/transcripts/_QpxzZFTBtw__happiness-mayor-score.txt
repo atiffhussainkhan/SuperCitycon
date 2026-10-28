@@ -1,0 +1,119 @@
+# Super Citycon: Happiness &amp; Mayor Score – City Building Game How-To Tutorial
+# channel: Super Citycon - City Building Game
+# youtube: https://www.youtube.com/watch?v=_QpxzZFTBtw
+# transcript retrieved 2026-10-23 via yt-dlp (android_vr client)
+# NOTE: auto-generated captions; timestamps approximate, word boundaries may be wrong.
+# Quoting rule: quote the sentence, and check the timestamp before relying on it.
+
+[00:03] hello and welcome in this video I want
+[00:03] hello and welcome in this video I want to give you a quick overview of
+[00:06] to give you a quick overview of
+[00:06] to give you a quick overview of happiness and uh City score and major
+[00:09] happiness and uh City score and major
+[00:09] happiness and uh City score and major score uh now how does it work um
+[00:13] score uh now how does it work um
+[00:13] score uh now how does it work um happiness is essentially a factor that's
+[00:17] happiness is essentially a factor that's
+[00:17] happiness is essentially a factor that's uh shaped from everything in your city
+[00:21] uh shaped from everything in your city
+[00:21] uh shaped from everything in your city as everything is taken into account it's
+[00:24] as everything is taken into account it's
+[00:24] as everything is taken into account it's all your supply it's the pollution
+[00:27] all your supply it's the pollution
+[00:27] all your supply it's the pollution situation um it's it's it's everything
+[00:30] situation um it's it's it's everything
+[00:30] situation um it's it's it's everything so if everything is perfect everywhere
+[00:34] so if everything is perfect everywhere
+[00:34] so if everything is perfect everywhere you will will achieve the maximum
+[00:37] you will will achieve the maximum
+[00:37] you will will achieve the maximum happiness um I won't give too much
+[00:40] happiness um I won't give too much
+[00:40] happiness um I won't give too much details about uh the weight of each
+[00:43] details about uh the weight of each
+[00:43] details about uh the weight of each because it's little bit different not
+[00:46] because it's little bit different not
+[00:46] because it's little bit different not everything affects happiness in the same
+[00:48] everything affects happiness in the same
+[00:48] everything affects happiness in the same way um but generally uh happiness is a
+[00:51] way um but generally uh happiness is a
+[00:51] way um but generally uh happiness is a measure to tell if everything is good in
+[00:53] measure to tell if everything is good in
+[00:53] measure to tell if everything is good in your city or not um yeah from happiness
+[00:59] your city or not um yeah from happiness
+[00:59] your city or not um yeah from happiness and the amount of residents combined um
+[01:03] and the amount of residents combined um
+[01:03] and the amount of residents combined um we calculate your City score so that's
+[01:05] we calculate your City score so that's
+[01:05] we calculate your City score so that's the score that you get uh for your
+[01:08] the score that you get uh for your
+[01:08] the score that you get uh for your current city uh so the more residents
+[01:12] current city uh so the more residents
+[01:12] current city uh so the more residents you got at a higher happiness level uh
+[01:15] you got at a higher happiness level uh
+[01:16] you got at a higher happiness level uh the higher is your City score now you
+[01:18] the higher is your City score now you
+[01:18] the higher is your City score now you can have a pretty high City score from
+[01:20] can have a pretty high City score from
+[01:20] can have a pretty high City score from having very happy people but not too
+[01:22] having very happy people but not too
+[01:22] having very happy people but not too much of them you can also have uh a
+[01:25] much of them you can also have uh a
+[01:25] much of them you can also have uh a comparably high cityy score from having
+[01:27] comparably high cityy score from having
+[01:27] comparably high cityy score from having much residents which are not too happy
+[01:30] much residents which are not too happy
+[01:30] much residents which are not too happy uh but you get the best City score from
+[01:32] uh but you get the best City score from
+[01:33] uh but you get the best City score from having a lot of residents that are very
+[01:35] having a lot of residents that are very
+[01:35] having a lot of residents that are very happy um so far no one figured out
+[01:38] happy um so far no one figured out
+[01:38] happy um so far no one figured out what's the
+[01:39] what's the
+[01:39] what's the maximum um yeah it's still open um all
+[01:43] maximum um yeah it's still open um all
+[01:43] maximum um yeah it's still open um all that all the uh City score of
+[01:47] that all the uh City score of
+[01:48] that all the uh City score of your uh different cities in your region
+[01:51] your uh different cities in your region
+[01:51] your uh different cities in your region uh not all of them possibly we will
+[01:52] uh not all of them possibly we will
+[01:52] uh not all of them possibly we will launch new regions uh soon
+[01:57] launch new regions uh soon
+[01:57] launch new regions uh soon um all the cities of one region combined
+[02:01] um all the cities of one region combined
+[02:01] um all the cities of one region combined to your major score for that region um
+[02:05] to your major score for that region um
+[02:05] to your major score for that region um sorry um you can see the major score for
+[02:08] sorry um you can see the major score for
+[02:08] sorry um you can see the major score for your region in the top left uh that one
+[02:12] your region in the top left uh that one
+[02:12] your region in the top left uh that one shows you uh all your city scores
+[02:15] shows you uh all your city scores
+[02:15] shows you uh all your city scores combined uh you can also see it here in
+[02:18] combined uh you can also see it here in
+[02:18] combined uh you can also see it here in the government area in the overview uh
+[02:22] the government area in the overview uh
+[02:22] the government area in the overview uh tab um here this one here that's your
+[02:26] tab um here this one here that's your
+[02:26] tab um here this one here that's your Mator score with your Mator score you
+[02:28] Mator score with your Mator score you
+[02:28] Mator score with your Mator score you can compete with other majes um to see
+[02:32] can compete with other majes um to see
+[02:32] can compete with other majes um to see how good you perform in
+[02:35] how good you perform in
+[02:35] how good you perform in comparison um yeah that's it about major
+[02:38] comparison um yeah that's it about major
+[02:38] comparison um yeah that's it about major score and happiness um keep your
+[02:40] score and happiness um keep your
+[02:40] score and happiness um keep your residents happy it's really important to
+[02:43] residents happy it's really important to
+[02:43] residents happy it's really important to care politics should know that um yeah
+[02:47] care politics should know that um yeah
+[02:47] care politics should know that um yeah thanks for watching thanks for playing
+[02:48] thanks for watching thanks for playing
+[02:48] thanks for watching thanks for playing check out the other videos uh on the
+[02:51] check out the other videos uh on the
+[02:51] check out the other videos uh on the channel join our Discord to get in touch
+[02:54] channel join our Discord to get in touch
+[02:54] channel join our Discord to get in touch uh have fun and have a great time bye

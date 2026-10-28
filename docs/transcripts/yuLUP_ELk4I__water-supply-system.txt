@@ -1,0 +1,91 @@
+# Super Citycon: Water Supply System – City Building Game How-To Tutorial
+# channel: Super Citycon - City Building Game
+# youtube: https://www.youtube.com/watch?v=yuLUP_ELk4I
+# transcript retrieved 2026-10-23 via yt-dlp (android_vr client)
+# NOTE: auto-generated captions; timestamps approximate, word boundaries may be wrong.
+# Quoting rule: quote the sentence, and check the timestamp before relying on it.
+
+[00:03] hello and welcome in this video I want
+[00:03] hello and welcome in this video I want to talk about the water system in super
+[00:06] to talk about the water system in super
+[00:06] to talk about the water system in super cityon um your residents also your
+[00:09] cityon um your residents also your
+[00:09] cityon um your residents also your industry and your commercials will
+[00:11] industry and your commercials will
+[00:11] industry and your commercials will consume water so it needs to come from
+[00:13] consume water so it needs to come from
+[00:13] consume water so it needs to come from anywhere and that's where your water
+[00:17] anywhere and that's where your water
+[00:17] anywhere and that's where your water production facilities or water supply
+[00:19] production facilities or water supply
+[00:19] production facilities or water supply facilities
+[00:21] facilities
+[00:21] facilities um
+[00:23] um
+[00:23] um yeah
+[00:25] yeah
+[00:25] yeah are needed for sorry um let's check it
+[00:28] are needed for sorry um let's check it
+[00:28] are needed for sorry um let's check it here in the shop we got a water tower we
+[00:30] here in the shop we got a water tower we
+[00:30] here in the shop we got a water tower we got a small water pump and we got a big
+[00:32] got a small water pump and we got a big
+[00:32] got a small water pump and we got a big water pump um those are the supply
+[00:35] water pump um those are the supply
+[00:35] water pump um those are the supply buildings we also got the water pipeline
+[00:38] buildings we also got the water pipeline
+[00:39] buildings we also got the water pipeline the water pipeline is a different
+[00:40] the water pipeline is a different
+[00:40] the water pipeline is a different purpose um it is to connect multiple
+[00:43] purpose um it is to connect multiple
+[00:43] purpose um it is to connect multiple Maps um in terms of connecting the water
+[00:46] Maps um in terms of connecting the water
+[00:46] Maps um in terms of connecting the water Nets so you can have your uh Supply on
+[00:50] Nets so you can have your uh Supply on
+[00:50] Nets so you can have your uh Supply on one map and the consumption on another
+[00:52] one map and the consumption on another
+[00:52] one map and the consumption on another whatever you choose whatever you like um
+[00:56] whatever you choose whatever you like um
+[00:56] whatever you choose whatever you like um in the government section and the
+[00:57] in the government section and the
+[00:57] in the government section and the overview uh you will see your current
+[01:00] overview uh you will see your current
+[01:00] overview uh you will see your current production and you will see your current
+[01:03] production and you will see your current
+[01:03] production and you will see your current consumption uh it's very low in my case
+[01:06] consumption uh it's very low in my case
+[01:06] consumption uh it's very low in my case just 5% so there's a lot of Supply build
+[01:09] just 5% so there's a lot of Supply build
+[01:09] just 5% so there's a lot of Supply build on this map that's technically not
+[01:11] on this map that's technically not
+[01:11] on this map that's technically not needed but it's good to be there um take
+[01:15] needed but it's good to be there um take
+[01:15] needed but it's good to be there um take care that you don't uh run into usage
+[01:18] care that you don't uh run into usage
+[01:19] care that you don't uh run into usage over 90% from zon it will have negative
+[01:22] over 90% from zon it will have negative
+[01:22] over 90% from zon it will have negative effects on your economy uh in terms of
+[01:24] effects on your economy uh in terms of
+[01:24] effects on your economy uh in terms of happiness and in terms of the major
+[01:26] happiness and in terms of the major
+[01:26] happiness and in terms of the major score
+[01:28] score
+[01:28] score um once your map is connected to the
+[01:31] um once your map is connected to the
+[01:31] um once your map is connected to the global uh water net you will find um an
+[01:35] global uh water net you will find um an
+[01:35] global uh water net you will find um an Globe icon here that indicates you that
+[01:39] Globe icon here that indicates you that
+[01:39] Globe icon here that indicates you that this current map is part of the global
+[01:41] this current map is part of the global
+[01:41] this current map is part of the global Water net and not only the local map one
+[01:46] Water net and not only the local map one
+[01:46] Water net and not only the local map one um yeah that's it about water supply
+[01:48] um yeah that's it about water supply
+[01:48] um yeah that's it about water supply it's pretty straightforward
+[01:51] it's pretty straightforward
+[01:51] it's pretty straightforward uh let me know if you got any questions
+[01:53] uh let me know if you got any questions
+[01:53] uh let me know if you got any questions thanks for watching thanks for playing
+[01:55] thanks for watching thanks for playing
+[01:55] thanks for watching thanks for playing and see you in the next video bye

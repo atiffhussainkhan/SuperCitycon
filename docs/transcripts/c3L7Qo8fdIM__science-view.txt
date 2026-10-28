@@ -1,0 +1,213 @@
+# Super Citycon: Science View – City Building Game How-To Tutorial
+# channel: Super Citycon - City Building Game
+# youtube: https://www.youtube.com/watch?v=c3L7Qo8fdIM
+# transcript retrieved 2026-10-23 via yt-dlp (android_vr client)
+# NOTE: auto-generated captions; timestamps approximate, word boundaries may be wrong.
+# Quoting rule: quote the sentence, and check the timestamp before relying on it.
+
+[00:04] hello and welcome in this video I want
+[00:04] hello and welcome in this video I want to explain the science view of super
+[00:07] to explain the science view of super
+[00:07] to explain the science view of super city con um to enter the science view
+[00:10] city con um to enter the science view
+[00:10] city con um to enter the science view you tap the mini map in the top right
+[00:14] you tap the mini map in the top right
+[00:14] you tap the mini map in the top right corner and the map will switch to this
+[00:18] corner and the map will switch to this
+[00:18] corner and the map will switch to this one cool effect no um yeah you got uh
+[00:24] one cool effect no um yeah you got uh
+[00:24] one cool effect no um yeah you got uh various things to choose on the right
+[00:26] various things to choose on the right
+[00:26] various things to choose on the right sidebar that you can visualize on your
+[00:28] sidebar that you can visualize on your
+[00:28] sidebar that you can visualize on your map U um also in the top Center there
+[00:32] map U um also in the top Center there
+[00:32] map U um also in the top Center there will appear this little
+[00:35] will appear this little
+[00:35] will appear this little notification uh with a question mark if
+[00:37] notification uh with a question mark if
+[00:37] notification uh with a question mark if you click the question mark you will get
+[00:40] you click the question mark you will get
+[00:40] you click the question mark you will get an explanation what the current selected
+[00:43] an explanation what the current selected
+[00:43] an explanation what the current selected thing is
+[00:45] thing is
+[00:45] thing is about um you will see orange buildings
+[00:48] about um you will see orange buildings
+[00:48] about um you will see orange buildings and buildings of another color um orange
+[00:51] and buildings of another color um orange
+[00:51] and buildings of another color um orange in general means this building emits
+[00:55] in general means this building emits
+[00:55] in general means this building emits what you're currently selected in the
+[00:57] what you're currently selected in the
+[00:57] what you're currently selected in the current case um that's the commercial
+[01:00] current case um that's the commercial
+[01:00] current case um that's the commercial income bonus these are a lot of parks
+[01:04] income bonus these are a lot of parks
+[01:04] income bonus these are a lot of parks here and you can select each of
+[01:08] here and you can select each of
+[01:08] here and you can select each of them and um when you select it you will
+[01:14] them and um when you select it you will
+[01:14] them and um when you select it you will only you will will see uh the area of
+[01:17] only you will will see uh the area of
+[01:18] only you will will see uh the area of this selected building um highlighted in
+[01:21] this selected building um highlighted in
+[01:21] this selected building um highlighted in a slightly different color now let's go
+[01:23] a slightly different color now let's go
+[01:23] a slightly different color now let's go to all the things that we got here um
+[01:27] to all the things that we got here um
+[01:27] to all the things that we got here um the first one is the farm area Farm area
+[01:30] the first one is the farm area Farm area
+[01:30] the first one is the farm area Farm area indicates the area of a pole bar um and
+[01:35] indicates the area of a pole bar um and
+[01:35] indicates the area of a pole bar um and the area of a pole barn is the area in
+[01:38] the area of a pole barn is the area in
+[01:38] the area of a pole barn is the area in which uh Farm fields are crowing and
+[01:42] which uh Farm fields are crowing and
+[01:42] which uh Farm fields are crowing and farm animals uh can
+[01:45] farm animals uh can
+[01:45] farm animals uh can live if a field or a farm animal uh
+[01:49] live if a field or a farm animal uh
+[01:49] live if a field or a farm animal uh enclosure is outside of this area um it
+[01:53] enclosure is outside of this area um it
+[01:54] enclosure is outside of this area um it means it won't get
+[01:55] means it won't get
+[01:55] means it won't get active the next thing we got is Farm
+[01:58] active the next thing we got is Farm
+[01:58] active the next thing we got is Farm bonuses those are buildings that give
+[02:01] bonuses those are buildings that give
+[02:01] bonuses those are buildings that give bonus to your farm
+[02:04] bonus to your farm
+[02:04] bonus to your farm production um to your Fields as well as
+[02:08] production um to your Fields as well as
+[02:08] production um to your Fields as well as to your animal enclosures but it does
+[02:11] to your animal enclosures but it does
+[02:11] to your animal enclosures but it does not give bonus to food factories so
+[02:14] not give bonus to food factories so
+[02:14] not give bonus to food factories so processed food um does not benefit from
+[02:18] processed food um does not benefit from
+[02:18] processed food um does not benefit from those
+[02:19] those
+[02:19] those bonuses the next one here we got is
+[02:22] bonuses the next one here we got is
+[02:22] bonuses the next one here we got is pollution we can see on the mini map
+[02:24] pollution we can see on the mini map
+[02:24] pollution we can see on the mini map pollution is only Happening Here in the
+[02:27] pollution is only Happening Here in the
+[02:27] pollution is only Happening Here in the in this area
+[02:30] in this area
+[02:30] in this area uh this demo city is built pretty well
+[02:32] uh this demo city is built pretty well
+[02:32] uh this demo city is built pretty well so no residential area is affected by
+[02:36] so no residential area is affected by
+[02:36] so no residential area is affected by pollution um again you will see all the
+[02:39] pollution um again you will see all the
+[02:39] pollution um again you will see all the buildings that emit pollution in Orange
+[02:42] buildings that emit pollution in Orange
+[02:42] buildings that emit pollution in Orange and all the polluted area in
+[02:45] and all the polluted area in
+[02:45] and all the polluted area in brown and
+[02:53] here next is the industrial bonus those
+[02:53] here next is the industrial bonus those are as the name says bonuses for
+[02:57] are as the name says bonuses for
+[02:57] are as the name says bonuses for industrial buildings and all the the
+[03:00] industrial buildings and all the the
+[03:00] industrial buildings and all the the buildings set
+[03:02] buildings set
+[03:02] buildings set emitted uh next one is similar but for
+[03:08] emitted uh next one is similar but for
+[03:08] emitted uh next one is similar but for commercial um now we got the school now
+[03:11] commercial um now we got the school now
+[03:11] commercial um now we got the school now school is is a bit more special and a
+[03:13] school is is a bit more special and a
+[03:13] school is is a bit more special and a little bit more to analyze um because
+[03:17] little bit more to analyze um because
+[03:17] little bit more to analyze um because school so the connection to school is
+[03:20] school so the connection to school is
+[03:20] school so the connection to school is not only given by the school buildings
+[03:22] not only given by the school buildings
+[03:22] not only given by the school buildings themselves um but also by the bus stops
+[03:26] themselves um but also by the bus stops
+[03:26] themselves um but also by the bus stops but bus stops
+[03:28] but bus stops
+[03:28] but bus stops deactivate um if you do not have enough
+[03:31] deactivate um if you do not have enough
+[03:31] deactivate um if you do not have enough school capacity U more details about
+[03:34] school capacity U more details about
+[03:34] school capacity U more details about that in a dedicated video about the
+[03:36] that in a dedicated video about the
+[03:36] that in a dedicated video about the school system um here in the uh science
+[03:40] school system um here in the uh science
+[03:40] school system um here in the uh science view you have you can view that for each
+[03:44] view you have you can view that for each
+[03:44] view you have you can view that for each of the school
+[03:46] of the school
+[03:46] of the school categories as well as for buildings that
+[03:50] categories as well as for buildings that
+[03:50] categories as well as for buildings that give bonus to your school
+[03:52] give bonus to your school
+[03:52] give bonus to your school system um next thing we got is the Fire
+[03:57] system um next thing we got is the Fire
+[03:57] system um next thing we got is the Fire Security fire protection area
+[04:00] Security fire protection area
+[04:00] Security fire protection area uh ideally you want your complete City
+[04:03] uh ideally you want your complete City
+[04:03] uh ideally you want your complete City to be covered to get the full
+[04:06] to be covered to get the full
+[04:06] to be covered to get the full bonus uh next one is healthc
+[04:09] bonus uh next one is healthc
+[04:09] bonus uh next one is healthc care same for
+[04:13] care same for
+[04:13] care same for police residential income
+[04:16] police residential income
+[04:16] police residential income bonus and monor rail that's also a
+[04:19] bonus and monor rail that's also a
+[04:19] bonus and monor rail that's also a little bit of special one uh mono rails
+[04:23] little bit of special one uh mono rails
+[04:23] little bit of special one uh mono rails uh can provide Street connection to
+[04:26] uh can provide Street connection to
+[04:26] uh can provide Street connection to buildings without having streets that's
+[04:29] buildings without having streets that's
+[04:29] buildings without having streets that's only for residential buildings and it's
+[04:32] only for residential buildings and it's
+[04:32] only for residential buildings and it's only within the area of effect uh what
+[04:35] only within the area of effect uh what
+[04:36] only within the area of effect uh what you can see here pretty
+[04:42] well um what you can see here pretty
+[04:42] well um what you can see here pretty well
+[04:43] well
+[04:43] well is it's enough if a building is touched
+[04:47] is it's enough if a building is touched
+[04:47] is it's enough if a building is touched uh because what you see the area
+[04:48] uh because what you see the area
+[04:49] uh because what you see the area essentially ends here but if a building
+[04:51] essentially ends here but if a building
+[04:51] essentially ends here but if a building is touched so if one tile uh of a
+[04:55] is touched so if one tile uh of a
+[04:55] is touched so if one tile uh of a building is affected by an influence and
+[04:57] building is affected by an influence and
+[04:57] building is affected by an influence and that's true for all of them
+[05:00] that's true for all of them
+[05:00] that's true for all of them um all the building counts as
+[05:03] um all the building counts as
+[05:03] um all the building counts as affected and yeah you can do some cool
+[05:06] affected and yeah you can do some cool
+[05:06] affected and yeah you can do some cool tricks with that like saving space
+[05:10] tricks with that like saving space
+[05:10] tricks with that like saving space um off the streets and have more space
+[05:14] um off the streets and have more space
+[05:14] um off the streets and have more space for decorations Etc oh here actually is
+[05:17] for decorations Etc oh here actually is
+[05:17] for decorations Etc oh here actually is no decoration but yeah more about that
+[05:20] no decoration but yeah more about that
+[05:20] no decoration but yeah more about that about the benefits of monor rail in
+[05:22] about the benefits of monor rail in
+[05:22] about the benefits of monor rail in another dedicated video that's it about
+[05:25] another dedicated video that's it about
+[05:25] another dedicated video that's it about science view um let me know if you got
+[05:28] science view um let me know if you got
+[05:28] science view um let me know if you got any questions if that was clear um yeah
+[05:32] any questions if that was clear um yeah
+[05:32] any questions if that was clear um yeah thanks for watching thanks for playing
+[05:34] thanks for watching thanks for playing
+[05:34] thanks for watching thanks for playing and have a good time bye

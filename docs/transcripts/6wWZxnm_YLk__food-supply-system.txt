@@ -1,0 +1,157 @@
+# Super Citycon: Food Supply System – City Building Game How-To Tutorial
+# channel: Super Citycon - City Building Game
+# youtube: https://www.youtube.com/watch?v=6wWZxnm_YLk
+# transcript retrieved 2026-10-23 via yt-dlp (android_vr client)
+# NOTE: auto-generated captions; timestamps approximate, word boundaries may be wrong.
+# Quoting rule: quote the sentence, and check the timestamp before relying on it.
+
+[00:03] hello and welcome in this video I want
+[00:03] hello and welcome in this video I want to talk about the food supply system in
+[00:06] to talk about the food supply system in
+[00:07] to talk about the food supply system in super cityon um your residents are
+[00:10] super cityon um your residents are
+[00:10] super cityon um your residents are hungry so you need to supply them with
+[00:12] hungry so you need to supply them with
+[00:12] hungry so you need to supply them with food um you have different ways to do
+[00:15] food um you have different ways to do
+[00:15] food um you have different ways to do that you can have Fields you can have
+[00:17] that you can have Fields you can have
+[00:17] that you can have Fields you can have farm
+[00:18] farm
+[00:18] farm animals um and you can have uh food
+[00:21] animals um and you can have uh food
+[00:21] animals um and you can have uh food factories or at the moment it's one food
+[00:24] factories or at the moment it's one food
+[00:24] factories or at the moment it's one food factory we don't have different ones yet
+[00:28] factory we don't have different ones yet
+[00:28] factory we don't have different ones yet um to see how it Works let's take a
+[00:31] um to see how it Works let's take a
+[00:31] um to see how it Works let's take a quick view
+[00:33] quick view
+[00:33] quick view into uh the government area onto the
+[00:36] into uh the government area onto the
+[00:36] into uh the government area onto the food tab that's this one um you will
+[00:40] food tab that's this one um you will
+[00:40] food tab that's this one um you will have an overview for each category so
+[00:42] have an overview for each category so
+[00:42] have an overview for each category so plant Source animal source and processed
+[00:46] plant Source animal source and processed
+[00:46] plant Source animal source and processed food um you need to start with building
+[00:49] food um you need to start with building
+[00:49] food um you need to start with building Fields um because your animals will
+[00:52] Fields um because your animals will
+[00:52] Fields um because your animals will consume plant sourced food to produce
+[00:55] consume plant sourced food to produce
+[00:55] consume plant sourced food to produce animal sourced food um now it's not like
+[00:58] animal sourced food um now it's not like
+[00:59] animal sourced food um now it's not like in reality what happens in Game is uh
+[01:02] in reality what happens in Game is uh
+[01:02] in reality what happens in Game is uh the animals leverage your food supply uh
+[01:05] the animals leverage your food supply uh
+[01:05] the animals leverage your food supply uh so they consume less as they
+[01:08] so they consume less as they
+[01:08] so they consume less as they produce um same is true for the
+[01:10] produce um same is true for the
+[01:10] produce um same is true for the processed food um processed food needs
+[01:14] processed food um processed food needs
+[01:14] processed food um processed food needs uh animal and plant Source food uh but
+[01:17] uh animal and plant Source food uh but
+[01:17] uh animal and plant Source food uh but outputs
+[01:18] outputs
+[01:18] outputs more uh on the bottom you can see the
+[01:22] more uh on the bottom you can see the
+[01:22] more uh on the bottom you can see the summary of your production uh you can
+[01:24] summary of your production uh you can
+[01:24] summary of your production uh you can also see the summary of your consumption
+[01:27] also see the summary of your consumption
+[01:27] also see the summary of your consumption in the top right and you can have your
+[01:30] in the top right and you can have your
+[01:30] in the top right and you can have your current quote um seeing uh which type of
+[01:35] current quote um seeing uh which type of
+[01:35] current quote um seeing uh which type of food your residents are eating and the
+[01:38] food your residents are eating and the
+[01:38] food your residents are eating and the big bar tells you the overall usage of
+[01:42] big bar tells you the overall usage of
+[01:42] big bar tells you the overall usage of your food supply uh you should keep that
+[01:45] your food supply uh you should keep that
+[01:45] your food supply uh you should keep that below 90% uh to not have negative
+[01:49] below 90% uh to not have negative
+[01:49] below 90% uh to not have negative effects on your economy in terms of
+[01:52] effects on your economy in terms of
+[01:52] effects on your economy in terms of happiness and in terms of major
+[01:56] happiness and in terms of major
+[01:56] happiness and in terms of major score uh when it's about building um
+[02:00] score uh when it's about building um
+[02:00] score uh when it's about building um your food supply you need to take care
+[02:03] your food supply you need to take care
+[02:03] your food supply you need to take care that you got pole bars because animal
+[02:07] that you got pole bars because animal
+[02:07] that you got pole bars because animal animal enclosures and um the fields they
+[02:11] animal enclosures and um the fields they
+[02:11] animal enclosures and um the fields they only work when they are within the area
+[02:13] only work when they are within the area
+[02:13] only work when they are within the area of pole bar um you can see this area by
+[02:17] of pole bar um you can see this area by
+[02:17] of pole bar um you can see this area by switching to science View and in the
+[02:20] switching to science View and in the
+[02:20] switching to science View and in the science view you choose your food supply
+[02:24] science view you choose your food supply
+[02:24] science view you choose your food supply yeah we got a lot of stuff here where is
+[02:28] yeah we got a lot of stuff here where is
+[02:28] yeah we got a lot of stuff here where is it now that's actually the food bonus
+[02:31] it now that's actually the food bonus
+[02:31] it now that's actually the food bonus that's another thing I will explain in a
+[02:32] that's another thing I will explain in a
+[02:32] that's another thing I will explain in a minute um that's
+[02:35] minute um that's
+[02:35] minute um that's your that's your barn areas so you can
+[02:38] your that's your barn areas so you can
+[02:38] your that's your barn areas so you can see we got two B Bar pole barns in that
+[02:41] see we got two B Bar pole barns in that
+[02:41] see we got two B Bar pole barns in that area and they cover all the fields and
+[02:45] area and they cover all the fields and
+[02:45] area and they cover all the fields and um all the animal enclosures so this
+[02:49] um all the animal enclosures so this
+[02:49] um all the animal enclosures so this works totally fine um to boost your
+[02:53] works totally fine um to boost your
+[02:53] works totally fine um to boost your production you can have all those
+[02:55] production you can have all those
+[02:55] production you can have all those buildings this sample city is heavily
+[02:59] buildings this sample city is heavily
+[02:59] buildings this sample city is heavily boosted let's switch back so we can see
+[03:01] boosted let's switch back so we can see
+[03:01] boosted let's switch back so we can see what's up here yeah it's windmills and
+[03:04] what's up here yeah it's windmills and
+[03:04] what's up here yeah it's windmills and uh silos um so each of those um gives a
+[03:09] uh silos um so each of those um gives a
+[03:09] uh silos um so each of those um gives a bonus to your food production within the
+[03:11] bonus to your food production within the
+[03:11] bonus to your food production within the surrounding area in this case uh within
+[03:14] surrounding area in this case uh within
+[03:14] surrounding area in this case uh within an area of 13 by
+[03:17] an area of 13 by
+[03:17] an area of 13 by 13 um you can see that individually for
+[03:20] 13 um you can see that individually for
+[03:20] 13 um you can see that individually for each building by tapping it and the area
+[03:24] each building by tapping it and the area
+[03:24] each building by tapping it and the area where this bonus building givs effect um
+[03:28] where this bonus building givs effect um
+[03:28] where this bonus building givs effect um is highlighted
+[03:38] uh yeah one thing to mention um these
+[03:38] uh yeah one thing to mention um these bonus buildings do not have effect on
+[03:41] bonus buildings do not have effect on
+[03:41] bonus buildings do not have effect on Industrial food production they only
+[03:43] Industrial food production they only
+[03:43] Industrial food production they only have effect on your fields and on your
+[03:46] have effect on your fields and on your
+[03:46] have effect on your fields and on your animal
+[03:48] animal
+[03:48] animal enclosures um yeah that's it about food
+[03:51] enclosures um yeah that's it about food
+[03:51] enclosures um yeah that's it about food production let me know if you got any
+[03:52] production let me know if you got any
+[03:53] production let me know if you got any questions thanks for watching thanks for
+[03:54] questions thanks for watching thanks for
+[03:54] questions thanks for watching thanks for playing and see you in the next video
+[03:57] playing and see you in the next video
+[03:57] playing and see you in the next video bye

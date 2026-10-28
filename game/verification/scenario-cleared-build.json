@@ -1,0 +1,244 @@
+{
+  "url": "http://127.0.0.1:4321/",
+  "label": "http://127.0.0.1:4321/",
+  "sections": {
+    "boot": {
+      "log": [
+        "preloaded 128/128 models (0 failures)",
+        "domain \"wld\" ready",
+        "domain \"buildings\" ready",
+        "domain \"economy\" ready",
+        "domain \"mobility\" ready",
+        "domain \"population\" ready",
+        "domain \"services\" ready",
+        "domain \"studio\" ready",
+        "domain \"ui\" ready",
+        "boot complete"
+      ],
+      "domains": [
+        "wld",
+        "buildings",
+        "economy",
+        "mobility",
+        "population",
+        "services",
+        "studio",
+        "ui"
+      ],
+      "core": [
+        "stage",
+        "save",
+        "modes"
+      ],
+      "fatalVisible": false
+    },
+    "world": {
+      "cells": 4096,
+      "scenery": 798,
+      "waterLevel": 0
+    },
+    "multiSlot": {
+      "ok": true,
+      "required": 2,
+      "total": 1,
+      "used": 0,
+      "placed": false,
+      "reason": "not-enough-slots",
+      "toasts": [
+        "No construction slot free — Monorail Station needs 2 slots (1 free)."
+      ]
+    },
+    "gate": {
+      "speedOk": true,
+      "cell": {
+        "cx": 22,
+        "cz": 24
+      },
+      "steps": [],
+      "slots": {
+        "total": 1,
+        "used": 1,
+        "free": 0
+      },
+      "toasts": [
+        {
+          "message": "No construction slot free — Monorail Station needs 2 slots (1 free).",
+          "kind": "warn"
+        },
+        {
+          "message": "No construction slot free — House needs 1 slot (0 free).",
+          "kind": "warn"
+        }
+      ],
+      "before": {
+        "treasury": 25000,
+        "builds": 0
+      },
+      "afterFirst": {
+        "treasury": 24880,
+        "builds": 1
+      },
+      "afterSecond": {
+        "treasury": 24880,
+        "builds": 1
+      },
+      "first": {
+        "ok": true,
+        "reason": null
+      },
+      "second": {
+        "ok": false,
+        "reason": "not-enough-slots"
+      },
+      "instances": 1
+    },
+    "scenery": {
+      "ok": true,
+      "cx": 5,
+      "cz": 0,
+      "placed": true,
+      "reason": null,
+      "model": "mdvl_nature_bank_01"
+    },
+    "build": {
+      "placed": 17,
+      "failed": [
+        "trn.monorail_station@36,34: slot-timeout"
+      ],
+      "roads": 9,
+      "slotWaits": 226,
+      "types": {
+        "res.house": 1,
+        "res.apartment": 1,
+        "res.terrace_house": 1,
+        "res.semi_detached": 1,
+        "res.low_rise_flats": 1,
+        "res.mid_rise_flats": 1,
+        "com.grocery": 1,
+        "com.cafe": 1,
+        "com.office_block": 1,
+        "ind.warehouse": 1,
+        "ind.vehicle_garage": 1,
+        "hea.medical_center": 1,
+        "fir.station": 1,
+        "edu.bus_station": 1,
+        "eng.solar": 1,
+        "wat.tower": 1,
+        "prk.park": 1
+      },
+      "instances": 19,
+      "models": 19
+    },
+    "sim": {
+      "population": 602,
+      "happiness": 64.94308077171102,
+      "treasury": 25249,
+      "day": 3,
+      "vehicles": 60,
+      "congestion": 1,
+      "citizens": 25,
+      "citizensInState": 0,
+      "coverage": 10,
+      "elapsed": 92
+    },
+    "hud": {
+      "children": 2,
+      "html": 15537,
+      "buttons": 86,
+      "text": "MAYOR — TREASURY $24,154 RESIDENTS 171 HAPPINESS 60% LOYALTY 50% DAY 1 12:00 DAY 1 II S N F U RESIDENTIAL 100% COMMERCIAL 100% INDUSTRIAL 100% ENERGY 100% WATER 100% FOOD 100% WASTE 100% POPULATION 145 BUILT RES.SEMI_DETACHED AT 29,33 TREASURY UPDATED POPULATION 171 INSPECT 1 BUILD 2 BULLDOZE 3 ROAD 4 TERRAFORM 5 PAINT 6 STUDIO 7 RESIDENTIAL 12 COMMERCIAL 10 INDUSTRIAL 4 ENERGY 5 WATER 4 FOOD & AG"
+    },
+    "art": {
+      "manifest": null,
+      "iconCount": 0,
+      "srcs": [],
+      "fetches": []
+    },
+    "bareHud": {
+      "buttons": 86,
+      "labelled": 70,
+      "licenceHidden": true,
+      "licenceText": "2D icons: your asset library — licence clearance pending.",
+      "images": 0
+    },
+    "pointer": {
+      "ok": true,
+      "detail": "tool=build type=res.house cell=(46,31) instances 19->20 models 19->20 (a slot was free)",
+      "target": {
+        "cx": 46,
+        "cz": 31,
+        "x": 220,
+        "y": 160
+      },
+      "before": {
+        "tool": "inspect",
+        "instances": 19,
+        "models": 19
+      },
+      "afterTool": "build",
+      "selection": {
+        "selectedType": "res.house",
+        "selection": "res.house"
+      },
+      "afterClick": {
+        "instances": 20,
+        "models": 20,
+        "toasts": [
+          "No construction slot free — Monorail Station needs 2 slots (1 free).",
+          "No construction slot free — Monorail Station needs 2 slots (1 free).",
+          "No construction slot free — Monorail Station needs 2 slots (1 free).",
+          "No construction slot free — Monorail Station needs 2 slots (1 free).",
+          "No construction slot free — Monorail Station needs 2 slots (1 free).",
+          "No construction slot free — Monorail Station needs 2 slots (1 free).",
+          "No construction slot free — Monorail Station needs 2 slots (1 free)."
+        ],
+        "buildingHere": "ok"
+      }
+    },
+    "render": {
+      "calls": 405,
+      "tris": 1028617,
+      "sceneMeshes": 658
+    },
+    "flatness": {
+      "distinct": 660,
+      "meanLuma": 111.16725
+    },
+    "studio": {
+      "ok": true,
+      "isOpen": true,
+      "before": 0,
+      "after": 2,
+      "paint1": {
+        "ok": true,
+        "reason": null
+      },
+      "paint2": {
+        "ok": true,
+        "reason": null
+      },
+      "objType": "string",
+      "objLength": 761,
+      "objHead": "# SuperCitycon SCC Studio export\n# format sccasset/1 (voxel material indices)\n# voxels 2\no scc-studio-model\n# material table (index = colour)\n# m1 void #0d0f1c\n# m2 ink #1a1c2c\n# m3 night #232844\n# m4 slate #2e3457\n# m5 steel #4b5280\n# m6 mist #9aa3d4\n# m7 snow #e8ecff\n# m8 gold #ffd166\n# m9 amber #",
+      "hasVertices": true,
+      "hasFaces": true
+    },
+    "save": {
+      "ok": true,
+      "wrote": true,
+      "instances": 20,
+      "listed": [
+        "scenario"
+      ]
+    },
+    "reload": {
+      "restored": true,
+      "before": 0,
+      "after": 20,
+      "instances": 20,
+      "treasury": 25129,
+      "models": 0,
+      "modelsAfter": 20,
+      "pageErrors": []
+    }
+  }
+}

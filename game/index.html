@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>SuperCitycon</title>
+    <!--
+      An empty favicon, so the browser does not ask for /favicon.ico and log a
+      404 on every boot. No asset is added: the library's 2D art is NOT
+      cleared, so shipping a favicon from it would break the cleared build.
+    -->
+    <link rel="icon" href="data:," />
+    <style>
+      :root {
+        --sc-ink: #1a1c2c;
+        --sc-panel: #232844;
+        --sc-panel-2: #2e3457;
+        --sc-edge: #4b5280;
+        --sc-text: #e8ecff;
+        --sc-dim: #9aa3d4;
+        --sc-gold: #ffd166;
+        --sc-green: #06d6a0;
+        --sc-red: #ef476f;
+        --sc-blue: #118ab2;
+        --sc-purple: #9b5de5;
+        --sc-font: 'Silkscreen', 'Press Start 2P', 'Courier New', ui-monospace, monospace;
+      }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0; padding: 0; width: 100%; height: 100%;
+        overflow: hidden; background: #0d0f1c; color: var(--sc-text);
+        font-family: var(--sc-font);
+        -webkit-font-smoothing: none;
+        image-rendering: pixelated;
+        user-select: none; -webkit-user-select: none;
+        touch-action: none;
+      }
+      #app { position: fixed; inset: 0; }
+      #viewport { position: absolute; inset: 0; }
+      #viewport canvas { display: block; width: 100%; height: 100%; }
+      #ui-root { position: absolute; inset: 0; pointer-events: none; }
+      #ui-root > * { pointer-events: auto; }
+
+      #boot {
+        position: absolute; inset: 0; z-index: 999;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 18px; background: radial-gradient(circle at 50% 42%, #2a2f55 0%, #0d0f1c 70%);
+        transition: opacity .5s ease; letter-spacing: .04em;
+      }
+      #boot.hidden { opacity: 0; pointer-events: none; }
+      #boot h1 {
+        margin: 0; font-size: clamp(22px, 5vw, 46px); letter-spacing: .12em;
+        color: var(--sc-gold); text-shadow: 0 4px 0 #8a5a00, 0 0 24px rgba(255,209,102,.25);
+      }
+      #boot .tag { color: var(--sc-dim); font-size: 12px; letter-spacing: .18em; text-transform: uppercase; }
+      #boot .bar { width: min(420px, 70vw); height: 16px; border: 3px solid var(--sc-edge); background: #171a30; padding: 2px; }
+      #boot .bar > i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--sc-green), var(--sc-gold)); transition: width .25s ease; }
+      #boot .status { font-size: 11px; color: var(--sc-dim); min-height: 14px; }
+      #boot .hint { font-size: 10px; color: #6a729e; max-width: 560px; text-align: center; line-height: 1.7; }
+      #fatal {
+        position: absolute; inset: 0; z-index: 1000; display: none;
+        padding: 40px; background: #16060c; color: #ffb3c6; font-size: 12px; line-height: 1.6;
+        white-space: pre-wrap; overflow: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div id="viewport"></div>
+      <div id="ui-root"></div>
+      <div id="boot">
+        <h1>SUPERCITYCON</h1>
+        <div class="tag">a retro voxel city, built from your library</div>
+        <div class="bar"><i id="boot-bar"></i></div>
+        <div class="status" id="boot-status">booting…</div>
+        <div class="hint">
+          Art &amp; animation: KayKit City Builder Bits, KayKit Adventurers, KayKit Character Animations,
+          Avramania Nature &amp; Terrain, Holokat Game Assets — CC0-1.0 / MIT.
+        </div>
+      </div>
+      <pre id="fatal"></pre>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

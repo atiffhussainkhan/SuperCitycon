@@ -1,0 +1,97 @@
+# Super Citycon: Police Department – City Building Game How-To Tutorial
+# channel: Super Citycon - City Building Game
+# youtube: https://www.youtube.com/watch?v=tFmR_0w1OuQ
+# transcript retrieved 2026-10-23 via yt-dlp (android_vr client)
+# NOTE: auto-generated captions; timestamps approximate, word boundaries may be wrong.
+# Quoting rule: quote the sentence, and check the timestamp before relying on it.
+
+[00:03] hello in this video I want to quickly
+[00:03] hello in this video I want to quickly talk about the police departments and
+[00:06] talk about the police departments and
+[00:06] talk about the police departments and security system in super cityon um at
+[00:09] security system in super cityon um at
+[00:09] security system in super cityon um at this point of development it has only a
+[00:12] this point of development it has only a
+[00:12] this point of development it has only a decoration and bonus character uh but
+[00:16] decoration and bonus character uh but
+[00:16] decoration and bonus character uh but since there is no crime happening in in
+[00:19] since there is no crime happening in in
+[00:19] since there is no crime happening in in super cityon it's the safest place you
+[00:21] super cityon it's the safest place you
+[00:21] super cityon it's the safest place you can imagine um yeah it's just around to
+[00:24] can imagine um yeah it's just around to
+[00:24] can imagine um yeah it's just around to give you some bonus and to make it look
+[00:26] give you some bonus and to make it look
+[00:27] give you some bonus and to make it look cool so that is the uh big Police
+[00:30] cool so that is the uh big Police
+[00:30] cool so that is the uh big Police Department we also have a small police
+[00:33] Department we also have a small police
+[00:33] Department we also have a small police station anywhere around
+[00:36] station anywhere around
+[00:36] station anywhere around here um yeah what's the purpose of those
+[00:39] here um yeah what's the purpose of those
+[00:39] here um yeah what's the purpose of those um to get the bonuses you need to cover
+[00:43] um to get the bonuses you need to cover
+[00:43] um to get the bonuses you need to cover uh your full City at bestest um so if
+[00:46] uh your full City at bestest um so if
+[00:46] uh your full City at bestest um so if every building is covered you get all
+[00:49] every building is covered you get all
+[00:49] every building is covered you get all the the bonuses possible for example if
+[00:52] the the bonuses possible for example if
+[00:52] the the bonuses possible for example if you look here on the building itself um
+[00:54] you look here on the building itself um
+[00:54] you look here on the building itself um you see this little icons here when they
+[00:57] you see this little icons here when they
+[00:57] you see this little icons here when they are Creed out they are not covered but
+[00:59] are Creed out they are not covered but
+[00:59] are Creed out they are not covered but this this one is very well covered for
+[01:01] this this one is very well covered for
+[01:02] this this one is very well covered for police um also for example fire and all
+[01:06] police um also for example fire and all
+[01:06] police um also for example fire and all three education
+[01:07] three education
+[01:07] three education levels um you can get an overview of
+[01:10] levels um you can get an overview of
+[01:10] levels um you can get an overview of your cover rch by tapping the mini map
+[01:13] your cover rch by tapping the mini map
+[01:13] your cover rch by tapping the mini map button in the top right uh this will
+[01:16] button in the top right uh this will
+[01:16] button in the top right uh this will open science View and um in science view
+[01:20] open science View and um in science view
+[01:20] open science View and um in science view you choose the police you will see all
+[01:23] you choose the police you will see all
+[01:23] you choose the police you will see all your police stations in Orange and all
+[01:26] your police stations in Orange and all
+[01:26] your police stations in Orange and all the covered area and this uh purple
+[01:29] the covered area and this uh purple
+[01:29] the covered area and this uh purple purish blue
+[01:31] purish blue
+[01:31] purish blue color um tap one station to actually see
+[01:36] color um tap one station to actually see
+[01:36] color um tap one station to actually see the area of effect for this one
+[01:46] station yeah um in the government area
+[01:46] station yeah um in the government area you got the security panel that shows uh
+[01:49] you got the security panel that shows uh
+[01:49] you got the security panel that shows uh your stats about police um yeah the main
+[01:53] your stats about police um yeah the main
+[01:53] your stats about police um yeah the main thing here is the local coverage so you
+[01:55] thing here is the local coverage so you
+[01:55] thing here is the local coverage so you can see uh 7 c% of your residential
+[02:00] can see uh 7 c% of your residential
+[02:00] can see uh 7 c% of your residential um buildings are covered 92% of the
+[02:04] um buildings are covered 92% of the
+[02:04] um buildings are covered 92% of the commercial and 93% of the industrial
+[02:08] commercial and 93% of the industrial
+[02:08] commercial and 93% of the industrial ones ideally you have 100% everywhere
+[02:11] ones ideally you have 100% everywhere
+[02:11] ones ideally you have 100% everywhere this gives you the maximum bonus and has
+[02:14] this gives you the maximum bonus and has
+[02:14] this gives you the maximum bonus and has the maximum effect or on your happiness
+[02:17] the maximum effect or on your happiness
+[02:17] the maximum effect or on your happiness and with set on your major score um
+[02:20] and with set on your major score um
+[02:21] and with set on your major score um that's it about Police Department um let
+[02:24] that's it about Police Department um let
+[02:24] that's it about Police Department um let me know if you got any questions thanks
+[02:26] me know if you got any questions thanks
+[02:26] me know if you got any questions thanks for watching see you in next video bye

@@ -1,0 +1,171 @@
+# Super Citycon: Switching Maps – City Building Game How-To Tutorial
+# channel: Super Citycon - City Building Game
+# youtube: https://www.youtube.com/watch?v=vBJdlAeLn0g
+# transcript retrieved 2026-10-23 via yt-dlp (android_vr client)
+# NOTE: auto-generated captions; timestamps approximate, word boundaries may be wrong.
+# Quoting rule: quote the sentence, and check the timestamp before relying on it.
+
+[00:03] hello and welcome in this video I want
+[00:04] hello and welcome in this video I want to explain how to switch maps in super
+[00:06] to explain how to switch maps in super
+[00:06] to explain how to switch maps in super cityon I was ask that pretty often so I
+[00:09] cityon I was ask that pretty often so I
+[00:09] cityon I was ask that pretty often so I thought I make a video about it uh in
+[00:11] thought I make a video about it uh in
+[00:11] thought I make a video about it uh in version one we had the map window this
+[00:14] version one we had the map window this
+[00:14] version one we had the map window this no longer exists in version two since in
+[00:18] no longer exists in version two since in
+[00:18] no longer exists in version two since in version two we introduced the region
+[00:20] version two we introduced the region
+[00:20] version two we introduced the region view you enter region view whoops no
+[00:25] view you enter region view whoops no
+[00:25] view you enter region view whoops no thanks uh you enter region view by
+[00:27] thanks uh you enter region view by
+[00:27] thanks uh you enter region view by zooming out and zooming out again Boop
+[00:30] zooming out and zooming out again Boop
+[00:30] zooming out and zooming out again Boop and you are in region view now from
+[00:33] and you are in region view now from
+[00:33] and you are in region view now from region view you can see all of your Maps
+[00:36] region view you can see all of your Maps
+[00:36] region view you can see all of your Maps actually all maps of this region uh
+[00:40] actually all maps of this region uh
+[00:40] actually all maps of this region uh possibly in the future there will be
+[00:41] possibly in the future there will be
+[00:41] possibly in the future there will be different regions uh but for now it's
+[00:43] different regions uh but for now it's
+[00:43] different regions uh but for now it's only one it's only this one um as you've
+[00:48] only one it's only this one um as you've
+[00:48] only one it's only this one um as you've just seen they are marked the active one
+[00:51] just seen they are marked the active one
+[00:51] just seen they are marked the active one is marked in blue and if you wait like
+[00:54] is marked in blue and if you wait like
+[00:54] is marked in blue and if you wait like two or 3 seconds those lines fade off
+[00:57] two or 3 seconds those lines fade off
+[00:57] two or 3 seconds those lines fade off and you can see all your region as well
+[01:00] and you can see all your region as well
+[01:00] and you can see all your region as well clean area uh for screenshots and pring
+[01:03] clean area uh for screenshots and pring
+[01:03] clean area uh for screenshots and pring about it uh posting on on social media
+[01:07] about it uh posting on on social media
+[01:07] about it uh posting on on social media sending to your mom
+[01:09] sending to your mom
+[01:09] sending to your mom Etc
+[01:11] Etc
+[01:11] Etc um yeah um oh what was it about
+[01:14] um yeah um oh what was it about
+[01:14] um yeah um oh what was it about switching Maps exactly now um before I
+[01:17] switching Maps exactly now um before I
+[01:17] switching Maps exactly now um before I tell you that it's super simple I mean
+[01:19] tell you that it's super simple I mean
+[01:19] tell you that it's super simple I mean you simply zoom into another map this
+[01:21] you simply zoom into another map this
+[01:21] you simply zoom into another map this popup appears asks you to switch into
+[01:24] popup appears asks you to switch into
+[01:24] popup appears asks you to switch into the other map you say yes or no uh for
+[01:27] the other map you say yes or no uh for
+[01:27] the other map you say yes or no uh for the moment I say no because I want to
+[01:29] the moment I say no because I want to
+[01:29] the moment I say no because I want to show you you more um if you tap a map
+[01:33] show you you more um if you tap a map
+[01:33] show you you more um if you tap a map you will see the stats of this current
+[01:36] you will see the stats of this current
+[01:36] you will see the stats of this current map um so steps you can see the tile
+[01:40] map um so steps you can see the tile
+[01:40] map um so steps you can see the tile usage so how many of the land
+[01:42] usage so how many of the land
+[01:42] usage so how many of the land tiles how many of the beach tiles and
+[01:46] tiles how many of the beach tiles and
+[01:46] tiles how many of the beach tiles and thewat tiles are occupied and how many
+[01:49] thewat tiles are occupied and how many
+[01:49] thewat tiles are occupied and how many are free you also can um rename your
+[01:54] are free you also can um rename your
+[01:54] are free you also can um rename your city
+[02:05] that's Spence Meer City now or you can
+[02:05] that's Spence Meer City now or you can choose AI name d d d silent priest
+[02:11] choose AI name d d d silent priest
+[02:11] choose AI name d d d silent priest ccare Blue Springs Sarat
+[02:15] ccare Blue Springs Sarat
+[02:15] ccare Blue Springs Sarat Town Raba yeah whatever you see if you
+[02:19] Town Raba yeah whatever you see if you
+[02:19] Town Raba yeah whatever you see if you like something or give it your own
+[02:20] like something or give it your own
+[02:20] like something or give it your own custom name um you can also from that
+[02:24] custom name um you can also from that
+[02:24] custom name um you can also from that window you can um demolish all your map
+[02:28] window you can um demolish all your map
+[02:28] window you can um demolish all your map at once bulldo all map at once you push
+[02:32] at once bulldo all map at once you push
+[02:32] at once bulldo all map at once you push this guy and then you will get a warning
+[02:36] this guy and then you will get a warning
+[02:36] this guy and then you will get a warning hopefully you read
+[02:37] hopefully you read
+[02:37] hopefully you read it um the okay button is marked in red
+[02:41] it um the okay button is marked in red
+[02:41] it um the okay button is marked in red uh because once you click okay your city
+[02:44] uh because once you click okay your city
+[02:44] uh because once you click okay your city is wiped out and there is no way uh to
+[02:49] is wiped out and there is no way uh to
+[02:49] is wiped out and there is no way uh to uh to restore it um what will happen is
+[02:52] uh to restore it um what will happen is
+[02:52] uh to restore it um what will happen is all the buildings that you own will be
+[02:54] all the buildings that you own will be
+[02:54] all the buildings that you own will be put into your
+[02:55] put into your
+[02:55] put into your inventory uh so you can build them again
+[02:58] inventory uh so you can build them again
+[02:58] inventory uh so you can build them again you don't lose those buildings you still
+[03:00] you don't lose those buildings you still
+[03:00] you don't lose those buildings you still own them um but they are in your
+[03:03] own them um but they are in your
+[03:03] own them um but they are in your inventory and your map is completely
+[03:05] inventory and your map is completely
+[03:05] inventory and your map is completely empty so for my example now I say no
+[03:11] empty so for my example now I say no
+[03:11] empty so for my example now I say no sex um yeah that's the info
+[03:15] sex um yeah that's the info
+[03:15] sex um yeah that's the info again and as said before switching Maps
+[03:19] again and as said before switching Maps
+[03:20] again and as said before switching Maps is as simple as zooming into the
+[03:24] is as simple as zooming into the
+[03:24] is as simple as zooming into the maps why does this trigger
+[03:27] maps why does this trigger
+[03:27] maps why does this trigger twice just found a little ux Buck here
+[03:31] twice just found a little ux Buck here
+[03:31] twice just found a little ux Buck here but yeah you get it so it's very simple
+[03:34] but yeah you get it so it's very simple
+[03:34] but yeah you get it so it's very simple uh once you're in the city Boop you go
+[03:38] uh once you're in the city Boop you go
+[03:38] uh once you're in the city Boop you go fully zoom out you are in region
+[03:41] fully zoom out you are in region
+[03:41] fully zoom out you are in region view you zoom into the other map you
+[03:44] view you zoom into the other map you
+[03:44] view you zoom into the other map you want to
+[03:45] want to
+[03:45] want to enter click
+[03:47] enter click
+[03:47] enter click yes and the game will reload with the
+[03:50] yes and the game will reload with the
+[03:50] yes and the game will reload with the city you
+[03:52] city you
+[03:52] city you selected uh
+[03:54] selected uh
+[03:54] selected uh yeah what else to say no that's it
+[03:58] yeah what else to say no that's it
+[03:58] yeah what else to say no that's it that's pretty straightforward
+[04:01] that's pretty straightforward
+[04:01] that's pretty straightforward actually pretty proud of this new region
+[04:03] actually pretty proud of this new region
+[04:03] actually pretty proud of this new region view feature because it was everything
+[04:07] view feature because it was everything
+[04:07] view feature because it was everything but not easy to do this on low speec
+[04:10] but not easy to do this on low speec
+[04:10] but not easy to do this on low speec mobile devices but yeah we made it work
+[04:15] mobile devices but yeah we made it work
+[04:15] mobile devices but yeah we made it work um that's it let me know if you got
+[04:17] um that's it let me know if you got
+[04:17] um that's it let me know if you got questions um thanks for watching thanks
+[04:19] questions um thanks for watching thanks
+[04:19] questions um thanks for watching thanks for playing see you in the next video
+[04:21] for playing see you in the next video
+[04:21] for playing see you in the next video bye

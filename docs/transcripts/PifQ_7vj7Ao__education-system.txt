@@ -1,0 +1,209 @@
+# Super Citycon: Education System – City Building Game How-To Tutorial
+# channel: Super Citycon - City Building Game
+# youtube: https://www.youtube.com/watch?v=PifQ_7vj7Ao
+# transcript retrieved 2026-10-23 via yt-dlp (android_vr client)
+# NOTE: auto-generated captions; timestamps approximate, word boundaries may be wrong.
+# Quoting rule: quote the sentence, and check the timestamp before relying on it.
+
+[00:02] hello and welcome in this video I want
+[00:02] hello and welcome in this video I want to talk about the school and education
+[00:05] to talk about the school and education
+[00:05] to talk about the school and education system in super cicon um now let me find
+[00:09] system in super cicon um now let me find
+[00:09] system in super cicon um now let me find the school to quickly do that I enter uh
+[00:13] the school to quickly do that I enter uh
+[00:13] the school to quickly do that I enter uh science View and there we go okay what
+[00:16] science View and there we go okay what
+[00:16] science View and there we go okay what we got now here what you find that's the
+[00:19] we got now here what you find that's the
+[00:19] we got now here what you find that's the Elementary School uh the first uh level
+[00:22] Elementary School uh the first uh level
+[00:22] Elementary School uh the first uh level of school system for the basic needs um
+[00:28] of school system for the basic needs um
+[00:28] of school system for the basic needs um yeah School has an area of effect and it
+[00:32] yeah School has an area of effect and it
+[00:32] yeah School has an area of effect and it has a capacity so that's the capacity
+[00:35] has a capacity so that's the capacity
+[00:35] has a capacity so that's the capacity that means at this current level but
+[00:36] that means at this current level but
+[00:37] that means at this current level but that's already level five you can see
+[00:38] that's already level five you can see
+[00:38] that's already level five you can see that here um at that level it's good for
+[00:44] that here um at that level it's good for
+[00:44] that here um at that level it's good for 1 million residents and uh it connects
+[00:48] 1 million residents and uh it connects
+[00:48] 1 million residents and uh it connects um residential buildings to the school
+[00:51] um residential buildings to the school
+[00:51] um residential buildings to the school system within an area of 23 by 23 back
+[00:55] system within an area of 23 by 23 back
+[00:55] system within an area of 23 by 23 back to science view let's tap that one um
+[00:58] to science view let's tap that one um
+[00:58] to science view let's tap that one um you will see that color
+[01:01] you will see that color
+[01:01] you will see that color highlighted
+[01:03] highlighted
+[01:03] highlighted um to expand that area we got bus
+[01:07] um to expand that area we got bus
+[01:07] um to expand that area we got bus stations that's this
+[01:09] stations that's this
+[01:10] stations that's this ones um they
+[01:19] expand the uh School area well actually
+[01:19] expand the uh School area well actually they not expand they they give um they
+[01:22] they not expand they they give um they
+[01:22] they not expand they they give um they they provide School connection to the
+[01:24] they provide School connection to the
+[01:25] they provide School connection to the surrounding buildings um but they not
+[01:27] surrounding buildings um but they not
+[01:27] surrounding buildings um but they not need to build uh not to not need to be
+[01:30] need to build uh not to not need to be
+[01:30] need to build uh not to not need to be built directly next to a school or
+[01:32] built directly next to a school or
+[01:32] built directly next to a school or something you can build them anywhere
+[01:34] something you can build them anywhere
+[01:34] something you can build them anywhere and as soon as you have uh enough
+[01:37] and as soon as you have uh enough
+[01:38] and as soon as you have uh enough capacity uh in your schools um those bus
+[01:42] capacity uh in your schools um those bus
+[01:42] capacity uh in your schools um those bus stations will provide uh connection to
+[01:45] stations will provide uh connection to
+[01:45] stations will provide uh connection to the school system um once it was a
+[01:48] the school system um once it was a
+[01:48] the school system um once it was a question I was often asked now let's
+[01:51] question I was often asked now let's
+[01:51] question I was often asked now let's stick with the example of the uh of the
+[01:53] stick with the example of the uh of the
+[01:53] stick with the example of the uh of the elementary school uh once you would have
+[01:56] elementary school uh once you would have
+[01:56] elementary school uh once you would have more than a million residents and no
+[01:58] more than a million residents and no
+[01:58] more than a million residents and no other uh elementary schools in in our
+[02:01] other uh elementary schools in in our
+[02:01] other uh elementary schools in in our case where he got enough uh but once you
+[02:04] case where he got enough uh but once you
+[02:04] case where he got enough uh but once you had not enough um the bus station sto
+[02:07] had not enough um the bus station sto
+[02:07] had not enough um the bus station sto working so what happens at the moment
+[02:09] working so what happens at the moment
+[02:09] working so what happens at the moment that you do not reach the capacity
+[02:11] that you do not reach the capacity
+[02:11] that you do not reach the capacity demands The Bu bus stations um will
+[02:15] demands The Bu bus stations um will
+[02:15] demands The Bu bus stations um will deactivate and will no longer provide um
+[02:19] deactivate and will no longer provide um
+[02:19] deactivate and will no longer provide um connection to the school system uh as
+[02:21] connection to the school system uh as
+[02:21] connection to the school system uh as soon as you increased Your Capacity they
+[02:24] soon as you increased Your Capacity they
+[02:24] soon as you increased Your Capacity they will get back in active um what you
+[02:27] will get back in active um what you
+[02:27] will get back in active um what you ideally do uh is cover all your city um
+[02:31] ideally do uh is cover all your city um
+[02:31] ideally do uh is cover all your city um specifically cover all your residential
+[02:35] specifically cover all your residential
+[02:35] specifically cover all your residential uh buildings uh with
+[02:37] uh buildings uh with
+[02:37] uh buildings uh with educations um yeah in this demo city
+[02:43] educations um yeah in this demo city
+[02:43] educations um yeah in this demo city which is built to look nice it's not
+[02:45] which is built to look nice it's not
+[02:45] which is built to look nice it's not done that perfectly um let's quickly see
+[02:49] done that perfectly um let's quickly see
+[02:49] done that perfectly um let's quickly see an overview in in the government area um
+[02:54] an overview in in the government area um
+[02:54] an overview in in the government area um yeah capacity wise capacity is this one
+[02:58] yeah capacity wise capacity is this one
+[02:58] yeah capacity wise capacity is this one capacity wise we are fully covered um
+[03:02] capacity wise we are fully covered um
+[03:02] capacity wise we are fully covered um but they are not connected
+[03:05] but they are not connected
+[03:05] but they are not connected so uh many residents don't have uh
+[03:09] so uh many residents don't have uh
+[03:09] so uh many residents don't have uh access to schooling because there is no
+[03:11] access to schooling because there is no
+[03:11] access to schooling because there is no bus stations and no
+[03:14] bus stations and no
+[03:14] bus stations and no um no school around them that's
+[03:18] um no school around them that's
+[03:18] um no school around them that's something that could be improved here um
+[03:21] something that could be improved here um
+[03:21] something that could be improved here um now the other two steps the secondary
+[03:24] now the other two steps the secondary
+[03:24] now the other two steps the secondary schools and the
+[03:26] schools and the
+[03:26] schools and the university uh it's technically the same
+[03:28] university uh it's technically the same
+[03:28] university uh it's technically the same thing as
+[03:30] thing as
+[03:30] thing as the um as the elementary schools um they
+[03:34] the um as the elementary schools um they
+[03:34] the um as the elementary schools um they have a little bit bigger
+[03:36] have a little bit bigger
+[03:36] have a little bit bigger radius so you don't need that much of
+[03:39] radius so you don't need that much of
+[03:39] radius so you don't need that much of them and they have more
+[03:41] them and they have more
+[03:41] them and they have more capacity
+[03:43] capacity
+[03:43] capacity um and the universities even further
+[03:46] um and the universities even further
+[03:46] um and the universities even further where we got the university here here is
+[03:49] where we got the university here here is
+[03:49] where we got the university here here is one so that's a really huge area um
+[03:58] yeah we got some bonus buildings also
+[03:58] yeah we got some bonus buildings also for education
+[04:00] for education
+[04:00] for education um what they do is improve the quality
+[04:05] um what they do is improve the quality
+[04:05] um what they do is improve the quality of your school um like a library and I
+[04:10] of your school um like a library and I
+[04:10] of your school um like a library and I think we also got the art
+[04:12] think we also got the art
+[04:12] think we also got the art museum um not sure if it's around here
+[04:15] museum um not sure if it's around here
+[04:15] museum um not sure if it's around here on that map maybe let me quickly check
+[04:18] on that map maybe let me quickly check
+[04:18] on that map maybe let me quickly check oh yeah here is one that's the art
+[04:21] oh yeah here is one that's the art
+[04:21] oh yeah here is one that's the art museum so those buildings are there to
+[04:24] museum so those buildings are there to
+[04:25] museum so those buildings are there to improve your
+[04:26] improve your
+[04:26] improve your education um but at the point recording
+[04:29] education um but at the point recording
+[04:29] education um but at the point recording this I'm recording this when version
+[04:33] this I'm recording this when version
+[04:33] this I'm recording this when version 2.1.2 is live or the education system is
+[04:38] 2.1.2 is live or the education system is
+[04:38] 2.1.2 is live or the education system is kind of an open end in the game um so
+[04:40] kind of an open end in the game um so
+[04:41] kind of an open end in the game um so what it does when your buildings your
+[04:42] what it does when your buildings your
+[04:42] what it does when your buildings your residential buildings are covered by
+[04:44] residential buildings are covered by
+[04:44] residential buildings are covered by education you will receive an income
+[04:46] education you will receive an income
+[04:46] education you will receive an income bonus um but at this point education has
+[04:50] bonus um but at this point education has
+[04:50] bonus um but at this point education has no further effect uh that may change in
+[04:53] no further effect uh that may change in
+[04:53] no further effect uh that may change in the future um let me know your thoughts
+[04:56] the future um let me know your thoughts
+[04:56] the future um let me know your thoughts about it what shall we do what shall we
+[04:58] about it what shall we do what shall we
+[04:58] about it what shall we do what shall we do you features a chest are always
+[05:00] do you features a chest are always
+[05:00] do you features a chest are always welcome and yeah I'm totally interested
+[05:03] welcome and yeah I'm totally interested
+[05:03] welcome and yeah I'm totally interested in your ideas um yeah let me know that's
+[05:07] in your ideas um yeah let me know that's
+[05:07] in your ideas um yeah let me know that's it about the education system if you got
+[05:10] it about the education system if you got
+[05:10] it about the education system if you got further questions give me a comment uh
+[05:12] further questions give me a comment uh
+[05:12] further questions give me a comment uh join our Discord and get in touch I also
+[05:16] join our Discord and get in touch I also
+[05:16] join our Discord and get in touch I also have a subreddit where I look uh from
+[05:18] have a subreddit where I look uh from
+[05:18] have a subreddit where I look uh from time to time um yeah thanks for watching
+[05:22] time to time um yeah thanks for watching
+[05:22] time to time um yeah thanks for watching thanks for playing have a good time bye

@@ -1,0 +1,119 @@
+# Super Citycon: Connected Economies – City Building Game How-To Tutorial
+# channel: Super Citycon - City Building Game
+# youtube: https://www.youtube.com/watch?v=m5O-A33wQm0
+# transcript retrieved 2026-10-23 via yt-dlp (android_vr client)
+# NOTE: auto-generated captions; timestamps approximate, word boundaries may be wrong.
+# Quoting rule: quote the sentence, and check the timestamp before relying on it.
+
+[00:03] hello and welcome in this video I want
+[00:03] hello and welcome in this video I want to explain how you can
+[00:06] to explain how you can
+[00:06] to explain how you can connect um parts of the economy of
+[00:09] connect um parts of the economy of
+[00:09] connect um parts of the economy of multiple
+[00:10] multiple
+[00:10] multiple Maps um what you can connect is your
+[00:14] Maps um what you can connect is your
+[00:14] Maps um what you can connect is your food supply your Waste Management your
+[00:17] food supply your Waste Management your
+[00:17] food supply your Waste Management your water and your energy Supply now how
+[00:20] water and your energy Supply now how
+[00:20] water and your energy Supply now how does it work um for food and waste it's
+[00:24] does it work um for food and waste it's
+[00:24] does it work um for food and waste it's well it's simple for all but for food
+[00:26] well it's simple for all but for food
+[00:26] well it's simple for all but for food and waste it's about the harbor so when
+[00:28] and waste it's about the harbor so when
+[00:28] and waste it's about the harbor so when you have a Harbor on your map um it
+[00:31] you have a Harbor on your map um it
+[00:31] you have a Harbor on your map um it automatically connects to the global
+[00:34] automatically connects to the global
+[00:34] automatically connects to the global system um so essentially uh each map
+[00:38] system um so essentially uh each map
+[00:38] system um so essentially uh each map that owns in Harbor is connected to the
+[00:40] that owns in Harbor is connected to the
+[00:40] that owns in Harbor is connected to the global system and from Z on it does not
+[00:44] global system and from Z on it does not
+[00:44] global system and from Z on it does not matter
+[00:45] matter
+[00:45] matter anymore um if the food production uh or
+[00:49] anymore um if the food production uh or
+[00:49] anymore um if the food production uh or the waste management is on this current
+[00:52] the waste management is on this current
+[00:52] the waste management is on this current map or on any other of your map maps
+[00:55] map or on any other of your map maps
+[00:55] map or on any other of your map maps within your region um it's all connected
+[00:59] within your region um it's all connected
+[00:59] within your region um it's all connected um look looking at the um economy panel
+[01:03] um look looking at the um economy panel
+[01:03] um look looking at the um economy panel for food for example you will find this
+[01:06] for food for example you will find this
+[01:06] for food for example you will find this globe icon which indicates you okay this
+[01:09] globe icon which indicates you okay this
+[01:09] globe icon which indicates you okay this is connected to other Maps um also all
+[01:13] is connected to other Maps um also all
+[01:13] is connected to other Maps um also all the values you you will find here uh in
+[01:17] the values you you will find here uh in
+[01:17] the values you you will find here uh in that case show your Global numbers um
+[01:20] that case show your Global numbers um
+[01:20] that case show your Global numbers um because that's the only overview you
+[01:23] because that's the only overview you
+[01:23] because that's the only overview you still need at that point um now let's
+[01:26] still need at that point um now let's
+[01:26] still need at that point um now let's check water
+[01:43] uh the Water Supply as you can see it's
+[01:43] uh the Water Supply as you can see it's not connected yet it's only for this
+[01:46] not connected yet it's only for this
+[01:46] not connected yet it's only for this current map and uh the energy Supply you
+[01:50] current map and uh the energy Supply you
+[01:50] current map and uh the energy Supply you see it's already connected so that means
+[01:53] see it's already connected so that means
+[01:53] see it's already connected so that means we have a C wire on this map um now let
+[01:57] we have a C wire on this map um now let
+[01:57] we have a C wire on this map um now let me show you the buildings in the shop
+[02:00] me show you the buildings in the shop
+[02:00] me show you the buildings in the shop um you got this energy C
+[02:03] um you got this energy C
+[02:03] um you got this energy C wire same as with the harbor you build
+[02:06] wire same as with the harbor you build
+[02:06] wire same as with the harbor you build it once on a map and this map is
+[02:09] it once on a map and this map is
+[02:09] it once on a map and this map is connected to the global system so each
+[02:12] connected to the global system so each
+[02:12] connected to the global system so each uh map that has a C wire is
+[02:14] uh map that has a C wire is
+[02:14] uh map that has a C wire is automatically connected um same for the
+[02:17] automatically connected um same for the
+[02:17] automatically connected um same for the water
+[02:19] water
+[02:19] water pipeline um each map that has it is
+[02:22] pipeline um each map that has it is
+[02:22] pipeline um each map that has it is connected and the harbor it should be in
+[02:25] connected and the harbor it should be in
+[02:25] connected and the harbor it should be in the infrastructure section yes it's here
+[02:28] the infrastructure section yes it's here
+[02:28] the infrastructure section yes it's here each map that has Harbor has a connected
+[02:32] each map that has Harbor has a connected
+[02:32] each map that has Harbor has a connected food and a connected waste management
+[02:34] food and a connected waste management
+[02:34] food and a connected waste management system um yeah that's it about connected
+[02:38] system um yeah that's it about connected
+[02:38] system um yeah that's it about connected economies um or maybe a general hint um
+[02:42] economies um or maybe a general hint um
+[02:42] economies um or maybe a general hint um all your your money or for those who
+[02:44] all your your money or for those who
+[02:45] all your your money or for those who didn't know all your coins uh all your
+[02:47] didn't know all your coins uh all your
+[02:47] didn't know all your coins uh all your super cash um that's also one amount
+[02:51] super cash um that's also one amount
+[02:51] super cash um that's also one amount okay it's it's shared across all maps in
+[02:54] okay it's it's shared across all maps in
+[02:54] okay it's it's shared across all maps in general um yeah that's it about
+[02:57] general um yeah that's it about
+[02:57] general um yeah that's it about connected economies let me know if you
+[02:59] connected economies let me know if you
+[02:59] connected economies let me know if you got questions
+[03:00] got questions
+[03:00] got questions uh thanks for watching thanks for
+[03:02] uh thanks for watching thanks for
+[03:02] uh thanks for watching thanks for playing have a good time bye

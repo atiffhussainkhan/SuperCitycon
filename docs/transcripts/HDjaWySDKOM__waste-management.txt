@@ -1,0 +1,111 @@
+# Super Citycon: Waste Management – City Building Game How-To Tutorial
+# channel: Super Citycon - City Building Game
+# youtube: https://www.youtube.com/watch?v=HDjaWySDKOM
+# transcript retrieved 2026-10-23 via yt-dlp (android_vr client)
+# NOTE: auto-generated captions; timestamps approximate, word boundaries may be wrong.
+# Quoting rule: quote the sentence, and check the timestamp before relying on it.
+
+[00:04] hello and welcome in this video I want
+[00:04] hello and welcome in this video I want to talk about the waste management
+[00:06] to talk about the waste management
+[00:06] to talk about the waste management system in super cicon of course your
+[00:09] system in super cicon of course your
+[00:09] system in super cicon of course your residents produce a lot of waste and
+[00:12] residents produce a lot of waste and
+[00:12] residents produce a lot of waste and someone needs to get rid of it um what
+[00:15] someone needs to get rid of it um what
+[00:15] someone needs to get rid of it um what we got for you is different buildings
+[00:18] we got for you is different buildings
+[00:18] we got for you is different buildings that are made for this purpose uh let's
+[00:21] that are made for this purpose uh let's
+[00:21] that are made for this purpose uh let's check the
+[00:23] check the
+[00:23] check the shop at the category you see it in the
+[00:27] shop at the category you see it in the
+[00:27] shop at the category you see it in the lower lower end the one I selected here
+[00:30] lower lower end the one I selected here
+[00:30] lower lower end the one I selected here um we got the landfill we got the
+[00:32] um we got the landfill we got the
+[00:32] um we got the landfill we got the recycling station and we got the waste
+[00:35] recycling station and we got the waste
+[00:35] recycling station and we got the waste incineration which is also PowerUp blend
+[00:39] incineration which is also PowerUp blend
+[00:39] incineration which is also PowerUp blend um the landfill is uh cheap and pretty
+[00:43] um the landfill is uh cheap and pretty
+[00:43] um the landfill is uh cheap and pretty straightforward your waste is put there
+[00:46] straightforward your waste is put there
+[00:46] straightforward your waste is put there it's not super realistic CU magically it
+[00:48] it's not super realistic CU magically it
+[00:48] it's not super realistic CU magically it will disappear there but that's how we
+[00:51] will disappear there but that's how we
+[00:51] will disappear there but that's how we did it CU otherwise you would end up
+[00:54] did it CU otherwise you would end up
+[00:54] did it CU otherwise you would end up with a City full of waste
+[00:56] with a City full of waste
+[00:57] with a City full of waste um yeah the next one is serious
+[00:59] um yeah the next one is serious
+[00:59] um yeah the next one is serious recycling station uh the recycling
+[01:02] recycling station uh the recycling
+[01:02] recycling station uh the recycling station um also reduces your uh your
+[01:07] station um also reduces your uh your
+[01:07] station um also reduces your uh your waste um it's a little more expensive
+[01:10] waste um it's a little more expensive
+[01:10] waste um it's a little more expensive and it's
+[01:11] and it's
+[01:11] and it's upgradeable um so it's a choice a good
+[01:14] upgradeable um so it's a choice a good
+[01:14] upgradeable um so it's a choice a good choice once your city is a little bit
+[01:16] choice once your city is a little bit
+[01:16] choice once your city is a little bit more
+[01:17] more
+[01:17] more advanced um you can also choose uh the
+[01:19] advanced um you can also choose uh the
+[01:19] advanced um you can also choose uh the waste incineration it will also reduce
+[01:23] waste incineration it will also reduce
+[01:23] waste incineration it will also reduce the waste um or burn it for energy and
+[01:27] the waste um or burn it for energy and
+[01:27] the waste um or burn it for energy and produce energy for your city
+[01:30] produce energy for your city
+[01:30] produce energy for your city um it creates a lot of pollution but if
+[01:33] um it creates a lot of pollution but if
+[01:33] um it creates a lot of pollution but if you figure it out to put it uh into your
+[01:37] you figure it out to put it uh into your
+[01:37] you figure it out to put it uh into your industrial areas that won't be a problem
+[01:41] industrial areas that won't be a problem
+[01:41] industrial areas that won't be a problem in the government section you can get an
+[01:44] in the government section you can get an
+[01:45] in the government section you can get an overview um simply tells you the waste
+[01:48] overview um simply tells you the waste
+[01:48] overview um simply tells you the waste production from all the building
+[01:51] production from all the building
+[01:51] production from all the building categories um that's
+[01:54] categories um that's
+[01:54] categories um that's residential uh
+[01:57] residential uh
+[01:57] residential uh commercial um Industrial
+[02:01] commercial um Industrial
+[02:01] commercial um Industrial the government and the farms and you
+[02:04] the government and the farms and you
+[02:04] the government and the farms and you will see the removal um so so all your
+[02:09] will see the removal um so so all your
+[02:09] will see the removal um so so all your all your buildings that make the waste
+[02:11] all your buildings that make the waste
+[02:11] all your buildings that make the waste magically disappear and at the current
+[02:14] magically disappear and at the current
+[02:15] magically disappear and at the current states we are totally fine it's 177% in
+[02:17] states we are totally fine it's 177% in
+[02:17] states we are totally fine it's 177% in use which means your residents are happy
+[02:21] use which means your residents are happy
+[02:21] use which means your residents are happy and you will not have negative effects
+[02:24] and you will not have negative effects
+[02:24] and you will not have negative effects on happiness and with that also not have
+[02:28] on happiness and with that also not have
+[02:28] on happiness and with that also not have negative effects um on your major score
+[02:32] negative effects um on your major score
+[02:32] negative effects um on your major score um yeah that's it about Waste Management
+[02:35] um yeah that's it about Waste Management
+[02:35] um yeah that's it about Waste Management um let me know if you got any questions
+[02:37] um let me know if you got any questions
+[02:37] um let me know if you got any questions thanks for watching see you in the next
+[02:39] thanks for watching see you in the next
+[02:39] thanks for watching see you in the next video bye

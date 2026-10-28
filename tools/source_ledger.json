@@ -1,0 +1,274 @@
+{
+  "_readme": "Machine-readable source verification ledger. Every URL cited in the requirement documents was verified on 2026-10-23 by fetching it and reading its own title/channel/identity. Verdicts: OFFICIAL (the game's own material), THIRD_PARTY (genuinely about Super Citycon but not the developer), LEGIT (valid non-video source), PLATFORM (generic Steam-platform behaviour, not game-specific), FOREIGN (a DIFFERENT GAME - rows citing only these are invalid), WEAK (real but cannot currently be quoted), JUNK (not a source). See docs/SOURCE-VERIFICATION.md for the full narrative and the proof for each verdict.",
+  "verified_on": "2026-10-23",
+  "verdicts": {
+    "OFFICIAL": "The game's own material (official YouTube channel, official site, official store/app pages, official community).",
+    "THIRD_PARTY": "Independently produced but genuinely about Super Citycon.",
+    "LEGIT": "Valid primary source that is not a video.",
+    "PLATFORM": "Generic platform behaviour (e.g. Steam Workshop mechanics). Not evidence about SuperCitycon specifics.",
+    "FOREIGN": "Belongs to a DIFFERENT GAME. Any requirement whose only support is a FOREIGN source is invalid.",
+    "WEAK": "Real and relevant, but the body cannot currently be read, so it cannot be quoted as evidence.",
+    "JUNK": "Not a source (search-engine query URL, bare domain)."
+  },
+  "youtube": {
+    "jYAD0SkDmY0": {
+      "verdict": "OFFICIAL",
+      "channel": "Super Citycon - City Building Game",
+      "title": "Super Citycon: The Basics - City Building Game How-To Tutorial"
+    },
+    "LmY_TpU1B5Y": {
+      "verdict": "OFFICIAL",
+      "channel": "Super Citycon - City Building Game",
+      "title": "Super Citycon: Economy Overview - City Building Game How-To Tutorial"
+    },
+    "m5O-A33wQm0": {
+      "verdict": "OFFICIAL",
+      "channel": "Super Citycon - City Building Game",
+      "title": "Super Citycon: Connected Economies - City Building Game How-To Tutorial"
+    },
+    "CIb2IWyNPJw": {
+      "verdict": "OFFICIAL",
+      "channel": "Super Citycon - City Building Game",
+      "title": "Super Citycon: Resident Bonuses - City Building Game How-To Tutorial"
+    },
+    "c3L7Qo8fdIM": {
+      "verdict": "OFFICIAL",
+      "channel": "Super Citycon - City Building Game",
+      "title": "Super Citycon: Science View - City Building Game How-To Tutorial"
+    },
+    "OUYirEhc9c8": {
+      "verdict": "OFFICIAL",
+      "channel": "Super Citycon - City Building Game",
+      "title": "Super Citycon: Income Bonuses - City Building Game How-To Tutorial"
+    },
+    "PifQ_7vj7Ao": {
+      "verdict": "OFFICIAL",
+      "channel": "Super Citycon - City Building Game",
+      "title": "Super Citycon: Education System - City Building Game How-To Tutorial"
+    },
+    "_QpxzZFTBtw": {
+      "verdict": "OFFICIAL",
+      "channel": "Super Citycon - City Building Game",
+      "title": "Super Citycon: Happiness & Mayor Score - City Building Game How-To Tutorial"
+    },
+    "4SlxOgZ67MU": {
+      "verdict": "OFFICIAL",
+      "channel": "Super Citycon - City Building Game",
+      "title": "Super Citycon: Healthcare System - City Building Game How-To Tutorial"
+    },
+    "HDjaWySDKOM": {
+      "verdict": "OFFICIAL",
+      "channel": "Super Citycon - City Building Game",
+      "title": "Super Citycon: Waste Management - City Building Game How-To Tutorial"
+    },
+    "6wWZxnm_YLk": {
+      "verdict": "OFFICIAL",
+      "channel": "Super Citycon - City Building Game",
+      "title": "Super Citycon: Food Supply System - City Building Game How-To Tutorial"
+    },
+    "tFmR_0w1OuQ": {
+      "verdict": "OFFICIAL",
+      "channel": "Super Citycon - City Building Game",
+      "title": "Super Citycon: Police Department - City Building Game How-To Tutorial"
+    },
+    "yuLUP_ELk4I": {
+      "verdict": "OFFICIAL",
+      "channel": "Super Citycon - City Building Game",
+      "title": "Super Citycon: Water Supply System - City Building Game How-To Tutorial"
+    },
+    "vBJdlAeLn0g": {
+      "verdict": "OFFICIAL",
+      "channel": "Super Citycon - City Building Game",
+      "title": "Super Citycon: Switching Maps - City Building Game How-To Tutorial"
+    },
+    "0wFTp0aDpQg": {
+      "verdict": "OFFICIAL",
+      "channel": "Super Citycon - City Building Game",
+      "title": "Super Citycon: Fire Department - City Building Game How-To Tutorial"
+    },
+    "y5g7xPHzj0A": {
+      "verdict": "OFFICIAL",
+      "channel": "Super Citycon - City Building Game",
+      "title": "Super Citycon: Energy Supply - City Building Game How-To Tutorial"
+    },
+    "71H1tU2DGz8": {
+      "verdict": "OFFICIAL",
+      "channel": "Super Citycon - City Building Game",
+      "title": "Super Citycon: Monorails - City Building Game How-To Tutorial"
+    },
+    "cSRDwHvowWI": {
+      "verdict": "OFFICIAL",
+      "channel": "Super Citycon - City Building Game",
+      "title": "Super Citycon: Storage Feature - City Building Game How-To Tutorial"
+    },
+    "ovWkwWS5FlY": {
+      "verdict": "OFFICIAL",
+      "channel": "Super Citycon - City Building Game",
+      "title": "Super Citycon: Camera Modes - City Building Game How-To Tutorial"
+    },
+    "bOPESpVGXOU": {
+      "verdict": "OFFICIAL",
+      "channel": "Super Citycon - City Building Game",
+      "title": "Super Citycon is Coming to Steam! Wishlist Now for PC & Mac!"
+    },
+    "6Jd2kyaEZbM": {
+      "verdict": "OFFICIAL",
+      "channel": "Super Citycon - City Building Game",
+      "title": "Super Citycon in 30 seconds"
+    },
+    "NJfQ_5-wlWo": {
+      "verdict": "OFFICIAL",
+      "channel": "Super Citycon - City Building Game",
+      "title": "How to make models for Super Citycon with Magica Voxel"
+    },
+    "TgxftADwB6E": {
+      "verdict": "THIRD_PARTY",
+      "channel": "TA Plays Games",
+      "title": "Super Citycon - Build a City First Gameplay Walkthrough | Android / iOS"
+    },
+    "FEELWEOJs2M": {
+      "verdict": "THIRD_PARTY",
+      "channel": "Wishlist Radar",
+      "title": "SuperCitycon: a retro city builder with its own voxel editor"
+    },
+    "0SzCY7BFC8A": {
+      "verdict": "FOREIGN",
+      "channel": "UrbanLoon",
+      "title": "I Tried Building a City With 0 Traffic Jams... It Actually Worked",
+      "proof": "Cities: Skylines traffic video. Not SuperCitycon."
+    },
+    "ZVslYTb-a2M": {
+      "verdict": "FOREIGN",
+      "channel": "Biffa Plays Indie Games",
+      "title": "A Viewer Sent Me Their WORST Traffic... So I Fixed It",
+      "proof": "Description: 'A viewer sent me their Cities: Skylines 2 city because the traffic had reached total gridlock!' Not SuperCitycon."
+    }
+  },
+  "hosts": {
+    "playkot.helpshift.com": {
+      "verdict": "FOREIGN",
+      "proof": "Playkot's SuperCity help centre (different mobile game by Playkot)."
+    },
+    "supercitygametips.com": {
+      "verdict": "FOREIGN",
+      "proof": "Playkot's SuperCity tips site. Posts dated 2025-2026 with 'SuperCity Turns 15!' - a 2011 title, not Super Citycon (2022)."
+    },
+    "lite.duckduckgo.com": {
+      "verdict": "JUNK",
+      "proof": "Search-engine query URL, not a document."
+    },
+    "github.com": {
+      "verdict": "JUNK",
+      "proof": "Bare domain with no path."
+    },
+    "store.steampowered.com": {
+      "verdict": "LEGIT",
+      "proof": "Steam pages for app 3474890 (SuperCitycon) and 5295650 (SuperCitycon Demo)."
+    },
+    "steamcommunity.com": {
+      "verdict": "LEGIT",
+      "proof": "Steam community pages for app 3474890."
+    },
+    "api.steampowered.com": {
+      "verdict": "LEGIT",
+      "proof": "Steam appdetails / news APIs for appid 3474890."
+    },
+    "steamdb.info": {
+      "verdict": "LEGIT",
+      "proof": "SteamDB entry for app 3474890."
+    },
+    "apps.apple.com": {
+      "verdict": "LEGIT",
+      "proof": "App Store id 1607860732 = Super Citycon: Build a City."
+    },
+    "itunes.apple.com": {
+      "verdict": "LEGIT",
+      "proof": "Apple lookup API for app id 1607860732."
+    },
+    "play.google.com": {
+      "verdict": "LEGIT",
+      "proof": "Google Play package com.benwilles.citybuilder."
+    },
+    "supercitycon.net": {
+      "verdict": "LEGIT",
+      "proof": "Official site."
+    },
+    "www.reddit.com": {
+      "verdict": "LEGIT",
+      "proof": "r/supercitycon and official developer posts about Super Citycon."
+    },
+    "mobilegaminghub.com": {
+      "verdict": "THIRD_PARTY",
+      "proof": "Title verified: 'Super Citycon Tips and Tricks to Build a Beautiful City'."
+    },
+    "mwm.ai": {
+      "verdict": "THIRD_PARTY",
+      "proof": "App catalogue entry for app id 1607860732."
+    },
+    "trophieshunter.com": {
+      "verdict": "THIRD_PARTY",
+      "proof": "Achievements for Super Citycon: Build a City (iOS)."
+    },
+    "gamehypes.com": {
+      "verdict": "THIRD_PARTY",
+      "proof": "Super Citycon resource page."
+    },
+    "appshunter.io": {
+      "verdict": "THIRD_PARTY",
+      "proof": "App id 1607860732."
+    },
+    "theend.wiki": {
+      "verdict": "WEAK",
+      "proof": "Page body returns a Vercel security checkpoint; cannot be quoted."
+    },
+    "discord.gg": {
+      "verdict": "LEGIT",
+      "proof": "Official community invite linked from the Steam page."
+    },
+    "shared.fastly.steamstatic.com": {
+      "verdict": "LEGIT",
+      "proof": "Official Steam trailer/screenshot assets under apps/3474890."
+    },
+    "supercity-friends.fandom.com": {
+      "verdict": "FOREIGN",
+      "proof": "'Supercity Friends Wiki' (Fandom), wiki category 'SuperCity Wiki'. Documents Playkot's SuperCity: daily bonus pays '7 SuperBucks or a Casino Chip', green/red/black/gold Casino Chips. SuperBucks and Casino are not Super Citycon currencies (Super Citycon uses Super Cash / Coins). Article title 'Daily Player Bonus | Supercity Friends Wiki | Fandom'."
+    },
+    "thegameextras.com": {
+      "verdict": "THIRD_PARTY",
+      "proof": "'Super Citycon: City Builder' page. Quires the publisher's own App Store description verbatim ('Huge and unlimited maps, short construction times and a simulation style economy! ... Unlock over 150 Buildings'), links out to the official itunes id1607860732 / supercitycon.net / Ben Willes channels, and embeds the official trailer UViBBw0S3eo. Genuinely about Super Citycon."
+    },
+    "www.facebook.com": {
+      "verdict": "OFFICIAL",
+      "proof": "Developer page for Ben Willes Games (benwillesgames), the publisher of the mobile title 'Super Citycon: Build a City'. Confirmed as an official channel via the official-links block on thegameextras.com and the App Store listing."
+    },
+    "www.youtube.com": {
+      "verdict": "OFFICIAL",
+      "proof": "Host for the game's own channel. Verified two ways: the channel RSS feed (https://www.youtube.com/feeds/videos.xml?channel_id=UCb5PQ1wJm1XVukaSPya3qww) returns <title>Super Citycon - City Building Game</title> with <yt:channelId>b5PQ1wJm1XVukaSPya3qww</yt:channelId>; and https://www.youtube.com/@supercitycon/videos returns the page title 'Super Citycon - City Building Game - YouTube'. Per-video ids are still judged individually by the youtube verdict map."
+    },
+    "index.commoncrawl.org": {
+      "verdict": "LEGIT",
+      "proof": "Common Crawl index API, used to retrieve an archived capture of the official dev blog article https://supercitycon.net/new-bonuses-for-residence-growth/ (which now returns 404). Query 'CC-MAIN-2024-51-index?url=supercitycon.net%2Fnew-bonuses-for-residence-growth%2F&output=json' returns status 200, mime text/html, timestamp 20241213091112, with the WARC filename/offset/length needed to fetch the exact bytes. The recovered article text is the publisher's own words."
+    },
+    "data.commoncrawl.org": {
+      "verdict": "LEGIT",
+      "proof": "Common Crawl WARC data endpoint (data.commoncrawl.org). Used to fetch the exact archived bytes of the official dev blog article 'New Bonuses for Residence Growth' (supercitycon.net), whose live URL now returns 404. The byte range is given by the CC-MAIN-2024-51 index record: file crawl-data/CC-MAIN-2024-51/segments/1733066116599.47/warc/CC-MAIN-20241213074100-20241213104100-00780.warc.gz, offset 494166670, length 39681 (capture timestamp 2024-12-13, HTTP 200). The recovered article text is the publisher's own words."
+    }
+  },
+  "url_overrides": {
+    "https://store.steampowered.com/app/3474890/Super_Citycon/": {
+      "verdict": "LEGIT",
+      "note": "Non-canonical underscore slug; redirects. Prefer https://store.steampowered.com/app/3474890/SuperCitycon/"
+    }
+  },
+  "platform_only": {
+    "https://steamcommunity.com/games/SteamWorkshop/announcements/detail/": {
+      "note": "Generic Steam Workshop platform announcements - cite only for platform behaviour (versioning, dependencies, load order), never for SuperCitycon specifics."
+    },
+    "https://steamcommunity.com/workshop/": {
+      "note": "Generic Steam Workshop page - weak as evidence."
+    },
+    "https://steamcommunity.com/workshop/workshopsubmitinfo/": {
+      "note": "Generic Steam Workshop submission page - weak as evidence."
+    }
+  }
+}

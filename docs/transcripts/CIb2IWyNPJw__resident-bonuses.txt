@@ -1,0 +1,317 @@
+# Super Citycon: Resident Bonuses – City Building Game How-To Tutorial
+# channel: Super Citycon - City Building Game
+# youtube: https://www.youtube.com/watch?v=CIb2IWyNPJw
+# transcript retrieved 2026-10-23 via yt-dlp (android_vr client)
+# NOTE: auto-generated captions; timestamps approximate, word boundaries may be wrong.
+# Quoting rule: quote the sentence, and check the timestamp before relying on it.
+
+[00:03] hello and welcome in this video I want
+[00:03] hello and welcome in this video I want to explain the residence bonuses so
+[00:07] to explain the residence bonuses so
+[00:07] to explain the residence bonuses so bonuses that actually increase your
+[00:10] bonuses that actually increase your
+[00:10] bonuses that actually increase your residence amount um those came to the
+[00:14] residence amount um those came to the
+[00:14] residence amount um those came to the game in version
+[00:15] game in version
+[00:15] game in version two um yeah let's check the government
+[00:19] two um yeah let's check the government
+[00:19] two um yeah let's check the government overview
+[00:21] overview
+[00:21] overview first uh here we are so this are the new
+[00:26] first uh here we are so this are the new
+[00:26] first uh here we are so this are the new bonuses we have culture entertainment
+[00:29] bonuses we have culture entertainment
+[00:29] bonuses we have culture entertainment Recreation
+[00:30] Recreation
+[00:31] Recreation wealth diversity and loyalty all those
+[00:35] wealth diversity and loyalty all those
+[00:35] wealth diversity and loyalty all those bonuses sum up to your residence bonus
+[00:38] bonuses sum up to your residence bonus
+[00:38] bonuses sum up to your residence bonus and increase your residence
+[00:40] and increase your residence
+[00:40] and increase your residence amount um now how do they work um
+[00:44] amount um now how do they work um
+[00:44] amount um now how do they work um culture entertainment and Recreation
+[00:46] culture entertainment and Recreation
+[00:46] culture entertainment and Recreation they work in a similar way
+[00:50] they work in a similar way
+[00:50] they work in a similar way um you got buildings that uh have um
+[00:55] um you got buildings that uh have um
+[00:55] um you got buildings that uh have um culture points like here this is culture
+[00:59] culture points like here this is culture
+[00:59] culture points like here this is culture um this little plus um indicates that
+[01:03] um this little plus um indicates that
+[01:04] um this little plus um indicates that you can have multiple of those buildings
+[01:07] you can have multiple of those buildings
+[01:07] you can have multiple of those buildings on one map um while you still get the
+[01:10] on one map um while you still get the
+[01:10] on one map um while you still get the bonus for each one uh let me quickly
+[01:13] bonus for each one uh let me quickly
+[01:13] bonus for each one uh let me quickly look for another
+[01:15] look for another
+[01:15] look for another example uh yeah the cinema on the cinema
+[01:19] example uh yeah the cinema on the cinema
+[01:19] example uh yeah the cinema on the cinema you will find the orange symbol this one
+[01:22] you will find the orange symbol this one
+[01:22] you will find the orange symbol this one has culture and
+[01:24] has culture and
+[01:24] has culture and entertainment um but this one is unique
+[01:28] entertainment um but this one is unique
+[01:28] entertainment um but this one is unique uh which means uh the cinema will have
+[01:31] uh which means uh the cinema will have
+[01:31] uh which means uh the cinema will have effect only once on the map so even when
+[01:35] effect only once on the map so even when
+[01:35] effect only once on the map so even when you got multiple Cinemas you only get
+[01:38] you got multiple Cinemas you only get
+[01:38] you got multiple Cinemas you only get those points once not multiple
+[01:47] times um yeah now back to the
+[01:47] times um yeah now back to the overview what you need to satisfy your
+[01:49] overview what you need to satisfy your
+[01:49] overview what you need to satisfy your residence and get the full bonus of 250%
+[01:53] residence and get the full bonus of 250%
+[01:53] residence and get the full bonus of 250% for each category uh is that you need to
+[01:57] for each category uh is that you need to
+[01:57] for each category uh is that you need to have one point or per thousand residents
+[02:01] have one point or per thousand residents
+[02:01] have one point or per thousand residents that live in your city so uh a city with
+[02:04] that live in your city so uh a city with
+[02:04] that live in your city so uh a city with 10,000 residents is completely fine with
+[02:07] 10,000 residents is completely fine with
+[02:07] 10,000 residents is completely fine with just 10 culture points or but a bigger
+[02:10] just 10 culture points or but a bigger
+[02:10] just 10 culture points or but a bigger city depending on the size may need a
+[02:12] city depending on the size may need a
+[02:12] city depending on the size may need a lot more on this city this current demo
+[02:16] lot more on this city this current demo
+[02:16] lot more on this city this current demo City this is very well decorated uh you
+[02:19] City this is very well decorated uh you
+[02:19] City this is very well decorated uh you can see it especially on the recreation
+[02:21] can see it especially on the recreation
+[02:21] can see it especially on the recreation points uh we have a lot of that um you
+[02:25] points uh we have a lot of that um you
+[02:25] points uh we have a lot of that um you could remove a lot of parks here look
+[02:28] could remove a lot of parks here look
+[02:28] could remove a lot of parks here look like this big areas here or here there's
+[02:32] like this big areas here or here there's
+[02:32] like this big areas here or here there's there's parks and decorational stuff
+[02:35] there's parks and decorational stuff
+[02:35] there's parks and decorational stuff everywhere um yeah this could be removed
+[02:38] everywhere um yeah this could be removed
+[02:38] everywhere um yeah this could be removed and could be built with skyscrapers or
+[02:40] and could be built with skyscrapers or
+[02:40] and could be built with skyscrapers or other residential buildings um to
+[02:44] other residential buildings um to
+[02:44] other residential buildings um to optimize the city for the maximum amount
+[02:46] optimize the city for the maximum amount
+[02:46] optimize the city for the maximum amount of
+[02:47] of
+[02:47] of residents or if you like it like that
+[02:50] residents or if you like it like that
+[02:50] residents or if you like it like that simply leave it um there's no need to
+[02:52] simply leave it um there's no need to
+[02:53] simply leave it um there's no need to run the high scores but if you feel like
+[02:55] run the high scores but if you feel like
+[02:55] run the high scores but if you feel like you can do and compete and try to figure
+[02:58] you can do and compete and try to figure
+[02:58] you can do and compete and try to figure out what is the best puzzle no one knows
+[03:01] out what is the best puzzle no one knows
+[03:01] out what is the best puzzle no one knows yet no one knows um what's what's the
+[03:05] yet no one knows um what's what's the
+[03:05] yet no one knows um what's what's the actual maximum of a map um yeah it's
+[03:09] actual maximum of a map um yeah it's
+[03:09] actual maximum of a map um yeah it's interesting I'm I'm really curious to
+[03:12] interesting I'm I'm really curious to
+[03:12] interesting I'm I'm really curious to see what players come up in the future
+[03:15] see what players come up in the future
+[03:15] see what players come up in the future um yeah that was culture entertainment
+[03:17] um yeah that was culture entertainment
+[03:17] um yeah that was culture entertainment and Recreation as said s work similar um
+[03:21] and Recreation as said s work similar um
+[03:22] and Recreation as said s work similar um just have a different icon and it's
+[03:24] just have a different icon and it's
+[03:24] just have a different icon and it's different buildings um that that have
+[03:26] different buildings um that that have
+[03:26] different buildings um that that have this property
+[03:30] this property
+[03:30] this property uh Wells Works different uh some of the
+[03:34] uh Wells Works different uh some of the
+[03:34] uh Wells Works different uh some of the buildings not all of them uh have an
+[03:37] buildings not all of them uh have an
+[03:37] buildings not all of them uh have an actual wels value uh that's what you see
+[03:41] actual wels value uh that's what you see
+[03:41] actual wels value uh that's what you see here at the top of the cards so here is
+[03:44] here at the top of the cards so here is
+[03:44] here at the top of the cards so here is wels level one wels level two uh let me
+[03:48] wels level one wels level two uh let me
+[03:48] wels level one wels level two uh let me see if I find yeah the beach ones they
+[03:51] see if I find yeah the beach ones they
+[03:51] see if I find yeah the beach ones they have wells level three um and so on some
+[03:55] have wells level three um and so on some
+[03:55] have wells level three um and so on some don't have it those that don't have the
+[03:58] don't have it those that don't have the
+[03:58] don't have it those that don't have the wels value they are neutral to the
+[04:01] wels value they are neutral to the
+[04:01] wels value they are neutral to the wealth system they do not matter uh what
+[04:04] wealth system they do not matter uh what
+[04:04] wealth system they do not matter uh what matters essentially is the average of
+[04:07] matters essentially is the average of
+[04:07] matters essentially is the average of all the buildings uh that have the wells
+[04:11] all the buildings uh that have the wells
+[04:11] all the buildings uh that have the wells property um yeah and the average is what
+[04:16] property um yeah and the average is what
+[04:16] property um yeah and the average is what decides how many of the bonus you get um
+[04:19] decides how many of the bonus you get um
+[04:19] decides how many of the bonus you get um as you can see here I'm not sure if you
+[04:21] as you can see here I'm not sure if you
+[04:21] as you can see here I'm not sure if you can read it well um my current wealth
+[04:25] can read it well um my current wealth
+[04:25] can read it well um my current wealth level is
+[04:27] level is
+[04:27] level is 1.65 uh which translates to bonus in
+[04:31] 1.65 uh which translates to bonus in
+[04:31] 1.65 uh which translates to bonus in this case of
+[04:33] this case of
+[04:33] this case of 129% if the wealth level would be three
+[04:36] 129% if the wealth level would be three
+[04:36] 129% if the wealth level would be three uh I would get the full uh 250%
+[04:46] bonus next one we got is diversity
+[04:46] bonus next one we got is diversity diversity is pretty straightforward uh
+[04:48] diversity is pretty straightforward uh
+[04:49] diversity is pretty straightforward uh diversity means buildings
+[04:51] diversity means buildings
+[04:51] diversity means buildings diversity um and you get one diversity
+[04:54] diversity um and you get one diversity
+[04:55] diversity um and you get one diversity point for each unique building that you
+[04:57] point for each unique building that you
+[04:57] point for each unique building that you got on your map um so to get 250
+[05:01] got on your map um so to get 250
+[05:01] got on your map um so to get 250 diversity points you need at least 250
+[05:05] diversity points you need at least 250
+[05:05] diversity points you need at least 250 different buildings on your map does not
+[05:07] different buildings on your map does not
+[05:07] different buildings on your map does not matter which ones um it just needs to be
+[05:11] matter which ones um it just needs to be
+[05:11] matter which ones um it just needs to be a diversity in terms of
+[05:13] a diversity in terms of
+[05:13] a diversity in terms of buildings um now there is one hook and
+[05:17] buildings um now there is one hook and
+[05:17] buildings um now there is one hook and this Hook is that you can't have more of
+[05:20] this Hook is that you can't have more of
+[05:20] this Hook is that you can't have more of eight Sky creepers at a time in your
+[05:23] eight Sky creepers at a time in your
+[05:23] eight Sky creepers at a time in your city um if you start spawning
+[05:26] city um if you start spawning
+[05:26] city um if you start spawning skyscrapers uh spamming skyscrapers uh
+[05:29] skyscrapers uh spamming skyscrapers uh
+[05:29] skyscrapers uh spamming skyscrapers uh which seen it in the past that
+[05:31] which seen it in the past that
+[05:31] which seen it in the past that essentially uh the the players that
+[05:33] essentially uh the the players that
+[05:33] essentially uh the the players that wanted to max out the city uh just spent
+[05:37] wanted to max out the city uh just spent
+[05:37] wanted to max out the city uh just spent one the best skyscraper across all the
+[05:40] one the best skyscraper across all the
+[05:40] one the best skyscraper across all the city um so this mechanics is uh kind of
+[05:45] city um so this mechanics is uh kind of
+[05:45] city um so this mechanics is uh kind of a bit force creativity uh so once you
+[05:48] a bit force creativity uh so once you
+[05:48] a bit force creativity uh so once you have more than eight of a skyscraper of
+[05:51] have more than eight of a skyscraper of
+[05:51] have more than eight of a skyscraper of a type uh you will get uh loyalty uh
+[05:54] a type uh you will get uh loyalty uh
+[05:54] a type uh you will get uh loyalty uh sorry A diversity
+[05:56] sorry A diversity
+[05:56] sorry A diversity penalty um that means diversity point
+[05:59] penalty um that means diversity point
+[05:59] penalty um that means diversity point points will be deducted but uh since
+[06:03] points will be deducted but uh since
+[06:03] points will be deducted but uh since there is not only 250 buildings in the
+[06:06] there is not only 250 buildings in the
+[06:06] there is not only 250 buildings in the game we already have some more I do not
+[06:08] game we already have some more I do not
+[06:08] game we already have some more I do not know the exact amount but it's already
+[06:10] know the exact amount but it's already
+[06:10] know the exact amount but it's already more and it's continuously growing um
+[06:13] more and it's continuously growing um
+[06:13] more and it's continuously growing um you could have more so you could I don't
+[06:15] you could have more so you could I don't
+[06:15] you could have more so you could I don't know to name a number you could have 350
+[06:18] know to name a number you could have 350
+[06:18] know to name a number you could have 350 different buildings and then you can
+[06:21] different buildings and then you can
+[06:21] different buildings and then you can take the penalty up to some level uh
+[06:25] take the penalty up to some level uh
+[06:25] take the penalty up to some level uh without losing benefits that's on you to
+[06:29] without losing benefits that's on you to
+[06:29] without losing benefits that's on you to figure it out out that's the puzzle part
+[06:30] figure it out out that's the puzzle part
+[06:30] figure it out out that's the puzzle part of the
+[06:31] of the
+[06:31] of the game um yeah that's diversity pretty
+[06:36] game um yeah that's diversity pretty
+[06:36] game um yeah that's diversity pretty straightforward uh loyalty even simpler
+[06:40] straightforward uh loyalty even simpler
+[06:40] straightforward uh loyalty even simpler um twice a day once in the morning once
+[06:43] um twice a day once in the morning once
+[06:43] um twice a day once in the morning once in the evening you can lock into the
+[06:45] in the evening you can lock into the
+[06:45] in the evening you can lock into the game care about your residence each time
+[06:48] game care about your residence each time
+[06:48] game care about your residence each time you do that you will get one loyalty
+[06:51] you do that you will get one loyalty
+[06:51] you do that you will get one loyalty Point um if you stay away from your city
+[06:55] Point um if you stay away from your city
+[06:55] Point um if you stay away from your city longer as 24 hours um
+[06:59] longer as 24 hours um
+[06:59] longer as 24 hours um loyalty points will deduct it so you
+[07:02] loyalty points will deduct it so you
+[07:02] loyalty points will deduct it so you will lose one point uh per complete day
+[07:08] will lose one point uh per complete day
+[07:08] will lose one point uh per complete day in terms of a 24-hour day um that you
+[07:11] in terms of a 24-hour day um that you
+[07:11] in terms of a 24-hour day um that you stay away uh you will lose those so
+[07:14] stay away uh you will lose those so
+[07:14] stay away uh you will lose those so loyalty is about loyalty and um it's a
+[07:19] loyalty is about loyalty and um it's a
+[07:19] loyalty is about loyalty and um it's a long-term bonus that you collect over
+[07:21] long-term bonus that you collect over
+[07:21] long-term bonus that you collect over time we'll possibly introduce um some
+[07:25] time we'll possibly introduce um some
+[07:25] time we'll possibly introduce um some new mechanics to boost this a little bit
+[07:28] new mechanics to boost this a little bit
+[07:28] new mechanics to boost this a little bit uh but currently that's how it
+[07:30] uh but currently that's how it
+[07:30] uh but currently that's how it works oh yeah I said that translates to
+[07:33] works oh yeah I said that translates to
+[07:33] works oh yeah I said that translates to your overall resident bonus and your
+[07:37] your overall resident bonus and your
+[07:37] your overall resident bonus and your residential capacity will be increased
+[07:40] residential capacity will be increased
+[07:40] residential capacity will be increased um by this amount um but also your Works
+[07:44] um by this amount um but also your Works
+[07:44] um by this amount um but also your Works spaces so it's not like you get more and
+[07:46] spaces so it's not like you get more and
+[07:46] spaces so it's not like you get more and more residents from the bonus and you
+[07:48] more residents from the bonus and you
+[07:48] more residents from the bonus and you need to build workspaces like crazy so
+[07:51] need to build workspaces like crazy so
+[07:51] need to build workspaces like crazy so commercial and Industrial um no they
+[07:53] commercial and Industrial um no they
+[07:53] commercial and Industrial um no they scale at the same level so this grows in
+[07:58] scale at the same level so this grows in
+[07:58] scale at the same level so this grows in parallel um
+[08:00] parallel um
+[08:00] parallel um yeah that's it about the residence bonus
+[08:02] yeah that's it about the residence bonus
+[08:02] yeah that's it about the residence bonus uh let me know if that was well
+[08:05] uh let me know if that was well
+[08:05] uh let me know if that was well explained if you understood it or if you
+[08:07] explained if you understood it or if you
+[08:07] explained if you understood it or if you still have any questions um yeah let me
+[08:10] still have any questions um yeah let me
+[08:10] still have any questions um yeah let me know in the comments or ping me on
+[08:12] know in the comments or ping me on
+[08:12] know in the comments or ping me on Discord or whatever um thanks for
+[08:16] Discord or whatever um thanks for
+[08:16] Discord or whatever um thanks for watching thanks for playing bye

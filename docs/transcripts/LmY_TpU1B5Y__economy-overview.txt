@@ -1,0 +1,135 @@
+# Super Citycon: Economy Overview – City Building Game How-To Tutorial
+# channel: Super Citycon - City Building Game
+# youtube: https://www.youtube.com/watch?v=LmY_TpU1B5Y
+# transcript retrieved 2026-10-23 via yt-dlp (android_vr client)
+# NOTE: auto-generated captions; timestamps approximate, word boundaries may be wrong.
+# Quoting rule: quote the sentence, and check the timestamp before relying on it.
+
+[00:03] hello and welcome in this video I want
+[00:03] hello and welcome in this video I want to give you a quick overview over the
+[00:06] to give you a quick overview over the
+[00:06] to give you a quick overview over the economy in super cityor um so what's the
+[00:09] economy in super cityor um so what's the
+[00:10] economy in super cityor um so what's the economy about uh let's tap one of the
+[00:12] economy about uh let's tap one of the
+[00:12] economy about uh let's tap one of the bars in the top um to see some details
+[00:17] bars in the top um to see some details
+[00:17] bars in the top um to see some details um yeah that's actually the most
+[00:19] um yeah that's actually the most
+[00:19] um yeah that's actually the most important info for you during building
+[00:22] important info for you during building
+[00:22] important info for you during building um you got your demand bars block you
+[00:24] um you got your demand bars block you
+[00:24] um you got your demand bars block you got the usage bars block um uh generally
+[00:28] got the usage bars block um uh generally
+[00:28] got the usage bars block um uh generally rule the Fuller bar is the more you need
+[00:31] rule the Fuller bar is the more you need
+[00:31] rule the Fuller bar is the more you need of it uh once it's completely full you
+[00:33] of it uh once it's completely full you
+[00:33] of it uh once it's completely full you run out you run out of residential
+[00:36] run out you run out of residential
+[00:36] run out you run out of residential capacity that's the first one
+[00:39] capacity that's the first one
+[00:40] capacity that's the first one um commercial capacity workspaces and
+[00:43] um commercial capacity workspaces and
+[00:43] um commercial capacity workspaces and Industrial workspaces uh energy Supply
+[00:46] Industrial workspaces uh energy Supply
+[00:46] Industrial workspaces uh energy Supply water supply food supply Waste
+[00:49] water supply food supply Waste
+[00:49] water supply food supply Waste Management so what you need to check is
+[00:52] Management so what you need to check is
+[00:52] Management so what you need to check is to keep the bars as low as possible um
+[00:55] to keep the bars as low as possible um
+[00:55] to keep the bars as low as possible um below 90% you are fine starting from 90%
+[01:00] below 90% you are fine starting from 90%
+[01:00] below 90% you are fine starting from 90% uh usage uh it will reduce the growth of
+[01:04] uh usage uh it will reduce the growth of
+[01:04] uh usage uh it will reduce the growth of your city uh once something is uh 100%
+[01:07] your city uh once something is uh 100%
+[01:07] your city uh once something is uh 100% usage your city will not grow
+[01:10] usage your city will not grow
+[01:10] usage your city will not grow anymore um yeah pretty basic um in the
+[01:15] anymore um yeah pretty basic um in the
+[01:15] anymore um yeah pretty basic um in the government section you can have an
+[01:17] government section you can have an
+[01:17] government section you can have an overview for each of the categories uh
+[01:20] overview for each of the categories uh
+[01:20] overview for each of the categories uh like energy Supply water supply food
+[01:24] like energy Supply water supply food
+[01:24] like energy Supply water supply food waste um Health Care security um fire
+[01:29] waste um Health Care security um fire
+[01:29] waste um Health Care security um fire and school system um I made dedicated
+[01:32] and school system um I made dedicated
+[01:32] and school system um I made dedicated videos for each of those uh so if you
+[01:35] videos for each of those uh so if you
+[01:35] videos for each of those uh so if you want some more infos be sure to check
+[01:37] want some more infos be sure to check
+[01:37] want some more infos be sure to check out those um
+[01:52] uh this is also covered in in a separate
+[01:52] uh this is also covered in in a separate videos that's all your bonuses your
+[01:55] videos that's all your bonuses your
+[01:55] videos that's all your bonuses your happiness your resident bonuses actually
+[01:58] happiness your resident bonuses actually
+[01:58] happiness your resident bonuses actually uh your happiness uh and your City score
+[02:01] uh your happiness uh and your City score
+[02:02] uh your happiness uh and your City score which sums up to Major score which is
+[02:04] which sums up to Major score which is
+[02:04] which sums up to Major score which is something you can compete with other
+[02:07] something you can compete with other
+[02:07] something you can compete with other Majors if you
+[02:08] Majors if you
+[02:08] Majors if you like um another overview um it's
+[02:13] like um another overview um it's
+[02:13] like um another overview um it's essentially the same plugs that you get
+[02:14] essentially the same plugs that you get
+[02:15] essentially the same plugs that you get when you click here it's your usage it's
+[02:17] when you click here it's your usage it's
+[02:17] when you click here it's your usage it's your demand and it's the coverage of
+[02:20] your demand and it's the coverage of
+[02:20] your demand and it's the coverage of your services um all for the services
+[02:23] your services um all for the services
+[02:23] your services um all for the services it's the opposite that's also why we
+[02:25] it's the opposite that's also why we
+[02:25] it's the opposite that's also why we made it circles um those ones you
+[02:28] made it circles um those ones you
+[02:28] made it circles um those ones you ideally want to be completely full um
+[02:32] ideally want to be completely full um
+[02:32] ideally want to be completely full um those ones the bars you want to be empty
+[02:34] those ones the bars you want to be empty
+[02:34] those ones the bars you want to be empty or not filled at least they don't need
+[02:37] or not filled at least they don't need
+[02:37] or not filled at least they don't need you can't make them empty that doesn't
+[02:38] you can't make them empty that doesn't
+[02:38] you can't make them empty that doesn't work because you will always have some
+[02:40] work because you will always have some
+[02:40] work because you will always have some consumption and some demand either
+[02:43] consumption and some demand either
+[02:43] consumption and some demand either residential or workspaces um but yeah
+[02:46] residential or workspaces um but yeah
+[02:46] residential or workspaces um but yeah keeps them low as said below 90% while
+[02:49] keeps them low as said below 90% while
+[02:49] keeps them low as said below 90% while so circles you try to get some full um
+[02:52] so circles you try to get some full um
+[02:52] so circles you try to get some full um that's the optimal situation for your
+[02:54] that's the optimal situation for your
+[02:54] that's the optimal situation for your city up here this block is not fully
+[02:57] city up here this block is not fully
+[02:57] city up here this block is not fully developed um yeah at the moment moment
+[03:00] developed um yeah at the moment moment
+[03:00] developed um yeah at the moment moment it shows you your major score major
+[03:02] it shows you your major score major
+[03:02] it shows you your major score major score is the sum of all uh City scores
+[03:06] score is the sum of all uh City scores
+[03:06] score is the sum of all uh City scores of your
+[03:07] of your
+[03:07] of your region um yeah I said I made separate
+[03:11] region um yeah I said I made separate
+[03:11] region um yeah I said I made separate videos for each of those topics be sure
+[03:13] videos for each of those topics be sure
+[03:14] videos for each of those topics be sure to check those out uh let me know if you
+[03:16] to check those out uh let me know if you
+[03:16] to check those out uh let me know if you got any questions um thanks for watching
+[03:19] got any questions um thanks for watching
+[03:20] got any questions um thanks for watching thanks for playing see you in the next
+[03:22] thanks for playing see you in the next
+[03:22] thanks for playing see you in the next video

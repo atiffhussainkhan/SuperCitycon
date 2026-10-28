@@ -1,0 +1,119 @@
+# Super Citycon: Monorails – City Building Game How-To Tutorial
+# channel: Super Citycon - City Building Game
+# youtube: https://www.youtube.com/watch?v=71H1tU2DGz8
+# transcript retrieved 2026-10-23 via yt-dlp (android_vr client)
+# NOTE: auto-generated captions; timestamps approximate, word boundaries may be wrong.
+# Quoting rule: quote the sentence, and check the timestamp before relying on it.
+
+[00:05] hello and welcome to this video about
+[00:05] hello and welcome to this video about the power of monor rail in super City
+[00:08] the power of monor rail in super City
+[00:08] the power of monor rail in super City cone now that's monor rail that's
+[00:11] cone now that's monor rail that's
+[00:11] cone now that's monor rail that's running through your
+[00:13] running through your
+[00:13] running through your City all across uh the rails you have
+[00:17] City all across uh the rails you have
+[00:17] City all across uh the rails you have built uh now what's special they got a
+[00:21] built uh now what's special they got a
+[00:21] built uh now what's special they got a special power and the special power is
+[00:23] special power and the special power is
+[00:23] special power and the special power is let me show you here uh monor rails have
+[00:28] let me show you here uh monor rails have
+[00:28] let me show you here uh monor rails have the ability to connect
+[00:31] the ability to connect
+[00:31] the ability to connect um sorry to provide Street connection to
+[00:33] um sorry to provide Street connection to
+[00:34] um sorry to provide Street connection to Res build residential buildings in the
+[00:37] Res build residential buildings in the
+[00:37] Res build residential buildings in the area without having streets so when it
+[00:41] area without having streets so when it
+[00:41] area without having streets so when it comes that you run out of space on your
+[00:44] comes that you run out of space on your
+[00:44] comes that you run out of space on your city and you want to get more residents
+[00:46] city and you want to get more residents
+[00:46] city and you want to get more residents you want to get more out of it um the
+[00:50] you want to get more out of it um the
+[00:50] you want to get more out of it um the monil is possibly the best tool for it
+[00:53] monil is possibly the best tool for it
+[00:53] monil is possibly the best tool for it um because one thing you can do besides
+[00:57] um because one thing you can do besides
+[00:57] um because one thing you can do besides like in this example here completely
+[01:00] like in this example here completely
+[01:00] like in this example here completely saving the streets by just building two
+[01:02] saving the streets by just building two
+[01:02] saving the streets by just building two monor Rail stations um you can
+[01:06] monor Rail stations um you can
+[01:06] monor Rail stations um you can also use the same map crit
+[01:11] also use the same map crit
+[01:11] also use the same map crit twice uh let me find an example or here
+[01:14] twice uh let me find an example or here
+[01:14] twice uh let me find an example or here for example monor rails can be build
+[01:16] for example monor rails can be build
+[01:16] for example monor rails can be build over
+[01:17] over
+[01:17] over fields oh that's
+[01:21] fields oh that's
+[01:21] fields oh that's interesting um but here for example you
+[01:23] interesting um but here for example you
+[01:23] interesting um but here for example you can see the monor rails are built across
+[01:27] can see the monor rails are built across
+[01:27] can see the monor rails are built across decoration buildings so space that is
+[01:30] decoration buildings so space that is
+[01:30] decoration buildings so space that is already occupied by decorational
+[01:32] already occupied by decorational
+[01:33] already occupied by decorational buildings uh can be used to also provide
+[01:37] buildings uh can be used to also provide
+[01:37] buildings uh can be used to also provide uh connection to the traffic system um
+[01:40] uh connection to the traffic system um
+[01:40] uh connection to the traffic system um which is extremely powerful when it
+[01:43] which is extremely powerful when it
+[01:43] which is extremely powerful when it comes to maxing out your
+[01:46] comes to maxing out your
+[01:46] comes to maxing out your city um once you run out of
+[01:49] city um once you run out of
+[01:49] city um once you run out of space and that's how it looks here I
+[01:53] space and that's how it looks here I
+[01:53] space and that's how it looks here I don't know where the trains are at the
+[01:54] don't know where the trains are at the
+[01:54] don't know where the trains are at the moment yeah but they are here it's
+[01:57] moment yeah but they are here it's
+[01:57] moment yeah but they are here it's coming
+[02:01] I love
+[02:01] I love that chip chip chip and it comes over
+[02:13] here yeah nice no um yeah I'm
+[02:13] here yeah nice no um yeah I'm sorry um yeah that's but that's the
+[02:15] sorry um yeah that's but that's the
+[02:15] sorry um yeah that's but that's the power of monor rails it's essentially
+[02:17] power of monor rails it's essentially
+[02:17] power of monor rails it's essentially besides that it looks super cool um it's
+[02:21] besides that it looks super cool um it's
+[02:21] besides that it looks super cool um it's it's a powerful tool to optimize space
+[02:23] it's a powerful tool to optimize space
+[02:23] it's a powerful tool to optimize space in your city and again in the science
+[02:27] in your city and again in the science
+[02:27] in your city and again in the science view you can choose the monoral category
+[02:30] view you can choose the monoral category
+[02:30] view you can choose the monoral category which is the last one at the bottom and
+[02:32] which is the last one at the bottom and
+[02:32] which is the last one at the bottom and you will see all your monal stations and
+[02:35] you will see all your monal stations and
+[02:35] you will see all your monal stations and the area in which the they provide um
+[02:39] the area in which the they provide um
+[02:39] the area in which the they provide um connection to residential buildings um
+[02:42] connection to residential buildings um
+[02:42] connection to residential buildings um it's only to residential buildings
+[02:44] it's only to residential buildings
+[02:44] it's only to residential buildings commercial buildings and um industrial
+[02:47] commercial buildings and um industrial
+[02:47] commercial buildings and um industrial buildings are not affected by the monor
+[02:51] buildings are not affected by the monor
+[02:51] buildings are not affected by the monor rail um yeah that's it um thanks for
+[02:56] rail um yeah that's it um thanks for
+[02:56] rail um yeah that's it um thanks for watching thanks for playing let me know
+[02:58] watching thanks for playing let me know
+[02:58] watching thanks for playing let me know if you got any questions join join our
+[03:00] if you got any questions join join our
+[03:00] if you got any questions join join our Discord Community if you didn't already
+[03:03] Discord Community if you didn't already
+[03:03] Discord Community if you didn't already and yeah have a great time bye

@@ -1,0 +1,23 @@
+{
+  "name": "supercitycon",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "SuperCitycon — retro 16-bit voxel city builder. All art sourced from the user's asset library (CC0-1.0 / MIT packs only).",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:cleared": "SC_SHIP_CLEARED=1 vite build",
+    "preview": "vite preview --port 4173 --strictPort",
+    "check": "node tools/check-syntax.mjs",
+    "test": "node --test",
+    "test:integration": "node --test tests/integration.test.mjs",
+    "verify:production": "node tools/verify-production.mjs"
+  },
+  "devDependencies": {
+    "vite": "^5.4.10"
+  },
+  "dependencies": {
+    "three": "^0.169.0"
+  }
+}

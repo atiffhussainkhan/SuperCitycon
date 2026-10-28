@@ -1,0 +1,81 @@
+# Super Citycon: Fire Department – City Building Game How-To Tutorial
+# channel: Super Citycon - City Building Game
+# youtube: https://www.youtube.com/watch?v=0wFTp0aDpQg
+# transcript retrieved 2026-10-23 via yt-dlp (android_vr client)
+# NOTE: auto-generated captions; timestamps approximate, word boundaries may be wrong.
+# Quoting rule: quote the sentence, and check the timestamp before relying on it.
+
+[00:02] hello and welcome in this video I want
+[00:03] hello and welcome in this video I want to give a quick overview over the fire
+[00:06] to give a quick overview over the fire
+[00:06] to give a quick overview over the fire department and the fire system in super
+[00:10] department and the fire system in super
+[00:10] department and the fire system in super cityon um yeah you got this little cute
+[00:12] cityon um yeah you got this little cute
+[00:12] cityon um yeah you got this little cute fire department you can build and um
+[00:16] fire department you can build and um
+[00:16] fire department you can build and um with that um all the buildings if they
+[00:19] with that um all the buildings if they
+[00:19] with that um all the buildings if they are covered by by fire protection uh
+[00:23] are covered by by fire protection uh
+[00:23] are covered by by fire protection uh They will receive a bonus you can see
+[00:25] They will receive a bonus you can see
+[00:25] They will receive a bonus you can see the bonuses the building receives uh
+[00:28] the bonuses the building receives uh
+[00:28] the bonuses the building receives uh here in the uh orbit view if you long
+[00:31] here in the uh orbit view if you long
+[00:31] here in the uh orbit view if you long tap a building if that one is not gray
+[00:34] tap a building if that one is not gray
+[00:34] tap a building if that one is not gray out it means that building is
+[00:36] out it means that building is
+[00:36] out it means that building is covered
+[00:39] covered
+[00:39] covered um in the science view that you open
+[00:42] um in the science view that you open
+[00:42] um in the science view that you open with clicking the mini map in the uh top
+[00:45] with clicking the mini map in the uh top
+[00:45] with clicking the mini map in the uh top right corner you enter science view yeah
+[00:49] right corner you enter science view yeah
+[00:49] right corner you enter science view yeah I said that already um you can see all
+[00:53] I said that already um you can see all
+[00:53] I said that already um you can see all your fire departments in Orange and you
+[00:56] your fire departments in Orange and you
+[00:56] your fire departments in Orange and you can see in red um all the area that is
+[01:00] can see in red um all the area that is
+[01:00] can see in red um all the area that is covered um if you tap a fire department
+[01:03] covered um if you tap a fire department
+[01:03] covered um if you tap a fire department you will see the area of effect for only
+[01:07] you will see the area of effect for only
+[01:07] you will see the area of effect for only this
+[01:13] department let's close that one and go
+[01:13] department let's close that one and go into the government
+[01:15] into the government
+[01:15] into the government section and here you will find the tab
+[01:18] section and here you will find the tab
+[01:18] section and here you will find the tab for the fire departments and you can see
+[01:21] for the fire departments and you can see
+[01:21] for the fire departments and you can see the local local coverage for each
+[01:23] the local local coverage for each
+[01:23] the local local coverage for each building category so residential uh
+[01:26] building category so residential uh
+[01:26] building category so residential uh commercial and
+[01:28] commercial and
+[01:28] commercial and Industrial um in this sample City it's
+[01:31] Industrial um in this sample City it's
+[01:31] Industrial um in this sample City it's not very well covered you could do much
+[01:34] not very well covered you could do much
+[01:34] not very well covered you could do much better best is get 100% because then you
+[01:37] better best is get 100% because then you
+[01:37] better best is get 100% because then you will receive the maximum bonus it will
+[01:39] will receive the maximum bonus it will
+[01:39] will receive the maximum bonus it will have the maximum effect on happiness and
+[01:42] have the maximum effect on happiness and
+[01:42] have the maximum effect on happiness and with that it will have the maximum
+[01:44] with that it will have the maximum
+[01:44] with that it will have the maximum effect on your major score for your city
+[01:47] effect on your major score for your city
+[01:47] effect on your major score for your city uh yeah that's it um let me know if you
+[01:51] uh yeah that's it um let me know if you
+[01:51] uh yeah that's it um let me know if you got any questions thanks for watching
+[01:53] got any questions thanks for watching
+[01:53] got any questions thanks for watching see you in the next video bye

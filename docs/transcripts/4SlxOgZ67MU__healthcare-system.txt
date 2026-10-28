@@ -1,0 +1,105 @@
+# Super Citycon: Healthcare System – City Building Game How-To Tutorial
+# channel: Super Citycon - City Building Game
+# youtube: https://www.youtube.com/watch?v=4SlxOgZ67MU
+# transcript retrieved 2026-10-23 via yt-dlp (android_vr client)
+# NOTE: auto-generated captions; timestamps approximate, word boundaries may be wrong.
+# Quoting rule: quote the sentence, and check the timestamp before relying on it.
+
+[00:03] hello and welcome in this video I want
+[00:03] hello and welcome in this video I want to talk about the Health Care system in
+[00:05] to talk about the Health Care system in
+[00:05] to talk about the Health Care system in super cityon for healthare we got two
+[00:07] super cityon for healthare we got two
+[00:07] super cityon for healthare we got two types of buildings currently uh one is
+[00:10] types of buildings currently uh one is
+[00:10] types of buildings currently uh one is the hospital that you can see the
+[00:12] the hospital that you can see the
+[00:12] the hospital that you can see the hospital is upgradeable uh has multiple
+[00:15] hospital is upgradeable uh has multiple
+[00:15] hospital is upgradeable uh has multiple levels and the other one we got is this
+[00:18] levels and the other one we got is this
+[00:18] levels and the other one we got is this little Medical Center um yeah which is
+[00:21] little Medical Center um yeah which is
+[00:21] little Medical Center um yeah which is cheaper and I think it unlocks earlier
+[00:24] cheaper and I think it unlocks earlier
+[00:24] cheaper and I think it unlocks earlier but it also has a smaller area of effect
+[00:27] but it also has a smaller area of effect
+[00:27] but it also has a smaller area of effect uh once you get those you will sometimes
+[00:30] uh once you get those you will sometimes
+[00:30] uh once you get those you will sometimes find those uh what are they actually
+[00:33] find those uh what are they actually
+[00:33] find those uh what are they actually called emergency wagon or something
+[00:36] called emergency wagon or something
+[00:36] called emergency wagon or something actually don't know uh but yeah this
+[00:38] actually don't know uh but yeah this
+[00:38] actually don't know uh but yeah this this dudes you will find them in your
+[00:41] this dudes you will find them in your
+[00:41] this dudes you will find them in your city um yeah tap a building to see if
+[00:46] city um yeah tap a building to see if
+[00:46] city um yeah tap a building to see if it's covered I explained it already in
+[00:48] it's covered I explained it already in
+[00:48] it's covered I explained it already in other videos but if it's not Creed out
+[00:50] other videos but if it's not Creed out
+[00:50] other videos but if it's not Creed out that means yes this building is covered
+[00:53] that means yes this building is covered
+[00:53] that means yes this building is covered by healthare and you will get a bonus
+[00:56] by healthare and you will get a bonus
+[00:56] by healthare and you will get a bonus for that um ideally you want each
+[00:59] for that um ideally you want each
+[00:59] for that um ideally you want each building to to be covered so you can
+[01:01] building to to be covered so you can
+[01:01] building to to be covered so you can receive the full bonus you can get an
+[01:03] receive the full bonus you can get an
+[01:03] receive the full bonus you can get an overview in the government area and the
+[01:06] overview in the government area and the
+[01:06] overview in the government area and the healthcare tab um Healthcare has two
+[01:10] healthcare tab um Healthcare has two
+[01:10] healthcare tab um Healthcare has two measures it's capacity so you need
+[01:13] measures it's capacity so you need
+[01:13] measures it's capacity so you need enough capacity uh for your current
+[01:15] enough capacity uh for your current
+[01:15] enough capacity uh for your current residence
+[01:16] residence
+[01:16] residence amount um in my case it's not covered
+[01:19] amount um in my case it's not covered
+[01:19] amount um in my case it's not covered it's only 60% that's not too good and
+[01:23] it's only 60% that's not too good and
+[01:23] it's only 60% that's not too good and there is the local coverage which means
+[01:25] there is the local coverage which means
+[01:25] there is the local coverage which means the local
+[01:27] the local
+[01:27] the local availability um let's switch over to
+[01:29] availability um let's switch over to
+[01:29] availability um let's switch over to science view you open science view by
+[01:32] science view you open science view by
+[01:32] science view you open science view by clicking the mini map in the top right
+[01:34] clicking the mini map in the top right
+[01:34] clicking the mini map in the top right um choose Healthcare and the green area
+[01:38] um choose Healthcare and the green area
+[01:38] um choose Healthcare and the green area is the area that is covered with
+[01:40] is the area that is covered with
+[01:40] is the area that is covered with healthare while the white area is not
+[01:44] healthare while the white area is not
+[01:44] healthare while the white area is not covered so ideally you distribute your
+[01:47] covered so ideally you distribute your
+[01:47] covered so ideally you distribute your your hospitals or your medical centers
+[01:50] your hospitals or your medical centers
+[01:50] your hospitals or your medical centers uh whatever you prefer uh in a way that
+[01:53] uh whatever you prefer uh in a way that
+[01:53] uh whatever you prefer uh in a way that your map is fully covered because then
+[01:55] your map is fully covered because then
+[01:55] your map is fully covered because then you will receive the full bonus which
+[01:58] you will receive the full bonus which
+[01:58] you will receive the full bonus which gives you the full effect on your
+[02:00] gives you the full effect on your
+[02:00] gives you the full effect on your resident's happiness and with that the
+[02:03] resident's happiness and with that the
+[02:03] resident's happiness and with that the biggest effect also on your major score
+[02:07] biggest effect also on your major score
+[02:07] biggest effect also on your major score um yeah that's it easy and
+[02:09] um yeah that's it easy and
+[02:09] um yeah that's it easy and straightforward let me know if you got
+[02:11] straightforward let me know if you got
+[02:11] straightforward let me know if you got any questions thanks for watching see
+[02:13] any questions thanks for watching see
+[02:13] any questions thanks for watching see you in the next video bye

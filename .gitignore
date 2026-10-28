@@ -1,0 +1,29 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# SuperCitycon — what does NOT belong in the repository
+#
+# The rule: ONE copy of the game. Every model binary is committed exactly
+# once (in game/public/assets/models). Everything below is either derived
+# from that, or source material that already lives elsewhere.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Dependencies — reinstalled by `npm ci`. (The bare name also catches the
+# convenience symlink at the workspace root.)
+node_modules
+node_modules/
+
+# The build output. `npm run build` regenerates it in about ten seconds, and
+# committing it would put a SECOND copy of every model binary in the history.
+game/dist/
+
+# The raw library archives and their extracted trees. They are source
+# material for the asset curator and live in ~/.minimax/asset-library.
+# The KayKit City Builder pack is the exception: it exists nowhere else, so
+# it travels with the game.
+game/public/assets/extracted/
+game/public/assets/*.zip
+!game/public/assets/kaykit-city-builder.zip
+
+# Scratch
+.DS_Store
+*.log
+Thumbs.db

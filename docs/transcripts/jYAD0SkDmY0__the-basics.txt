@@ -1,0 +1,631 @@
+# Super Citycon: The Basics – City Building Game How-To Tutorial
+# channel: Super Citycon - City Building Game
+# youtube: https://www.youtube.com/watch?v=jYAD0SkDmY0
+# transcript retrieved 2026-10-23 via yt-dlp (android_vr client)
+# NOTE: auto-generated captions; timestamps approximate, word boundaries may be wrong.
+# Quoting rule: quote the sentence, and check the timestamp before relying on it.
+
+[00:03] hello and welcome in this video I want
+[00:03] hello and welcome in this video I want to give you a quick overview over the
+[00:06] to give you a quick overview over the
+[00:06] to give you a quick overview over the basics um in super City cor um I will
+[00:11] basics um in super City cor um I will
+[00:11] basics um in super City cor um I will show you this on already existing City
+[00:14] show you this on already existing City
+[00:14] show you this on already existing City because some of the
+[00:16] because some of the
+[00:16] because some of the features um they do not they are not
+[00:19] features um they do not they are not
+[00:19] features um they do not they are not unlocked at the game start um so yeah
+[00:23] unlocked at the game start um so yeah
+[00:23] unlocked at the game start um so yeah first of all let's go for building and
+[00:26] first of all let's go for building and
+[00:26] first of all let's go for building and editing
+[00:27] editing
+[00:27] editing function um maybe let's start was
+[00:30] function um maybe let's start was
+[00:30] function um maybe let's start was demolished so I have some space to do
+[00:33] demolished so I have some space to do
+[00:33] demolished so I have some space to do something uh if you open the inventory
+[00:36] something uh if you open the inventory
+[00:36] something uh if you open the inventory on the right side uh you will find the
+[00:38] on the right side uh you will find the
+[00:38] on the right side uh you will find the bulldozer button uh if you check the
+[00:41] bulldozer button uh if you check the
+[00:41] bulldozer button uh if you check the bulldozzer uh you can choose three
+[00:44] bulldozzer uh you can choose three
+[00:44] bulldozzer uh you can choose three categories which
+[00:46] categories which
+[00:46] categories which essentially uh tells which things get
+[00:50] essentially uh tells which things get
+[00:50] essentially uh tells which things get bulldozed when you tap them so I will
+[00:52] bulldozed when you tap them so I will
+[00:52] bulldozed when you tap them so I will disable trees and streets and I can go
+[00:56] disable trees and streets and I can go
+[00:56] disable trees and streets and I can go here and boom everything get it's
+[01:01] here and boom everything get it's
+[01:01] here and boom everything get it's demolished uh that's one way of
+[01:03] demolished uh that's one way of
+[01:03] demolished uh that's one way of destroying things now let's build
+[01:06] destroying things now let's build
+[01:07] destroying things now let's build something
+[01:09] something
+[01:09] something new building is very straightforward you
+[01:12] new building is very straightforward you
+[01:12] new building is very straightforward you drag it there it automatically snaps to
+[01:14] drag it there it automatically snaps to
+[01:14] drag it there it automatically snaps to the streets I actually choose a bad spot
+[01:17] the streets I actually choose a bad spot
+[01:17] the streets I actually choose a bad spot because the muddy roads won't give Road
+[01:20] because the muddy roads won't give Road
+[01:20] because the muddy roads won't give Road connection uh to this building um but
+[01:24] connection uh to this building um but
+[01:24] connection uh to this building um but yeah that's okay it's just for
+[01:26] yeah that's okay it's just for
+[01:26] yeah that's okay it's just for demonstration purposes uh you can also
+[01:30] demonstration purposes uh you can also
+[01:30] demonstration purposes uh you can also oh this popup will ask you to support us
+[01:34] oh this popup will ask you to support us
+[01:34] oh this popup will ask you to support us um watching that so the game will run on
+[01:36] um watching that so the game will run on
+[01:36] um watching that so the game will run on double speed uh for 10 minutes um yeah
+[01:40] double speed uh for 10 minutes um yeah
+[01:40] double speed uh for 10 minutes um yeah for now we don't do that um yes to edit
+[01:44] for now we don't do that um yes to edit
+[01:44] for now we don't do that um yes to edit a building you long tap a building and
+[01:47] a building you long tap a building and
+[01:47] a building you long tap a building and you will get into orbit mode here you
+[01:49] you will get into orbit mode here you
+[01:49] you will get into orbit mode here you can top the edit button on the right
+[01:53] can top the edit button on the right
+[01:53] can top the edit button on the right side um this one will give you the
+[01:56] side um this one will give you the
+[01:56] side um this one will give you the options to
+[01:57] options to
+[01:57] options to rotate uh to confirm what you
+[02:01] rotate uh to confirm what you
+[02:01] rotate uh to confirm what you did let's transel that one um but you
+[02:06] did let's transel that one um but you
+[02:06] did let's transel that one um but you can also move it and put it somewhere
+[02:09] can also move it and put it somewhere
+[02:09] can also move it and put it somewhere else like here and it will be put
+[02:12] else like here and it will be put
+[02:12] else like here and it will be put somewhere will be put here um
+[02:15] somewhere will be put here um
+[02:15] somewhere will be put here um yeah in the bottom left you see your
+[02:18] yeah in the bottom left you see your
+[02:18] yeah in the bottom left you see your construction slots um in the beginning
+[02:20] construction slots um in the beginning
+[02:21] construction slots um in the beginning you will have only one but for each
+[02:24] you will have only one but for each
+[02:24] you will have only one but for each cityon building that you buil let's find
+[02:27] cityon building that you buil let's find
+[02:27] cityon building that you buil let's find one it's here that's the city building
+[02:30] one it's here that's the city building
+[02:30] one it's here that's the city building for each one of those uh you will get
+[02:33] for each one of those uh you will get
+[02:33] for each one of those uh you will get another permanent construction slot and
+[02:36] another permanent construction slot and
+[02:36] another permanent construction slot and so you um this will increase your
+[02:39] so you um this will increase your
+[02:39] so you um this will increase your constructions capabilities so you can
+[02:41] constructions capabilities so you can
+[02:41] constructions capabilities so you can have uh multiple constructions um at
+[02:45] have uh multiple constructions um at
+[02:45] have uh multiple constructions um at once and build bigger buildings because
+[02:48] once and build bigger buildings because
+[02:48] once and build bigger buildings because some bigger buildings uh require two or
+[02:51] some bigger buildings uh require two or
+[02:51] some bigger buildings uh require two or more construction
+[02:53] more construction
+[02:53] more construction slots um you can get those from shop you
+[02:56] slots um you can get those from shop you
+[02:56] slots um you can get those from shop you can also collect them over time or a
+[02:58] can also collect them over time or a
+[02:58] can also collect them over time or a combination of both
+[03:00] combination of both
+[03:00] combination of both then you are close to to almost the
+[03:03] then you are close to to almost the
+[03:03] then you are close to to almost the sandbox I say almost the sandbox of
+[03:06] sandbox I say almost the sandbox of
+[03:06] sandbox I say almost the sandbox of course we also have a new Sandbox offer
+[03:09] course we also have a new Sandbox offer
+[03:09] course we also have a new Sandbox offer with version
+[03:11] with version
+[03:11] with version two um yeah that was building and
+[03:14] two um yeah that was building and
+[03:14] two um yeah that was building and editing um what else can you do uh
+[03:17] editing um what else can you do uh
+[03:17] editing um what else can you do uh quickly in the top left uh you can
+[03:20] quickly in the top left uh you can
+[03:20] quickly in the top left uh you can switch the camera mode you can switch
+[03:23] switch the camera mode you can switch
+[03:23] switch the camera mode you can switch between the perspective camera with til
+[03:26] between the perspective camera with til
+[03:26] between the perspective camera with til shift and the autographic camera
+[03:30] shift and the autographic camera
+[03:30] shift and the autographic camera uh autographic gives you a bigger field
+[03:33] uh autographic gives you a bigger field
+[03:33] uh autographic gives you a bigger field of view um yeah more about that in a
+[03:36] of view um yeah more about that in a
+[03:36] of view um yeah more about that in a dedicated
+[03:38] dedicated
+[03:38] dedicated video um mini map opens the science view
+[03:42] video um mini map opens the science view
+[03:42] video um mini map opens the science view that gives you access to to various
+[03:45] that gives you access to to various
+[03:45] that gives you access to to various details uh about uh local influences in
+[03:48] details uh about uh local influences in
+[03:48] details uh about uh local influences in your
+[03:49] your
+[03:49] your city uh government area is for
+[03:53] city uh government area is for
+[03:53] city uh government area is for everything related to manage the game
+[03:56] everything related to manage the game
+[03:56] everything related to manage the game this part is for Collectibles that's
+[03:58] this part is for Collectibles that's
+[03:58] this part is for Collectibles that's card card you get from from chests or
+[04:02] card card you get from from chests or
+[04:02] card card you get from from chests or over time you can also tap them to
+[04:06] over time you can also tap them to
+[04:06] over time you can also tap them to complete them earlier that's a premium
+[04:08] complete them earlier that's a premium
+[04:08] complete them earlier that's a premium option of course uh high scores gives
+[04:11] option of course uh high scores gives
+[04:11] option of course uh high scores gives you an overview of your current ranking
+[04:14] you an overview of your current ranking
+[04:14] you an overview of your current ranking um income gives you yeah it's obvious
+[04:18] um income gives you yeah it's obvious
+[04:18] um income gives you yeah it's obvious about your income City upgrades um as
+[04:22] about your income City upgrades um as
+[04:22] about your income City upgrades um as this is already an an game that's more
+[04:25] this is already an an game that's more
+[04:25] this is already an an game that's more Pro progressed um but when you start you
+[04:28] Pro progressed um but when you start you
+[04:28] Pro progressed um but when you start you will find a lot of uh City upgrades uh
+[04:31] will find a lot of uh City upgrades uh
+[04:31] will find a lot of uh City upgrades uh mainly City upgrades can be purchased
+[04:34] mainly City upgrades can be purchased
+[04:34] mainly City upgrades can be purchased with coins once you got everything at
+[04:36] with coins once you got everything at
+[04:36] with coins once you got everything at some point you will find uh some with uh
+[04:40] some point you will find uh some with uh
+[04:40] some point you will find uh some with uh super cash and yeah it's generally to
+[04:43] super cash and yeah it's generally to
+[04:43] super cash and yeah it's generally to improve your city so it's it's about
+[04:46] improve your city so it's it's about
+[04:46] improve your city so it's it's about everything it's about uh don't know
+[04:48] everything it's about uh don't know
+[04:48] everything it's about uh don't know water consumption Water Production
+[04:50] water consumption Water Production
+[04:50] water consumption Water Production energy uh trash uh the value of coins
+[04:55] energy uh trash uh the value of coins
+[04:55] energy uh trash uh the value of coins the appearance of coins Etc so you'll
+[04:58] the appearance of coins Etc so you'll
+[04:58] the appearance of coins Etc so you'll find a lot of them there um overview for
+[05:01] find a lot of them there um overview for
+[05:01] find a lot of them there um overview for electricity for water for food Waste
+[05:04] electricity for water for food Waste
+[05:04] electricity for water for food Waste Management healthc care police uh fire
+[05:08] Management healthc care police uh fire
+[05:08] Management healthc care police uh fire and
+[05:10] and
+[05:10] and education
+[05:12] education
+[05:12] education um we got the mailbox uh that's mainly
+[05:16] um we got the mailbox uh that's mainly
+[05:16] um we got the mailbox uh that's mainly where you receive your tasks um but also
+[05:18] where you receive your tasks um but also
+[05:18] where you receive your tasks um but also from time to time you will get a message
+[05:22] from time to time you will get a message
+[05:22] from time to time you will get a message you can also uh find some uh tutorials
+[05:27] you can also uh find some uh tutorials
+[05:27] you can also uh find some uh tutorials inside of here well mailbox is always
+[05:29] inside of here well mailbox is always
+[05:29] inside of here well mailbox is always worth
+[05:30] worth
+[05:30] worth checking um the shop yeah let's go to
+[05:33] checking um the shop yeah let's go to
+[05:33] checking um the shop yeah let's go to the shop that's this one um that's the
+[05:37] the shop that's this one um that's the
+[05:37] the shop that's this one um that's the purchases overview let me quickly show
+[05:40] purchases overview let me quickly show
+[05:40] purchases overview let me quickly show you what we got we got some
+[05:43] you what we got we got some
+[05:43] you what we got we got some add-ons uh add-on means you unlock it
+[05:46] add-ons uh add-on means you unlock it
+[05:46] add-ons uh add-on means you unlock it once you got it forever you can build it
+[05:48] once you got it forever you can build it
+[05:48] once you got it forever you can build it as often as you want um so they are
+[05:51] as often as you want um so they are
+[05:51] as often as you want um so they are completely yours we got the building of
+[05:53] completely yours we got the building of
+[05:53] completely yours we got the building of a week um that's in the center here uh
+[05:58] a week um that's in the center here uh
+[05:58] a week um that's in the center here uh that's a weekly rotating building and
+[06:00] that's a weekly rotating building and
+[06:00] that's a weekly rotating building and it's Unique and it's only available for
+[06:02] it's Unique and it's only available for
+[06:02] it's Unique and it's only available for this week once it's gone it's gone it
+[06:06] this week once it's gone it's gone it
+[06:06] this week once it's gone it's gone it maybe will come back uh any time in the
+[06:09] maybe will come back uh any time in the
+[06:09] maybe will come back uh any time in the future but uh not soon absolutely not
+[06:13] future but uh not soon absolutely not
+[06:13] future but uh not soon absolutely not soon um the next thing is sandbox
+[06:16] soon um the next thing is sandbox
+[06:16] soon um the next thing is sandbox constructions now if you're a real fan
+[06:19] constructions now if you're a real fan
+[06:19] constructions now if you're a real fan and you really want to support us and
+[06:21] and you really want to support us and
+[06:21] and you really want to support us and you want to get the best of super cityon
+[06:23] you want to get the best of super cityon
+[06:23] you want to get the best of super cityon this one is for you uh what does it do
+[06:27] this one is for you uh what does it do
+[06:27] this one is for you uh what does it do it's zero construction time that's
+[06:29] it's zero construction time that's
+[06:29] it's zero construction time that's essenti how I play the game all the time
+[06:33] essenti how I play the game all the time
+[06:33] essenti how I play the game all the time um it's so much fun because you can
+[06:35] um it's so much fun because you can
+[06:35] um it's so much fun because you can build Arrow as as fast as you want you
+[06:38] build Arrow as as fast as you want you
+[06:38] build Arrow as as fast as you want you can can uh instantly confirm buildings
+[06:42] can can uh instantly confirm buildings
+[06:42] can can uh instantly confirm buildings when you move them so so if you're a lot
+[06:45] when you move them so so if you're a lot
+[06:45] when you move them so so if you're a lot into building and you like it a lot uh
+[06:47] into building and you like it a lot uh
+[06:47] into building and you like it a lot uh that one is for you um the cityon
+[06:51] that one is for you um the cityon
+[06:51] that one is for you um the cityon building is a smaller one here um yeah
+[06:56] building is a smaller one here um yeah
+[06:56] building is a smaller one here um yeah as explained before it gives you another
+[06:58] as explained before it gives you another
+[06:58] as explained before it gives you another construction slot
+[07:00] construction slot
+[07:00] construction slot um the speed up
+[07:01] um the speed up
+[07:01] um the speed up packages um yeah in in my test test game
+[07:06] packages um yeah in in my test test game
+[07:06] packages um yeah in in my test test game here it doesn't show purchase option but
+[07:08] here it doesn't show purchase option but
+[07:08] here it doesn't show purchase option but that one is essentially to get rid of uh
+[07:13] that one is essentially to get rid of uh
+[07:13] that one is essentially to get rid of uh this button here in the bottom left
+[07:15] this button here in the bottom left
+[07:16] this button here in the bottom left which is the speed up button so you
+[07:17] which is the speed up button so you
+[07:17] which is the speed up button so you watch an ad you get speed up for a while
+[07:20] watch an ad you get speed up for a while
+[07:20] watch an ad you get speed up for a while um with that purchase uh you get rid of
+[07:23] um with that purchase uh you get rid of
+[07:23] um with that purchase uh you get rid of it and you got that speed up uh option
+[07:26] it and you got that speed up uh option
+[07:27] it and you got that speed up uh option forever um also construct ructions will
+[07:30] forever um also construct ructions will
+[07:30] forever um also construct ructions will finish faster when you're not in game so
+[07:33] finish faster when you're not in game so
+[07:33] finish faster when you're not in game so generally all our construction times are
+[07:36] generally all our construction times are
+[07:36] generally all our construction times are very low compared to other games we
+[07:38] very low compared to other games we
+[07:38] very low compared to other games we measures them in minutes uh not in hours
+[07:41] measures them in minutes uh not in hours
+[07:41] measures them in minutes uh not in hours or days and they progress when you're uh
+[07:44] or days and they progress when you're uh
+[07:44] or days and they progress when you're uh not in the game um and they progress
+[07:47] not in the game um and they progress
+[07:47] not in the game um and they progress even faster if you got speed up left or
+[07:50] even faster if you got speed up left or
+[07:51] even faster if you got speed up left or um if you got the speed up package um
+[07:54] um if you got the speed up package um
+[07:54] um if you got the speed up package um that one is for that block in the top
+[07:57] that one is for that block in the top
+[07:57] that one is for that block in the top right it's for our free users uh to
+[08:01] right it's for our free users uh to
+[08:01] right it's for our free users uh to still have full access to all the
+[08:02] still have full access to all the
+[08:02] still have full access to all the premium options uh but for free um so
+[08:06] premium options uh but for free um so
+[08:06] premium options uh but for free um so every 8 hours you can use those options
+[08:09] every 8 hours you can use those options
+[08:09] every 8 hours you can use those options and watch the four ads to release those
+[08:13] and watch the four ads to release those
+[08:13] and watch the four ads to release those rewards and also I think yeah every 3
+[08:16] rewards and also I think yeah every 3
+[08:16] rewards and also I think yeah every 3 hours you get a free gift uh top here
+[08:19] hours you get a free gift uh top here
+[08:19] hours you get a free gift uh top here for
+[08:20] for
+[08:20] for nothing
+[08:22] nothing
+[08:22] nothing um the piggy bank the piggy bank uh yeah
+[08:26] um the piggy bank the piggy bank uh yeah
+[08:26] um the piggy bank the piggy bank uh yeah it essentially collects uh super cash
+[08:29] it essentially collects uh super cash
+[08:29] it essentially collects uh super cash over time for your
+[08:30] over time for your
+[08:30] over time for your activity um and once you filled it uh
+[08:34] activity um and once you filled it uh
+[08:34] activity um and once you filled it uh you can you can um purchase it uh for
+[08:39] you can you can um purchase it uh for
+[08:39] you can you can um purchase it uh for very reduced price compared to the
+[08:41] very reduced price compared to the
+[08:41] very reduced price compared to the normal pricing of super
+[08:44] normal pricing of super
+[08:44] normal pricing of super cach uh below the pigy bank you got the
+[08:47] cach uh below the pigy bank you got the
+[08:47] cach uh below the pigy bank you got the regular Super Cash options to purchase
+[08:50] regular Super Cash options to purchase
+[08:50] regular Super Cash options to purchase uh then you will find uh the chests um
+[08:53] uh then you will find uh the chests um
+[08:53] uh then you will find uh the chests um so every 4 hours or every 24 hours you
+[08:57] so every 4 hours or every 24 hours you
+[08:57] so every 4 hours or every 24 hours you can redeem free chest here that give you
+[09:00] can redeem free chest here that give you
+[09:00] can redeem free chest here that give you collectible uh parts and that give you
+[09:03] collectible uh parts and that give you
+[09:04] collectible uh parts and that give you bonus
+[09:05] bonus
+[09:05] bonus cards um also completely free option
+[09:08] cards um also completely free option
+[09:08] cards um also completely free option that's it about uh the the shop the
+[09:12] that's it about uh the the shop the
+[09:12] that's it about uh the the shop the store and in the building shop you can
+[09:15] store and in the building shop you can
+[09:15] store and in the building shop you can find a lot of buildings
+[09:18] find a lot of buildings
+[09:18] find a lot of buildings currently uh as you can see in the top
+[09:21] currently uh as you can see in the top
+[09:21] currently uh as you can see in the top we got over 300 but it's continuously
+[09:25] we got over 300 but it's continuously
+[09:25] we got over 300 but it's continuously growing and you will find buildings of
+[09:27] growing and you will find buildings of
+[09:27] growing and you will find buildings of different categories
+[09:30] different categories
+[09:30] different categories um yeah for this the supply ones the
+[09:41] parks and this guys
+[09:41] parks and this guys creepers uh this one this tab is maybe
+[09:44] creepers uh this one this tab is maybe
+[09:44] creepers uh this one this tab is maybe not present in your game it's only there
+[09:47] not present in your game it's only there
+[09:47] not present in your game it's only there when you got something in storage
+[09:49] when you got something in storage
+[09:49] when you got something in storage especially when you got bonus cards in
+[09:51] especially when you got bonus cards in
+[09:51] especially when you got bonus cards in storage so storage is you can put um
+[09:55] storage so storage is you can put um
+[09:55] storage so storage is you can put um buildings and bonus Cards into storage
+[09:58] buildings and bonus Cards into storage
+[09:58] buildings and bonus Cards into storage using that button quick one to now it's
+[10:01] using that button quick one to now it's
+[10:01] using that button quick one to now it's in
+[10:03] in
+[10:03] in warehouse and um yeah you can redeem it
+[10:06] warehouse and um yeah you can redeem it
+[10:06] warehouse and um yeah you can redeem it from here
+[10:08] from here
+[10:08] from here by uh tapping this button in shop I have
+[10:13] by uh tapping this button in shop I have
+[10:13] by uh tapping this button in shop I have also a longer video about that um check
+[10:16] also a longer video about that um check
+[10:16] also a longer video about that um check out the YouTube channel for more details
+[10:19] out the YouTube channel for more details
+[10:19] out the YouTube channel for more details um what else for the basics yeah zoom in
+[10:22] um what else for the basics yeah zoom in
+[10:22] um what else for the basics yeah zoom in fully zoom in again enter the walk mode
+[10:24] fully zoom in again enter the walk mode
+[10:24] fully zoom in again enter the walk mode now we started inside the building um
+[10:28] now we started inside the building um
+[10:28] now we started inside the building um that should normally not happen but yeah
+[10:31] that should normally not happen but yeah
+[10:31] that should normally not happen but yeah okay and you can run around your city um
+[10:35] okay and you can run around your city um
+[10:35] okay and you can run around your city um push the exit button to get back uh open
+[10:39] push the exit button to get back uh open
+[10:39] push the exit button to get back uh open the settings and you will find options
+[10:41] the settings and you will find options
+[10:41] the settings and you will find options to modify how sensitive um the first
+[10:45] to modify how sensitive um the first
+[10:46] to modify how sensitive um the first person mode is depending on your device
+[10:49] person mode is depending on your device
+[10:49] person mode is depending on your device that may differ a little
+[10:56] bit uh zoom out fully and zoom out again
+[10:56] bit uh zoom out fully and zoom out again to enter the region view uh that's a
+[10:59] to enter the region view uh that's a
+[10:59] to enter the region view uh that's a place where you can switch Maps or get
+[11:02] place where you can switch Maps or get
+[11:02] place where you can switch Maps or get an overview um across all of your
+[11:05] an overview um across all of your
+[11:05] an overview um across all of your currently built settings for the first
+[11:08] currently built settings for the first
+[11:08] currently built settings for the first region in game wait a second to make the
+[11:10] region in game wait a second to make the
+[11:10] region in game wait a second to make the lines fade off so you got a nice and
+[11:12] lines fade off so you got a nice and
+[11:12] lines fade off so you got a nice and clear picture of
+[11:19] everything okay I think that's it for a
+[11:19] everything okay I think that's it for a quick overview oh no let me mention the
+[11:21] quick overview oh no let me mention the
+[11:21] quick overview oh no let me mention the bars in the top you can tap the bars so
+[11:24] bars in the top you can tap the bars so
+[11:24] bars in the top you can tap the bars so you actually get
+[11:25] you actually get
+[11:25] you actually get details
+[11:27] details
+[11:27] details um yeah what you can see here I mean
+[11:29] um yeah what you can see here I mean
+[11:30] um yeah what you can see here I mean does not matter which ones you tap so
+[11:31] does not matter which ones you tap so
+[11:32] does not matter which ones you tap so there is two
+[11:33] there is two
+[11:33] there is two blocks this block and this block uh this
+[11:36] blocks this block and this block uh this
+[11:36] blocks this block and this block uh this is your building demand um this is
+[11:39] is your building demand um this is
+[11:39] is your building demand um this is your uh economy usage uh why is it usage
+[11:45] your uh economy usage uh why is it usage
+[11:45] your uh economy usage uh why is it usage why is it visualized like that CU course
+[11:48] why is it visualized like that CU course
+[11:48] why is it visualized like that CU course I had a lot of lot of discussions with
+[11:50] I had a lot of lot of discussions with
+[11:50] I had a lot of lot of discussions with players uh about if the bar should be
+[11:53] players uh about if the bar should be
+[11:53] players uh about if the bar should be full uh or not full when it's in use or
+[11:56] full uh or not full when it's in use or
+[11:56] full uh or not full when it's in use or not in use uh so let me explain
+[11:58] not in use uh so let me explain
+[11:58] not in use uh so let me explain straightforward how it works um I made
+[12:00] straightforward how it works um I made
+[12:00] straightforward how it works um I made it simple in a way that means whenever a
+[12:04] it simple in a way that means whenever a
+[12:04] it simple in a way that means whenever a bar is full or there is demand of it and
+[12:06] bar is full or there is demand of it and
+[12:06] bar is full or there is demand of it and that's true for the building demand for
+[12:08] that's true for the building demand for
+[12:08] that's true for the building demand for example you can see here we definitely
+[12:10] example you can see here we definitely
+[12:10] example you can see here we definitely need more residential buildings because
+[12:12] need more residential buildings because
+[12:12] need more residential buildings because we are very well covered with commercial
+[12:15] we are very well covered with commercial
+[12:15] we are very well covered with commercial and with
+[12:17] and with
+[12:17] and with industrial um but we have two few
+[12:19] industrial um but we have two few
+[12:19] industrial um but we have two few residential you will also see that uh
+[12:22] residential you will also see that uh
+[12:22] residential you will also see that uh indicated below um yeah what what does
+[12:27] indicated below um yeah what what does
+[12:27] indicated below um yeah what what does it tells us we need to increase the food
+[12:29] it tells us we need to increase the food
+[12:29] it tells us we need to increase the food production yeah because the usage is at
+[12:32] production yeah because the usage is at
+[12:32] production yeah because the usage is at 82% um so if we get some more residents
+[12:35] 82% um so if we get some more residents
+[12:35] 82% um so if we get some more residents when we build more residential buildings
+[12:38] when we build more residential buildings
+[12:38] when we build more residential buildings we will run into food supply shortage
+[12:41] we will run into food supply shortage
+[12:41] we will run into food supply shortage soon um energy still with with 56%
+[12:46] soon um energy still with with 56%
+[12:46] soon um energy still with with 56% totally fine our water production is
+[12:48] totally fine our water production is
+[12:48] totally fine our water production is huge no problems here um and our waste
+[12:52] huge no problems here um and our waste
+[12:52] huge no problems here um and our waste management is also perfectly fine um but
+[12:54] management is also perfectly fine um but
+[12:54] management is also perfectly fine um but yeah straightforward um when a bar is
+[12:57] yeah straightforward um when a bar is
+[12:57] yeah straightforward um when a bar is full it means you need something uh when
+[13:00] full it means you need something uh when
+[13:00] full it means you need something uh when the bar is empty it means you're are
+[13:02] the bar is empty it means you're are
+[13:02] the bar is empty it means you're are fine um if you don't know tap the bar
+[13:06] fine um if you don't know tap the bar
+[13:06] fine um if you don't know tap the bar block um to see the actual details and
+[13:10] block um to see the actual details and
+[13:10] block um to see the actual details and um yeah oh another thing you can
+[13:14] um yeah oh another thing you can
+[13:14] um yeah oh another thing you can tap uh the your money amount to get it
+[13:17] tap uh the your money amount to get it
+[13:17] tap uh the your money amount to get it shorted or not so by money amount I talk
+[13:21] shorted or not so by money amount I talk
+[13:21] shorted or not so by money amount I talk about this up
+[13:28] here um
+[13:28] here um yeah oh this is your level uh by the way
+[13:31] yeah oh this is your level uh by the way
+[13:31] yeah oh this is your level uh by the way the level I was ask that often we don't
+[13:33] the level I was ask that often we don't
+[13:33] the level I was ask that often we don't have um XP points your level straight
+[13:37] have um XP points your level straight
+[13:37] have um XP points your level straight forward depends on your residence amount
+[13:39] forward depends on your residence amount
+[13:39] forward depends on your residence amount so to level up um you simply need more
+[13:42] so to level up um you simply need more
+[13:42] so to level up um you simply need more residence so build build build super
+[13:44] residence so build build build super
+[13:44] residence so build build build super City G is all about building uh build
+[13:48] City G is all about building uh build
+[13:48] City G is all about building uh build more and grow um once you reach more
+[13:51] more and grow um once you reach more
+[13:51] more and grow um once you reach more residents you will reach a higher level
+[13:53] residents you will reach a higher level
+[13:53] residents you will reach a higher level higher levels unlock more buildings and
+[13:56] higher levels unlock more buildings and
+[13:56] higher levels unlock more buildings and so on and so on uh next one is your
+[13:59] so on and so on uh next one is your
+[13:59] so on and so on uh next one is your residence amount of um this current map
+[14:04] residence amount of um this current map
+[14:04] residence amount of um this current map and Below you will find the date we
+[14:07] and Below you will find the date we
+[14:07] and Below you will find the date we start the date at Day Zero um so my city
+[14:11] start the date at Day Zero um so my city
+[14:11] start the date at Day Zero um so my city here this demo city is 229 years old um
+[14:24] yeah what else we got Street Building
+[14:24] yeah what else we got Street Building Street Building I think it's very
+[14:25] Street Building I think it's very
+[14:25] Street Building I think it's very straightforward we don't have too much
+[14:28] straightforward we don't have too much
+[14:28] straightforward we don't have too much space here I think I just demolished
+[14:30] space here I think I just demolished
+[14:30] space here I think I just demolished something somewhere where is it oh yeah
+[14:34] something somewhere where is it oh yeah
+[14:34] something somewhere where is it oh yeah here we got some
+[14:36] here we got some
+[14:36] here we got some space to
+[14:39] space to
+[14:39] space to um you select one this or that one you
+[14:43] um you select one this or that one you
+[14:43] um you select one this or that one you tap on the map and you
+[14:45] tap on the map and you
+[14:45] tap on the map and you will uh you will get a visual indicator
+[14:48] will uh you will get a visual indicator
+[14:48] will uh you will get a visual indicator of of every build that every direction
+[14:52] of of every build that every direction
+[14:52] of of every build that every direction that's possible and you tap there Bop
+[14:55] that's possible and you tap there Bop
+[14:55] that's possible and you tap there Bop and your streets will appear
+[14:59] and your streets will appear
+[14:59] and your streets will appear it's very simple um to De demolish them
+[15:03] it's very simple um to De demolish them
+[15:03] it's very simple um to De demolish them as set enter the inventory um select
+[15:08] as set enter the inventory um select
+[15:08] as set enter the inventory um select streets and and you can simply tap them
+[15:12] streets and and you can simply tap them
+[15:12] streets and and you can simply tap them to remove
+[15:14] to remove
+[15:14] to remove them um yeah that's it for now for a
+[15:18] them um yeah that's it for now for a
+[15:18] them um yeah that's it for now for a quick overview I think the video is
+[15:20] quick overview I think the video is
+[15:20] quick overview I think the video is already already longer as I as I hope to
+[15:22] already already longer as I as I hope to
+[15:23] already already longer as I as I hope to get it to make it um let me know if if
+[15:26] get it to make it um let me know if if
+[15:26] get it to make it um let me know if if anything is M uh Missing I'm I'm totally
+[15:28] anything is M uh Missing I'm I'm totally
+[15:28] anything is M uh Missing I'm I'm totally up for making more videos uh but since
+[15:31] up for making more videos uh but since
+[15:31] up for making more videos uh but since I'm not a YouTuber I consider myself
+[15:34] I'm not a YouTuber I consider myself
+[15:34] I'm not a YouTuber I consider myself more design anded developer and I have a
+[15:36] more design anded developer and I have a
+[15:36] more design anded developer and I have a hard time uh overthinking concepts for
+[15:39] hard time uh overthinking concepts for
+[15:39] hard time uh overthinking concepts for videos which ends up in never doing some
+[15:43] videos which ends up in never doing some
+[15:43] videos which ends up in never doing some so I just do them uh do them uh yeah
+[15:48] so I just do them uh do them uh yeah
+[15:48] so I just do them uh do them uh yeah freely with without scripts or anything
+[15:51] freely with without scripts or anything
+[15:51] freely with without scripts or anything um let me know if it helps any questions
+[15:54] um let me know if it helps any questions
+[15:54] um let me know if it helps any questions welcome um yeah join our Discord to get
+[15:57] welcome um yeah join our Discord to get
+[15:57] welcome um yeah join our Discord to get in touch um thanks for watching thanks
+[16:00] in touch um thanks for watching thanks
+[16:00] in touch um thanks for watching thanks for playing see you in the next videos
+[16:02] for playing see you in the next videos
+[16:02] for playing see you in the next videos uh bye
