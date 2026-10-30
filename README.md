@@ -9,6 +9,10 @@ Vite 5, ES modules, no TypeScript.
 
 Click the link, and the city is live in your browser. Nothing to install.
 
+**New here? Read [game/PLAY-GUIDE.md](game/PLAY-GUIDE.md)** — the controls, the
+seven tools, the shop, every HUD meter and every panel, in one page. The game
+also has it built in: press **H**.
+
 Every piece of art and animation comes from the owner's own asset library.
 Nothing is generated, redrawn or substituted.
 

@@ -323,7 +323,7 @@ export function createHUD(ctx, deps = {}) {
     ['zoom-out', '-', 'Zoom out (wheel)'],
     ['rotate-left', 'Q', 'Rotate left (Q)'],
     ['rotate-right', 'E', 'Rotate right (E)'],
-    ['reset', 'H', 'Reset camera (H)'],
+    ['reset', 'R', 'Reset camera (R)'],
   ]) {
     const btn = make('button', 'sc-btn', label);
     btn.type = 'button';
@@ -896,6 +896,7 @@ export function createHUD(ctx, deps = {}) {
       ['1 - 7', 'Select a tool'],
       ['W A S D', 'Pan the camera'],
       ['Q / E', 'Rotate the camera'],
+      ['R', 'Reset the camera'],
       ['Wheel', 'Zoom'],
       ['Right-drag', 'Rotate + tilt'],
       ['Left-drag', 'Pan'],

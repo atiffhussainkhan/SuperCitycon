@@ -400,6 +400,9 @@ export function createCameraRig(ctx, options = {}) {
     if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName || '')) return;
     if (e.code === 'KeyQ') { rotate(-RIG_RATES.dragYaw * 6); return; }
     if (e.code === 'KeyE') { rotate(RIG_RATES.dragYaw * 6); return; }
+    // R resets the camera. (H was the label on the reset button for a while,
+    // but H opens the help panel — the label was a lie, so the key moved.)
+    if (e.code === 'KeyR') { reset(); return; }
     const dir = KEY_PAN[e.code];
     if (dir) { keys.add(dir); e.preventDefault?.(); return; }
     if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.add('shift');
