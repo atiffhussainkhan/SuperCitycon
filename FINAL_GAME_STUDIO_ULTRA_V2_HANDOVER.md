@@ -4,8 +4,8 @@
 **Report date:** 2026-11-08
 **Branch:** `main` — the licence fix was committed and **pushed** as `c58d265`;
 the workflow ran green and deployed in 9 s, so the corrected build is **live**.
-This report's final post-deploy wording is in the follow-up commit that carries
-this file.
+This report's final wording is in the follow-up commits listed in §12
+(`e59b668`, `9d12462`, `ae40767`), all pushed.
 **Machine:** macOS 26.7.1 (25G241), **x86_64 Intel**, Node 22.14.0, npm 10.9.2,
 Python 3.15.2, git 2.50.1
 
@@ -91,11 +91,28 @@ at the pixels, saving and reloading in a fresh session.
 **fail** on a known-bad input and was caught. A gate that has never failed
 proves nothing; that is why the injection count is a published figure.
 
-### 2.3 Classification
+### 2.3 The final round — rebuilding the release from a clean checkout
+
+Run after the fixes in §4.7 and §4.8, against the release commit itself:
+
+| # | Command | Result | Verdict |
+|---|---|---|---|
+| 14 | `git worktree add --detach /tmp/pkg-src <commit>` → `npm ci` → `npm run build:cleared` | **218 files, 72.6 MB**, licence policy `CLEARED` (2D art stripped) | **PASS** |
+| 15 | `node tools/package-release.mjs` in that worktree | **720 files, 167.3 MB, 719 hashed**, secret scan clean over 711 files, `DO-NOT-PUBLISH` absent | **PASS** |
+| 16 | `shasum -a 256 -c SHA256SUMS.txt` in the built package | **719/719 OK**, exit 0 | **PASS** |
+| 17 | clean copy of the package → `npm ci` → `npm test` | **395/395 pass**, 8 suites, 0 fail | **PASS** |
+| 18 | clean copy of the package → `npm run check` | **56/56 files parse cleanly** | **PASS** |
+| 19 | clean copy → `python3 tools/audit_depth.py` / `verify_devbots.py` | **102/102 implementable** · **0 FAIL, 13 PASS** | **PASS** |
+| 20 | clean copy → `python3 tools/verify_design.py` | **3 FAIL, 28 PASS** — *correctly*: the package ships without the 2.4 GB cache, so the gate calls the paths **UNVERIFIED** and prints the restore command | **PASS (legible failure)** |
+| 21 | `python3 tools/pack_cache.py` in the clean copy | **FAIL** — names the 22 missing archives and the restore command; no path is called fabricated | **PASS (legible failure)** |
+| 22 | construction-slot progression, measured against the shipped source | slots `1 → 2`; Monorail Station gate `ok: true` once the landmark completes | **PASS** |
+| 23 | live HTTP against the deployed site | `DO-NOT-PUBLISH.txt` / `assets/ui-assets.json` / `assets/ui/` → **404**, `index.html` → **200** | **PASS** |
+
+### 2.4 Classification
 
 | Class | Items |
 |---|---|
-| **PASS** | All 13 checks above, plus the release-package verification in §8 |
+| **PASS** | All 23 checks above, plus the release-package verification in §8 |
 | **FAIL** | None outstanding. Every failure found during this work was fixed and re-verified. |
 | **BLOCKED** | 4 — see §9 |
 | **NOT APPLICABLE** | 2 — the 2D-art acceptance check on the publishable profile (correctly skipped, because that bundle deliberately ships no 2D art); the ARM build (no ARM hardware here) |
@@ -213,6 +230,36 @@ comment, the module docstring and the master. Two other published figures
 explicitly — **722** is the portable figure, **721** is the case where the
 shared mirror happens to hold one of them.
 
+### 4.7 The release documents were never version-controlled
+
+`.gitignore` ended with a bare `release/` pattern. Git matches an unanchored
+pattern at **any depth**, so it silently excluded `docs/release/` as well as the
+root package. The six release documents — `RELEASE-MANIFEST`, `TEST-RESULTS`,
+`PERFORMANCE`, `REMAINING-ISSUES`, `RECOVERY`, `LICENCES` — shipped inside the
+package, but existed only in the working tree: a clean checkout could not
+rebuild the release, and `git status` showed nothing because ignored files are
+hidden by default.
+
+**Found** while rebuilding the package from an isolated worktree at the release
+commit: the rebuild produced **708 files instead of 720**, and the missing 12
+were exactly the six documents in `docs/release/` and their six copies at the
+package root. **Fixed**: the pattern is now anchored (`/release/`), the six
+documents are committed, and the same worktree rebuild produces the full
+**720 files / 719 checksums** again.
+
+### 4.8 A claim in this report was wrong about the game's progression
+
+§9 said the two-slot buildings could *never* be built. They can. The
+construction-slot progression is implemented (FR-ECO-020): the player starts
+with one slot, the **Citycon Building** — a placeable landmark, unlocked at
+level 8, carrying `grantsConstructionSlot` — grants a second permanent slot,
+and once that construction completes the Monorail Station gate flips to `ok`
+and it builds. Measured directly against the shipped source: slots
+`total: 1 → 2`, then `free: 2`, Monorail Station gate `ok: true`, and
+`used: 2, free: 0` while it is under construction. The acceptance harness
+reports the refusal only because its scenario exercises the early game and
+never places the landmark. **Corrected** in §3 and §9.
+
 ---
 
 ## 5. Storage and clean-up — what was actually reclaimed
@@ -227,27 +274,28 @@ shared mirror happens to hold one of them.
 | `minimax-game/_audit_basenames_out.txt` | a generated audit scratch file |
 | `minimax-game/my_mario_game` | an empty stray directory |
 
-**Trash state, measured now:** **455 MB across 18 items / 3,934 files** — and
-**every single one is scratch this project created**, listed below. There is
-**no pre-existing user data in the Trash**: the 1,362 items the brief referred
-to were **already empty** when I measured (the Trash had been emptied between
-sessions), and I did not empty anything.
+**Trash state, measured now:** **886 MB across 4 items** — and **every single one
+is scratch this project created** in the final verification round: four
+temporary directories used to rebuild and independently verify the release
+package (`pkg-src/`, `pkg-out/`, `pkg-out2/`, `pkg-verify2/`). The Trash's
+earlier contents (18 items / 455 MB, all scratch of mine) were **emptied before
+this round** — macOS no longer lists them — so the manual action recorded in the
+previous round has evidently been taken, and it is needed again now for these
+four. There is **no pre-existing user data in the Trash**: the 1,362 items the
+brief referred to were already empty when I first measured, and I did not empty
+anything myself.
 
-| Item | Size | What it is |
-|---|---|---|
-| `pkg-final/` | 237 MB | a temporary extraction of the release package, used to verify it independently |
-| `pkg-verify/` | 216 MB | the same, from the earlier verification round |
-| `.DS_Store` ×2 | 748 KB | Finder metadata removed from the project tree |
-| `__pycache__/` | 260 KB | Python bytecode cache |
-| `m*.md`, `m_before.md`, `master-before.md` | 796 KB | snapshots of the master document taken while rebuilding it |
-| `staged.txt`, `actual.txt`, `expected_from_scripts.txt`, `ec_a/`, `emptycache2/`, `emptymirror/`, `emptytest/` | 12 KB | scratch from the archive-coverage measurements |
+| Item | What it is |
+|---|---|
+| `pkg-src/` | an isolated `git worktree` at the release commit: `npm ci` → `build:cleared` → the packager |
+| `pkg-out/`, `pkg-out2/` | two complete package builds produced by that worktree |
+| `pkg-verify2/` | a clean copy of the package, used for the independent `npm ci` + test run |
 
-The two large directories are the two temporary package extractions. They are
-**mine, from this session, and fully regenerable** — the package is rebuilt by
-`node tools/package-release.mjs` and re-verified by extracting it to a
-temporary directory. Nothing of yours is in there, so emptying the Trash now
-is safe. **I did not empty it**, because permanently deleting Trash contents
-was reserved for you.
+All four are **mine, from this session, and fully regenerable** — the package is
+rebuilt by `node tools/package-release.mjs` and re-verified by extracting it to a
+temporary directory. Nothing of yours is in there, so emptying the Trash is
+safe. **I did not empty it**, because permanently deleting Trash contents was
+reserved for you.
 
 **What I deliberately did NOT delete:**
 
@@ -258,12 +306,17 @@ was reserved for you.
   depends on it for path verification.
 - All original assets, source, licences, working builds and review history.
 
-**`.gitignore` was extended** so the 2.4 GB pack cache, the `__pycache__` and
-the **release package itself** can never be committed. The release package is a
-rebuildable artefact that deliberately contains the built bundle, so committing
-it would put a *third* copy of every model binary in the history. Measured with
-`git add -An`: **84 files would be staged, 0 archives**, and no
-`library-packs/` path among them.
+**`.gitignore`** keeps the 2.4 GB pack cache, the `__pycache__` and the **release
+package itself** out of the repository. The release package is a rebuildable
+artefact that deliberately contains the built bundle, so committing it would put
+a *third* copy of every model binary in the history. Verified with
+`git check-ignore`, which is the check that actually decides the question:
+`release/MINIMAX-GAME-STUDIO-ULTRA-V2/SHA256SUMS.txt` **is ignored** and
+`minimax-game/platformer-docs/library-packs/` **is ignored**.
+
+**A defect in that file was found and fixed in the final round** — see §4.7:
+the bare `release/` pattern also matched `docs/release/`, so the six release
+documents were never version-controlled.
 
 **Current footprint:** workspace **2.9 GB** = `minimax-game/` 2.4 GB (cache) +
 `game/` 229 MB + `release/` 212 MB + `docs/` 3.8 MB.
@@ -319,6 +372,7 @@ Machine-specific limits are catalogued in `docs/MAC-PORTABILITY.md` §8.
 | Checksums | **719/719 verified OK** by independent `shasum -a 256 -c` |
 | `DO-NOT-PUBLISH.txt` | **absent** |
 | Independent extract + `npm ci` + `npm test` | **395/395 pass**; harness 40/41 (1 skipped) |
+| Rebuilt from a **clean checkout** of the release commit | **720 files / 719 checksums** — `git worktree` → `npm ci` → `npm run build:cleared` → `node tools/package-release.mjs` |
 
 **Contents:** the verified game source *and* the built, licence-cleared bundle;
 the 3D design package (documents, inventory, gates, review record); the harness
@@ -399,11 +453,13 @@ have. None is a code fix.
 
 ## 10. Manual actions still necessary
 
-1. **Empty the Trash** (455 MB, 18 items). Everything in it is scratch this
-   project created — chiefly two temporary package extractions — so emptying it
-   is safe. The 1,362 pre-existing items the brief referred to were already
-   gone before I started. I did not empty it, because permanently deleting
-   Trash contents was reserved for you.
+1. **Empty the Trash** (886 MB, 4 items). Everything in it is scratch this
+   project created in the final round — four temporary directories used to
+   rebuild and independently verify the release package — so emptying it is
+   safe. The 1,362 pre-existing items the brief referred to were already
+   gone before I started, and the previous round's scratch has since been
+   emptied too. I did not empty it, because permanently deleting Trash
+   contents was reserved for you.
 2. **Clear the 82 2D licences** (publisher's decision) if you want a decorated
    build. The published site is already licence-compliant without them.
 3. **Run the harness on an Apple Silicon Mac** to close B-1.
@@ -447,17 +503,26 @@ Playwright)
 
 **New:** `tools/{playwright-resolve,performance,package-release}.mjs` ·
 `docs/dependency-manifest.json` · `docs/MAC-PORTABILITY.md` · `docs/release/*`
-· `docs/review/*` (the three Cursor review briefs and their README) ·
+(now **tracked** — see §4.7) · `docs/review/*` (the three Cursor review briefs
+and their README) ·
 `game/verification/{prod-run,live-run,live-final,cleared-run,portable-run,
 final-prod,final-prod-rerun,final-cleared,final-local,performance}/` ·
 `release/MINIMAX-GAME-STUDIO-ULTRA-V2/` (gitignored — a rebuildable artefact) ·
 `minimax-game/tools/pack_cache.py` (the cache module) · the whole
 `minimax-game/` tree
 
-**Committed and pushed** as `c58d265` — *"Publish only the licence-cleared
-bundle, and finalise the handover"* — 85 files, 132,713 insertions, 0 archives.
+**Committed and pushed**, in order:
+
+| Commit | What it carried |
+|---|---|
+| `c58d265` | the licence fix, the deploy workflow change, the profile fix, the portability artefacts, and the first version of this report — 85 files, 132,713 insertions, 0 archives |
+| `e59b668` | the completed deploy and the live verification evidence |
+| `9d12462` | the corrected construction-slot claim (§4.8) |
+| `ae40767` | the `.gitignore` anchor fix and the six release documents (§4.7) |
+
 The release package is deliberately **not** committed; it is rebuilt by
-`node tools/package-release.mjs`.
+`node tools/package-release.mjs` — and now verifiably so, from a clean checkout
+(§8).
 
 ---
 
