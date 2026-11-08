@@ -2,7 +2,10 @@
 
 **Repository:** `/Users/mac/.minimax/sessions/mvs_be813ca06b864c7390e5996b68d3db8f/workspace`
 **Report date:** 2026-11-08
-**Branch:** `main` · HEAD `8baa512` · working tree has uncommitted work (see §12)
+**Branch:** `main` — the licence fix was committed and **pushed** as `c58d265`;
+the workflow ran green and deployed in 9 s, so the corrected build is **live**.
+This report's final post-deploy wording is in the follow-up commit that carries
+this file.
 **Machine:** macOS 26.7.1 (25G241), **x86_64 Intel**, Node 22.14.0, npm 10.9.2,
 Python 3.15.2, git 2.50.1
 
@@ -29,6 +32,11 @@ glossed:
 2. **Apple Silicon was not executed.** This machine is Intel. The shipped
    bundle contains **0 native executables**, so the same artefact runs on ARM,
    but I will not claim a test I did not run.
+
+**The licence exposure on the live site is closed.** With your approval the
+corrected build was committed and pushed; the site now serves the publishable
+bundle, and `DO-NOT-PUBLISH.txt`, `assets/ui-assets.json` and `assets/ui/` all
+return **404**.
 
 ---
 
@@ -61,7 +69,7 @@ Nothing is projected or quoted from memory.
 | 4 | `npm run verify:production -- --port 4182 --profile local` | `40/40 checks passed` | **PASS 40/40** |
 | 5 | `npm ci` from the lockfile, then re-run #2 | clean install, 395/395 again | **PASS** |
 | 6 | `node tools/performance.mjs --port 4176 --frames 90` | see §6 | **PASS** — 0 console errors |
-| 7 | Live site `https://atiffhussainkhan.github.io/SuperCitycon/` | `40/40` against the deployed bundle (measured earlier in this project); **re-checked this session**: `DO-NOT-PUBLISH.txt` → **HTTP 200** and `assets/ui-assets.json` → **HTTP 200** | **PASS** for the game, **FAIL for the licence profile** — see §4.1 |
+| 7 | Live site `https://atiffhussainkhan.github.io/SuperCitycon/` | **after the deploy**: `DO-NOT-PUBLISH.txt` → **404**, `assets/ui-assets.json` → **404**, `assets/ui/` → **404**, `index.html` → **200**; the acceptance harness against the live URL → **40/41, 1 skipped** (the 2D-art check) | **PASS** — the licence exposure is closed |
 
 The acceptance harness is the one that matters: it builds the bundle, serves
 it with `vite preview`, opens it in a headless Chromium, and **plays it** —
@@ -130,6 +138,12 @@ published. I confirmed both live by HTTP.
 `dist/assets/ui/`, `dist/assets/ui-assets.json` and `dist/DO-NOT-PUBLISH.txt`
 are all absent before it deploys. The LOCAL profile remains available for the
 owner's own use.
+
+**Fixed and live.** The change was committed and pushed to `main` (`c58d265`),
+the workflow ran green — including the new "Check the bundle" step — and
+deployed in 9 s. The live site now returns **404** for `DO-NOT-PUBLISH.txt`,
+`assets/ui-assets.json` and `assets/ui/`, and **200** for `index.html`. The
+licence exposure is closed, not merely fixed in the source tree.
 
 ### 4.2 The harness was verifying the wrong bundle
 
@@ -377,16 +391,20 @@ have. None is a code fix.
    is safe. The 1,362 pre-existing items the brief referred to were already
    gone before I started. I did not empty it, because permanently deleting
    Trash contents was reserved for you.
-2. **Decide the live deploy.** The corrected workflow is committed to the
-   working tree but **not pushed**. Pushing `main` redeploys the site with the
-   licence-compliant bundle — the live HUD loses its 2D icons and falls back to
-   text. The current live site still serves the uncleared build. **This is
-   your call; I did not push.**
-3. **Clear the 82 2D licences** (publisher's decision) if you want a decorated
-   build.
-4. **Run the harness on an Apple Silicon Mac** to close B-1.
-5. **Review the 4 open design decisions** (`OPEN-002`, `OPEN-005`, and the two
+2. **Clear the 82 2D licences** (publisher's decision) if you want a decorated
+   build. The published site is already licence-compliant without them.
+3. **Run the harness on an Apple Silicon Mac** to close B-1.
+4. **Review the 4 open design decisions** (`OPEN-002`, `OPEN-005`, and the two
    published-value questions in `docs/release/REMAINING-ISSUES.md` §3–§5).
+
+**Done during this session, with your approval:** the corrected build was
+committed and **pushed to `main`** (commit `c58d265`). The GitHub Actions
+workflow ran green — including its new "Check the bundle" step, which asserts
+the uncleared art and the notice are absent — and deployed in 9 s. The live
+site now returns **404** for `DO-NOT-PUBLISH.txt`, `assets/ui-assets.json` and
+`assets/ui/`, **200** for `index.html`, and passes the acceptance harness at
+**40/41 (1 skipped)** against the live URL. The licence exposure described in
+§4.1 is closed.
 
 ---
 
@@ -416,33 +434,33 @@ Playwright)
 
 **New:** `tools/{playwright-resolve,performance,package-release}.mjs` ·
 `docs/dependency-manifest.json` · `docs/MAC-PORTABILITY.md` · `docs/release/*`
-· `game/verification/{prod-run,live-run,cleared-run,portable-run,final-prod,
-final-prod-rerun,final-cleared,final-local,performance}/` ·
-`release/MINIMAX-GAME-STUDIO-ULTRA-V2/` ·
+· `docs/review/*` (the three Cursor review briefs and their README) ·
+`game/verification/{prod-run,live-run,live-final,cleared-run,portable-run,
+final-prod,final-prod-rerun,final-cleared,final-local,performance}/` ·
+`release/MINIMAX-GAME-STUDIO-ULTRA-V2/` (gitignored — a rebuildable artefact) ·
 `minimax-game/tools/pack_cache.py` (the cache module) · the whole
 `minimax-game/` tree
 
-**Uncommitted.** Nothing was committed or pushed, because you did not ask for
-it. The push decision is yours (§10.2).
+**Committed and pushed** as `c58d265` — *"Publish only the licence-cleared
+bundle, and finalise the handover"* — 85 files, 132,713 insertions, 0 archives.
+The release package is deliberately **not** committed; it is rebuilt by
+`node tools/package-release.mjs`.
 
 ---
 
 ## 13. Recommendations
 
-1. **Push `main`.** The corrected workflow is the whole point of finding the
-   licence defect; leaving the live site serving the uncleared build keeps the
-   defect live. The HUD remains complete without the 2D icons.
-2. **Run the harness once on an Apple Silicon Mac** — 15 minutes, closes B-1,
+1. **Run the harness once on an Apple Silicon Mac** — 15 minutes, closes B-1,
    and makes the "portable to ARM" claim measured rather than argued.
-3. **Do not upgrade Vite for the two advisories.** Neither is in the shipped
+2. **Do not upgrade Vite for the two advisories.** Neither is in the shipped
    artefact; the major bump would cost more re-verification than it buys.
-4. **Keep the pack cache.** It is 2.4 GB of regenerable cache, but deleting it
+3. **Keep the pack cache.** It is 2.4 GB of regenerable cache, but deleting it
    makes 722 of 849 cited paths unverifiable, and the gate will (correctly)
    refuse to certify the design without it.
-5. **Treat the injection count as the real health metric.** 18/18 is the
+4. **Treat the injection count as the real health metric.** 18/18 is the
    number that says the gates can be fooled — and have been taught not to be.
    A gate that has never failed proves nothing.
-6. **Fix the shop-tab overflow cosmetically** — a fade or wrapping layout. It
+5. **Fix the shop-tab overflow cosmetically** — a fade or wrapping layout. It
    is the only player-facing defect I found, and it is cosmetic.
 
 ---
