@@ -23,7 +23,15 @@ import sys
 
 HERE = pathlib.Path(__file__).resolve().parent
 DOCS = HERE.parent / "platformer-docs"
-DEFAULT_AGENTS = pathlib.Path.home() / ".minimax" / "agents"
+
+# The bots travel with the project: `minimax-game/agents/pd-dev-*/agent.md` is
+# the portable copy that ships in the release package. The desktop runtime
+# installs them under `~/.minimax/agents`. Prefer the portable copy when it is
+# present, so the gate verifies the bots that were actually released; fall back
+# to the installed ones for a checkout that predates the portable copy.
+PORTABLE_AGENTS = HERE.parent / "agents"
+INSTALLED_AGENTS = pathlib.Path.home() / ".minimax" / "agents"
+DEFAULT_AGENTS = PORTABLE_AGENTS if PORTABLE_AGENTS.is_dir() else INSTALLED_AGENTS
 
 BOTS = {
     "pd-dev-platform": "ARCHITECTURE",

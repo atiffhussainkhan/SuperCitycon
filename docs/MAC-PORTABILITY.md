@@ -87,6 +87,24 @@ GAMESTUDIO_PACK_CACHE_DIR=/tmp/emptycache GAMESTUDIO_ASSET_MIRROR=/tmp/emptycach
 Keep the cache if you want to re-run `verify_design.py`; skip it if you only
 want to read the documents.
 
+**The five development bots travel with the package** in
+`minimax-game/agents/pd-dev-{platform,player,entities,world,assets}/agent.md`.
+`verify_devbots.py` reads that portable copy by default, so the gate runs on a
+fresh machine with no extra setup. To re-enable the bots in the desktop
+runtime (so they can be dispatched as agents), install them once:
+
+```bash
+mkdir -p "$HOME/.minimax/agents"
+cp -R minimax-game/agents/pd-dev-* "$HOME/.minimax/agents/"
+```
+
+The installed copy is what the gate falls back to when the portable copy is
+absent; to check the installed ones explicitly:
+
+```bash
+python3 tools/verify_devbots.py --agents-dir "$HOME/.minimax/agents"
+```
+
 ### 1c. The acceptance harness (headless browser)
 
 The browser harness is the project's most important verification step, and it

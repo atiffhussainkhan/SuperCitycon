@@ -16,10 +16,18 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-AGENTS = pathlib.Path.home() / ".minimax" / "agents"
 DOCS = ROOT / "platformer-docs"
+
+# The bots travel with the project (`minimax-game/agents/pd-dev-*/agent.md`) and
+# are installed under `~/.minimax/agents`. The injections must bite the bots the
+# gate actually reads, and they must never edit the repository or the installed
+# agents — so they work on a throwaway copy and the gate is pointed at it.
+PORTABLE_AGENTS = ROOT / "agents"
+INSTALLED_AGENTS = pathlib.Path.home() / ".minimax" / "agents"
+SOURCE_AGENTS = PORTABLE_AGENTS if PORTABLE_AGENTS.is_dir() else INSTALLED_AGENTS
 
 BOTS = {
     "pd-dev-platform": "ARCHITECTURE",
@@ -30,9 +38,25 @@ BOTS = {
 }
 
 
+def _make_workspace_agents() -> pathlib.Path:
+    """Copy the bots into a throwaway directory the injections may edit."""
+    tmp = pathlib.Path(tempfile.mkdtemp(prefix="devbots-inject-"))
+    for name in BOTS:
+        src = SOURCE_AGENTS / name / "agent.md"
+        dst_dir = tmp / name
+        dst_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(src, dst_dir / "agent.md")
+    return tmp
+
+
+WORK_AGENTS = _make_workspace_agents()
+
+
 def run(script: str) -> str:
-    proc = subprocess.run([sys.executable, str(ROOT / "tools" / script)],
-                          capture_output=True, text=True, cwd=ROOT)
+    cmd = [sys.executable, str(ROOT / "tools" / script)]
+    if script == "verify_devbots.py":
+        cmd += ["--agents-dir", str(WORK_AGENTS)]
+    proc = subprocess.run(cmd, capture_output=True, text=True, cwd=ROOT)
     return proc.stdout + proc.stderr
 
 
@@ -41,7 +65,7 @@ def fails(script: str) -> bool:
 
 
 def bot(name: str) -> pathlib.Path:
-    return AGENTS / name / "agent.md"
+    return WORK_AGENTS / name / "agent.md"
 
 
 def main() -> int:
@@ -550,6 +574,7 @@ def main() -> int:
         else:
             print(f"[PASS] published figure: the master publishes {total}/{total}, "
                   f"which is what this run produced")
+    shutil.rmtree(WORK_AGENTS, ignore_errors=True)
     return 1 if bad else 0
 
 

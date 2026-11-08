@@ -54,6 +54,7 @@ const COPY_DIRS = [
   ['game/dist', 'game/dist'],
   ['minimax-game/platformer-docs', 'minimax-game/platformer-docs'],
   ['minimax-game/tools', 'minimax-game/tools'],
+  ['minimax-game/agents', 'minimax-game/agents'],
   ['docs', 'docs'],
   ['tools', 'tools'],
   ['agents', 'agents'],

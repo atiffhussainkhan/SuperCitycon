@@ -261,6 +261,35 @@ and it builds. Measured directly against the shipped source: slots
 reports the refusal only because its scenario exercises the early game and
 never places the landmark. **Corrected** in §3 and §9.
 
+### 4.9 The release package shipped a gate that failed on arrival
+
+The five 3D development bots (`pd-dev-*`) lived only in the desktop runtime's
+agent home, `~/.minimax/agents` — **outside the repository**. The release
+package shipped `verify_devbots.py`, the gate that checks those bots, but not
+the bots themselves. Measured on a machine without them:
+
+```
+[FAIL] 5 development bot(s) not found: pd-dev-platform, pd-dev-player,
+        pd-dev-entities, pd-dev-world, pd-dev-assets
+```
+
+So a recipient who extracted the package on a fresh Mac got a gate that failed
+out of the box, and no way to satisfy it from the package. Nothing in the
+migration guide mentioned the bots either.
+
+**Fixed**: the bots now travel with the project in `minimax-game/agents/`, the
+packager includes that directory, `verify_devbots.py` reads the portable copy
+by default (falling back to the installed one), and `docs/MAC-PORTABILITY.md`
+§1b gives the one-line install step for re-enabling them in the desktop
+runtime.
+
+The fault-injection harness needed the matching fix: it had been mutating the
+**installed** bots in place, so once the gate read the portable copy those
+injections no longer bit anything — the score dropped to **13/18**. The harness
+now copies the bots into a throwaway directory and points the gate at it, so
+an injection never edits the repository or the installed agents. Back to
+**18/18**, with both copies verified byte-identical afterwards.
+
 ---
 
 ## 5. Storage and clean-up — what was actually reclaimed
@@ -376,10 +405,10 @@ Machine-specific limits are catalogued in `docs/MAC-PORTABILITY.md` §8.
 | Rebuilt from a **clean checkout** of the release commit | **720 files / 719 checksums** — `git worktree` → `npm ci` → `npm run build:cleared` → `node tools/package-release.mjs` |
 
 **Contents:** the verified game source *and* the built, licence-cleared bundle;
-the 3D design package (documents, inventory, gates, review record); the harness
-and tooling; the release documentation. `node_modules/`, `library-packs/`,
-`.git/`, logs and `.DS_Store` are excluded, and every exclusion is written
-down in `tools/package-release.mjs`.
+the 3D design package (documents, inventory, gates, **the five development
+bots**, review record); the harness and tooling; the release documentation.
+`node_modules/`, `library-packs/`, `.git/`, logs and `.DS_Store` are excluded,
+and every exclusion is written down in `tools/package-release.mjs`.
 
 **Independently verified by extracting it to a clean directory** and running it
 from there — not from the working tree:
@@ -391,7 +420,7 @@ from there — not from the working tree:
 | `npm run check` | **PASS — 56/56 files parse cleanly** |
 | `npm run verify:production` | **PASS — 40/41, 1 skipped** (the 2D-art check, correctly skipped) |
 | `python3 tools/audit_depth.py` | **PASS — 102/102 implementable** |
-| `python3 tools/verify_devbots.py` | **PASS — 0 FAIL, 13 PASS** |
+| `python3 tools/verify_devbots.py` | **PASS — 0 FAIL, 13 PASS** — against the bots the package now carries (`minimax-game/agents/`), so the gate passes on a machine that has never run this project |
 | `python3 tools/verify_design.py` | **3 FAIL, 28 PASS** — *correctly*: the package ships without the 2.4 GB cache, so the gate reports the paths as **UNVERIFIED** and names the restore command. The fetch scripts ship with it and resolve their destination from their own location, so `bash tools/fetch-3d-packs.sh` restores the cache in place. |
 | `shasum -a 256 -c SHA256SUMS.txt` | **719/719 OK**, 0 non-matching |
 | Independent secret scan (stricter patterns) | **0 findings** across 304 text files |
@@ -500,8 +529,11 @@ closed when it cannot derive what the cache should contain.
 
 **Modified:** `.github/workflows/deploy.yml` (the licence fix) · `.gitignore` ·
 `game/README.md` · `game/tools/verify-production.mjs` (the profile fix) ·
+`minimax-game/tools/verify_devbots.py` (the portable bot copy) ·
+`minimax-game/tools/fault_inject_hardened.py` (injections on a throwaway copy) ·
 `tools/{scenario,headed,probe-pointer,probe-save,probe,shoot}.mjs` (portable
-Playwright)
+Playwright) · `tools/package-release.mjs` (ships the bots) ·
+`docs/MAC-PORTABILITY.md`
 
 **New:** `tools/{playwright-resolve,performance,package-release}.mjs` ·
 `docs/dependency-manifest.json` · `docs/MAC-PORTABILITY.md` · `docs/release/*`
@@ -510,8 +542,9 @@ and their README) ·
 `game/verification/{prod-run,live-run,live-final,cleared-run,portable-run,
 final-prod,final-prod-rerun,final-cleared,final-local,performance}/` ·
 `release/MINIMAX-GAME-STUDIO-ULTRA-V2/` (gitignored — a rebuildable artefact) ·
-`minimax-game/tools/pack_cache.py` (the cache module) · the whole
-`minimax-game/` tree
+`minimax-game/tools/pack_cache.py` (the cache module) ·
+`minimax-game/agents/pd-dev-*/agent.md` (the five development bots, now
+portable — see §4.9) · the whole `minimax-game/` tree
 
 **Committed and pushed**, in order:
 
