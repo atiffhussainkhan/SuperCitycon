@@ -68,8 +68,47 @@ def bot(name: str) -> pathlib.Path:
     return WORK_AGENTS / name / "agent.md"
 
 
+def _cache_blocked_reason() -> str | None:
+    """Why the path-dependent injections cannot run, or None if they can."""
+    sys.path.insert(0, str(ROOT / "tools"))
+    try:
+        import pack_cache
+        import verify_design as vd
+    except Exception as exc:  # pragma: no cover - import guard
+        return f"the gate modules could not be imported ({exc})"
+    state = pack_cache.cache_state()
+    if not state.get("complete"):
+        missing = len(state.get("missing") or [])
+        return (f"the asset archive cache is incomplete ({missing} archive(s) missing), "
+                f"so the cited paths cannot all resolve")
+    vd.results = {"FAIL": [], "WARN": [], "PASS": [], "INFO": []}
+    try:
+        boards = vd.load_boards()
+        known, _ = vd.load_inventory()
+        vd.check_assets(boards, known, True)
+    except Exception as exc:  # pragma: no cover - defensive
+        return f"the path check could not run ({exc})"
+    resolved = any(ln.startswith("asset paths: all ")
+                   for ln in vd.results["PASS"])
+    if not resolved:
+        first = (vd.results["FAIL"] or ["no path check output"])[0]
+        return f"the path check did not resolve every cited path ({first})"
+    return None
+
+
 def main() -> int:
     results: list[tuple[str, bool, str]] = []
+
+    # The asset-path injections mutate the path check, so they can only be
+    # proven when every cited path resolves — which needs the archive cache.
+    # Without it the harness is BLOCKED, not broken: say so legibly instead of
+    # dying with a traceback, and do not publish a figure it did not earn.
+    blocked = _cache_blocked_reason()
+    if blocked:
+        print(f"[BLOCKED] the hardened harness needs the asset archive cache: {blocked}")
+        print("        Restore with: bash tools/fetch-3d-packs.sh && "
+              "bash tools/fetch-remaining-3d.sh")
+        return 2
 
     def check(label: str, script: str, paths, mutate):
         backup = {p: p.read_text(encoding="utf-8") for p in paths}

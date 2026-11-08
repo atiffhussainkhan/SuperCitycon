@@ -47,6 +47,10 @@ python3 tools/verify_devbots.py       # 13 checks, 0 FAIL
 python3 tools/fault_inject_hardened.py # 18/18 hardened checks bite
 ```
 
+**The last gate needs the asset archive cache** (below). Without it, it reports
+`[BLOCKED]` with the restore command and exits **2** — it never prints a
+figure it did not earn, and never dies with a traceback.
+
 **Optional but recommended:** the asset archive cache.
 
 ```bash

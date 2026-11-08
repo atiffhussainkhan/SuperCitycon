@@ -108,12 +108,14 @@ Run after the fixes in §4.7 and §4.8, against the release commit itself:
 | 21 | `python3 tools/pack_cache.py` in the clean copy | **FAIL** — names the 22 missing archives and the restore command; no path is called fabricated | **PASS (legible failure)** |
 | 22 | construction-slot progression, measured against the shipped source | slots `1 → 2`; Monorail Station gate `ok: true` once the landmark completes | **PASS** |
 | 23 | live HTTP against the deployed site | `DO-NOT-PUBLISH.txt` / `assets/ui-assets.json` / `assets/ui/` → **404**, `index.html` → **200** | **PASS** |
+| 24 | packaged `verify_devbots.py` with `HOME` pointed at an empty directory | **0 FAIL, 13 PASS** — the gate passes on a machine that has never run this project, because the bots now travel inside the package | **PASS** |
+| 25 | packaged `fault_inject_hardened.py` with no asset cache | **BLOCKED, exit 2**, restore command printed, no figure published | **PASS (legible block)** |
 
 ### 2.4 Classification
 
 | Class | Items |
 |---|---|
-| **PASS** | All 23 checks above, plus the release-package verification in §8 |
+| **PASS** | All 25 checks above, plus the release-package verification in §8 |
 | **FAIL** | None outstanding. Every failure found during this work was fixed and re-verified. |
 | **BLOCKED** | 4 — see §9 |
 | **NOT APPLICABLE** | 2 — the 2D-art acceptance check on the publishable profile (correctly skipped, because that bundle deliberately ships no 2D art); the ARM build (no ARM hardware here) |
@@ -290,6 +292,13 @@ now copies the bots into a throwaway directory and points the gate at it, so
 an injection never edits the repository or the installed agents. Back to
 **18/18**, with both copies verified byte-identical afterwards.
 
+One more thing surfaced while verifying the packaged copy: the hardened
+harness needs the asset cache, because some injections mutate the path check
+and can only be proven when every cited path resolves. Without the cache it
+died with a raw `AssertionError` traceback. It now **reports `[BLOCKED]`**,
+names the restore command, and exits **2** — it never prints a figure it did
+not earn. With the cache present it is unchanged at **18/18**.
+
 ---
 
 ## 5. Storage and clean-up — what was actually reclaimed
@@ -422,6 +431,7 @@ from there — not from the working tree:
 | `python3 tools/audit_depth.py` | **PASS — 102/102 implementable** |
 | `python3 tools/verify_devbots.py` | **PASS — 0 FAIL, 13 PASS** — against the bots the package now carries (`minimax-game/agents/`), so the gate passes on a machine that has never run this project |
 | `python3 tools/verify_design.py` | **3 FAIL, 28 PASS** — *correctly*: the package ships without the 2.4 GB cache, so the gate reports the paths as **UNVERIFIED** and names the restore command. The fetch scripts ship with it and resolve their destination from their own location, so `bash tools/fetch-3d-packs.sh` restores the cache in place. |
+| `python3 tools/fault_inject_hardened.py` | **BLOCKED (exit 2)** — *correctly*: this gate needs the archive cache, because some injections mutate the path check and can only be proven when all 849 paths resolve. It prints the restore command instead of a traceback, and publishes no figure. With the cache present it reports **18/18**. |
 | `shasum -a 256 -c SHA256SUMS.txt` | **719/719 OK**, 0 non-matching |
 | Independent secret scan (stricter patterns) | **0 findings** across 304 text files |
 
