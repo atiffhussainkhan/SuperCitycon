@@ -1,0 +1,1421 @@
+{
+ "generatedBy": "v4/tools/audit-2d-licences.py",
+ "source": {
+  "gameManifest": "game/src/data/ui-assets.json",
+  "libraryIndex": "~/.minimax/asset-library/catalogue/game_asset_index.json",
+  "libraryIndexSummary": {
+   "total_images": 114852,
+   "licence": {
+    "unverified": 114852
+   }
+  }
+ },
+ "policy": "The asset library's own hard rule: every 2D record carries licence_status 'unverified'; never import or redistribute anything marked unverified. No pack-level licence text exists for these four packs, so no redistribution permission can be verified.",
+ "totals": {
+  "distinct_files": 69,
+  "manifest_records": 84,
+  "records_with_a_file": 82,
+  "cleared_for_redistribution": 0,
+  "quarantined": 69
+ },
+ "assets": [
+  {
+   "file": "assets/ui/bg-desert.png",
+   "pack": "Clipart",
+   "title": "Sand \u00b7 j0157683",
+   "library_id": "680510628657b92c95a4",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "bg.desert"
+   ],
+   "disposition": [
+    "reslot"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/bg-ground.png",
+   "pack": "Samples",
+   "title": "Pixel art \u00b7 g0106206",
+   "library_id": "46e072edb29143574961",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Samples-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "bg.ground"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/bg-lake.png",
+   "pack": "Clipart",
+   "title": "Lake \u00b7 j0194850",
+   "library_id": "f4cb93ea1f35e6249e89",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "bg.lake"
+   ],
+   "disposition": [
+    "reslot"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/bg-menu.png",
+   "pack": "Samples",
+   "title": "Pixel art \u00b7 g0106218",
+   "library_id": "88474c2aaadd1ef63d09",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Samples-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "bg.menu"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/bg-sky.png",
+   "pack": "Samples",
+   "title": "Pixel art \u00b7 g0106143",
+   "library_id": "92a0206ee46c77d0a9f3",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Samples-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "hud.day",
+    "bg.sky"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/bg-title.png",
+   "pack": "Samples",
+   "title": "Pixel art \u00b7 g0106185",
+   "library_id": "706c5b8922ac2e43b6b6",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Samples-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "hud.minimap",
+    "bg.title"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/bg-water.png",
+   "pack": "Samples",
+   "title": "Pixel art \u00b7 g0106160",
+   "library_id": "e04a4fa60e0c1e161620",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Samples-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "bg.water"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/cat-commercial.png",
+   "pack": "Clipart",
+   "title": "Home icon \u00b7 BS00401_",
+   "library_id": "d073eb7bd9992812259a",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "cat.commercial",
+    "hud.shop"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/cat-decoration.png",
+   "pack": "EPS_Clipart",
+   "title": "Statue",
+   "library_id": "813eac93b31fe8340908",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/EPS_Clipart-cleaned-06.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "cat.decoration"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/cat-education.png",
+   "pack": "EPS_Clipart",
+   "title": "School Bus Safety",
+   "library_id": "3c7a375fbdd92ee58760",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/EPS_Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "cat.education"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/cat-energy.png",
+   "pack": "Clipart",
+   "title": "Home icon \u00b7 IN00671_",
+   "library_id": "6031e995f98716249420",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "cat.energy"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/cat-fire.png",
+   "pack": "Clipart",
+   "title": "Firefighter \u00b7 j0350609",
+   "library_id": "48a0d802988fa8cd1f69",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "cat.fire"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/cat-food.png",
+   "pack": "Clipart",
+   "title": "Farm \u00b7 BL00364A",
+   "library_id": "f0e3dfada981806729c8",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "cat.food"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/cat-health.png",
+   "pack": "Samples",
+   "title": "Medical symbol \u00b7 g0131413",
+   "library_id": "a590b0bac217b763841b",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Samples-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "cat.health"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/cat-industrial.png",
+   "pack": "Clipart",
+   "title": "Home icon \u00b7 IN00691_",
+   "library_id": "6a18123ddce19ee3cc3a",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "cat.industrial"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/cat-infrastructure.png",
+   "pack": "EPS_Clipart",
+   "title": "Traffic Cone 1",
+   "library_id": "53ba14a5cdda1fcb7902",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/EPS_Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "cat.infrastructure"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/cat-parks.png",
+   "pack": "EPS_Clipart",
+   "title": "Trees 4",
+   "library_id": "fe6b4f13bbeac7afa726",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/EPS_Clipart-cleaned-03.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "cat.parks"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/cat-police.png",
+   "pack": "Clipart",
+   "title": "Pixel art \u00b7 TN00738A",
+   "library_id": "43130baff533025fa470",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "cat.police"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/cat-residential.png",
+   "pack": "Clipart",
+   "title": "Home icon \u00b7 BL00130_",
+   "library_id": "3c7f00f0827fd0a3ee51",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "cat.residential"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/cat-special.png",
+   "pack": "Clipart",
+   "title": "Trophy \u00b7 BS00841A",
+   "library_id": "811294a9aebf57ece61e",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "cat.special",
+    "hud.score",
+    "hud.government"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/cat-transit.png",
+   "pack": "Clipart",
+   "title": "Bus \u00b7 j0079138",
+   "library_id": "d6cd227cb4bc695d57ea",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "cat.transit"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/cat-waste.png",
+   "pack": "EPS_Clipart",
+   "title": "Dump Truck 20",
+   "library_id": "569f4953566eda5069cc",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/EPS_Clipart-cleaned-05.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "cat.waste"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/cat-water.png",
+   "pack": "EPS_Clipart",
+   "title": "Fountain 3",
+   "library_id": "c29968430f7feb8f08a9",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/EPS_Clipart-cleaned-05.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "cat.water"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/effect-dust.png",
+   "pack": "EPS_Clipart",
+   "title": "Dust Cloud",
+   "library_id": "4df4288c849aefe57af8",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/EPS_Clipart-cleaned-04.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "toast.error",
+    "fx.ink"
+   ],
+   "disposition": [
+    "reslot",
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/effect-sad.png",
+   "pack": "Clipart",
+   "title": "Pixel art \u00b7 AG00309_",
+   "library_id": "d82b16a46a436a113098",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "effect.sad"
+   ],
+   "disposition": [
+    "reslot"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/effect-smoke.png",
+   "pack": "EPS_Clipart",
+   "title": "Smoke Cloud 1",
+   "library_id": "d74db1e65987814f4468",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/EPS_Clipart-cleaned-02.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "effect.smoke"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/hud-announce.png",
+   "pack": "EPS_Clipart",
+   "title": "Megaphone 4",
+   "library_id": "6a38388b9716c558f2cd",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/EPS_Clipart-cleaned-06.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "hud.announce"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/hud-celebration.png",
+   "pack": "EPS_Clipart",
+   "title": "Smiley",
+   "library_id": "286b5484500466da7f44",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/EPS_Clipart-cleaned-05.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "hud.celebration"
+   ],
+   "disposition": [
+    "reslot"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/hud-happiness.png",
+   "pack": "Clipart",
+   "title": "Pixel art \u00b7 AG00310_",
+   "library_id": "5e5a1cad18be00a63d17",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "hud.happiness",
+    "effect.happy"
+   ],
+   "disposition": [
+    "reslot",
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/hud-info.png",
+   "pack": "10000.HighDefinition.PNG.Icon.Pack",
+   "title": "info",
+   "library_id": "358820bafcdf64ff7571",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/10000.HighDefinition.PNG.Icon.Pack-cleaned-01.zip",
+   "size": [
+    128,
+    128
+   ],
+   "slots": [
+    "toast.info"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/hud-load.png",
+   "pack": "EPS_Clipart",
+   "title": "File Folder",
+   "library_id": "1902d8bcaab20f6f0f30",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/EPS_Clipart-cleaned-03.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "hud.load"
+   ],
+   "disposition": [
+    "reslot"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/hud-loyalty.png",
+   "pack": "Clipart",
+   "title": "Pixel art \u00b7 BS00868A",
+   "library_id": "b3749bd53c9f1c061344",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "hud.loyalty",
+    "hud.approval"
+   ],
+   "disposition": [
+    "reslot",
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/hud-population.png",
+   "pack": "EPS_Clipart",
+   "title": "Meeting 01",
+   "library_id": "ab1051df10dcc0f211a5",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/EPS_Clipart-cleaned-03.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "hud.population"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/hud-save.png",
+   "pack": "10000.HighDefinition.PNG.Icon.Pack",
+   "title": "Floppy disk \u00b7 0",
+   "library_id": "f081480e88d5d9505471",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/10000.HighDefinition.PNG.Icon.Pack-cleaned-01.zip",
+   "size": [
+    95,
+    96
+   ],
+   "slots": [
+    "hud.save"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/hud-settings.png",
+   "pack": "EPS_Clipart",
+   "title": "Cog",
+   "library_id": "24575184c4b05ed3d057",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/EPS_Clipart-cleaned-03.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "hud.settings"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/hud-speed-pause.png",
+   "pack": "Clipart",
+   "title": "Pixel art \u00b7 BD14758_",
+   "library_id": "56679f7f7ec682fea814",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "hud.pause",
+    "ui.fill-bar-alt"
+   ],
+   "disposition": [
+    "reslot",
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/hud-speed-play.png",
+   "pack": "Clipart",
+   "title": "Pixel art \u00b7 BD14843_",
+   "library_id": "3b6bdd0f43ee223e2b5e",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "hud.play",
+    "ui.fill-bar"
+   ],
+   "disposition": [
+    "reslot",
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/hud-status.png",
+   "pack": "10000.HighDefinition.PNG.Icon.Pack",
+   "title": "Warning icon \u00b7 !",
+   "library_id": "453e8ec3938798bfc19f",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/10000.HighDefinition.PNG.Icon.Pack-cleaned-01.zip",
+   "size": [
+    128,
+    128
+   ],
+   "slots": [
+    "hud.status",
+    "toast.warn"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/hud-survey.png",
+   "pack": "Samples",
+   "title": "Antenna \u00b7 g0404990",
+   "library_id": "21cb5d2c1c5e01e553a5",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Samples-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "hud.survey"
+   ],
+   "disposition": [
+    "reslot"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/hud-treasury.png",
+   "pack": "EPS_Clipart",
+   "title": "Button $",
+   "library_id": "d8218716b9831e6eff1e",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/EPS_Clipart-cleaned-06.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "hud.treasury"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/portrait-c3.png",
+   "pack": "Samples",
+   "title": "Pixel art \u00b7 g0140482",
+   "library_id": "248e450476fbb1cddef3",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Samples-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "portrait.c3"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/portrait-c4.png",
+   "pack": "Samples",
+   "title": "Pixel art \u00b7 g0211383",
+   "library_id": "b43f25f6f3a43274ae86",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Samples-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "portrait.c4"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/portrait-c5.png",
+   "pack": "Clipart",
+   "title": "Pixel art \u00b7 j0195522",
+   "library_id": "659672947c85324b6a8c",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "portrait.c5"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/portrait-c6.png",
+   "pack": "Clipart",
+   "title": "Pixel art \u00b7 BD05881_",
+   "library_id": "ca60115c42d60a0b0ece",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "portrait.c6"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/portrait-c7.png",
+   "pack": "Samples",
+   "title": "Pixel art \u00b7 g0211379",
+   "library_id": "1b425d88797102ef2cb7",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Samples-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "portrait.c7"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/reward-coins.png",
+   "pack": "Clipart",
+   "title": "Pixel art \u00b7 j0336379",
+   "library_id": "9d3dc222dd0d120bc29c",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "reward.coins"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/special-crest.png",
+   "pack": "Samples",
+   "title": "Pixel art \u00b7 g0134011",
+   "library_id": "bd8ce549eef597408711",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Samples-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "special.crest"
+   ],
+   "disposition": [
+    "reslot"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/sprite-citizen-1.png",
+   "pack": "Samples",
+   "title": "Pixel art \u00b7 g0215587",
+   "library_id": "30d4dc2653d399031be4",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Samples-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "sprite.citizen.1"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/sprite-citizen-2.png",
+   "pack": "Samples",
+   "title": "Pixel art \u00b7 g0220133",
+   "library_id": "8ca2eba1307a8334ba61",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Samples-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "sprite.citizen.2"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/tile-grass.png",
+   "pack": "Clipart",
+   "title": "Pixel art \u00b7 BD10321_",
+   "library_id": "869723874be023d81798",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "tile.grass"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/tile-sand.png",
+   "pack": "Clipart",
+   "title": "Pixel art \u00b7 BD10316_",
+   "library_id": "29ed69f7fd271d1205cd",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "tile.sand"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/tile-stone.png",
+   "pack": "Clipart",
+   "title": "Pixel art \u00b7 BD14783_",
+   "library_id": "bebfc91b489819ed9c8d",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "tile.stone"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/tile-water.png",
+   "pack": "Clipart",
+   "title": "Pixel art \u00b7 BD10305_",
+   "library_id": "9ad4dcceca7e33077cb9",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "tile.water"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/tool-build.png",
+   "pack": "EPS_Clipart",
+   "title": "Wrench 1",
+   "library_id": "e8876d70496336b6b478",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/EPS_Clipart-cleaned-06.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "tool.build"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/tool-bulldoze.png",
+   "pack": "EPS_Clipart",
+   "title": "Bulldozer 07",
+   "library_id": "e3ca16f604a86bf9d7e8",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/EPS_Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "tool.bulldoze"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/tool-inspect.png",
+   "pack": "10000.HighDefinition.PNG.Icon.Pack",
+   "title": "search",
+   "library_id": "8e708f3852040b125cd5",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/10000.HighDefinition.PNG.Icon.Pack-cleaned-01.zip",
+   "size": [
+    128,
+    128
+   ],
+   "slots": [
+    "tool.inspect",
+    "panel.search"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/tool-paint.png",
+   "pack": "EPS_Clipart",
+   "title": "Paint Roller 12",
+   "library_id": "babf70ab85ecffc65521",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/EPS_Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "tool.paint"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/tool-place.png",
+   "pack": "Clipart",
+   "title": "Pixel art \u00b7 SL00638_",
+   "library_id": "a6fa22334b28eba54a64",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "tool.place"
+   ],
+   "disposition": [
+    "reslot"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/tool-road.png",
+   "pack": "EPS_Clipart",
+   "title": "Traffic light \u00b7 SL927C~1",
+   "library_id": "fbf400d191a2764654d4",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/EPS_Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "tool.road"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/tool-terraform.png",
+   "pack": "Samples",
+   "title": "Man with shovel \u00b7 g0215572",
+   "library_id": "a201214a43e6fc68d965",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Samples-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "tool.terraform"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/tool-voxel.png",
+   "pack": "Clipart",
+   "title": "Brick laying \u00b7 j0084528",
+   "library_id": "da15cf899b39e77b936c",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "tool.voxel"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/ui-button.png",
+   "pack": "EPS_Clipart",
+   "title": "Button &",
+   "library_id": "755670cc1e90b96bcacf",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/EPS_Clipart-cleaned-04.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "ui.button"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/ui-checkbox.png",
+   "pack": "EPS_Clipart",
+   "title": "Checkmark 2",
+   "library_id": "3e03b87258570fde87c2",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/EPS_Clipart-cleaned-05.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "ui.checkbox",
+    "toast.success"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/ui-panel-alt.png",
+   "pack": "EPS_Clipart",
+   "title": "Frame 0010",
+   "library_id": "310168335cc3293badf5",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/EPS_Clipart-cleaned-03.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "ui.panel.alt"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/ui-panel.png",
+   "pack": "EPS_Clipart",
+   "title": "Frame 0002",
+   "library_id": "2f2a6749ccbdaaf6db4f",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/EPS_Clipart-cleaned-02.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "ui.panel"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/ui-progress.png",
+   "pack": "Clipart",
+   "title": "Pixel art \u00b7 BD15118_",
+   "library_id": "116a18a58f2f92a25419",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "ui.progress"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/ui-slider-alt.png",
+   "pack": "Clipart",
+   "title": "Pixel art \u00b7 BD21539_",
+   "library_id": "1dc8087d6449068af915",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "ui.slider.alt"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/ui-slider.png",
+   "pack": "Clipart",
+   "title": "Pixel art \u00b7 BD15104_",
+   "library_id": "2775461a370b57f5f757",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/Clipart-cleaned-01.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "ui.slider"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  },
+  {
+   "file": "assets/ui/ui-tab.png",
+   "pack": "EPS_Clipart",
+   "title": "Frame 0038",
+   "library_id": "08be282cc84235c2d0cc",
+   "licence": "unverified",
+   "source_url": "https://github.com/atiffhussainkhan/Image/releases/download/game-art-search-v2-2026-10-05/EPS_Clipart-cleaned-06.zip",
+   "size": [
+    null,
+    null
+   ],
+   "slots": [
+    "ui.tab"
+   ],
+   "disposition": [
+    "use"
+   ],
+   "redistributable": false,
+   "decision": "QUARANTINE \u2014 licence unverified at source"
+  }
+ ]
+}

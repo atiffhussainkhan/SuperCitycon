@@ -1,0 +1,7 @@
+{
+  "name": "v4-tests",
+  "private": true,
+  "type": "module",
+  "main": "index.mjs",
+  "description": "Entry point for `node --test tests/` — index.mjs imports every *.test.mjs in this folder."
+}

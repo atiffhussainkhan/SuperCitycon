@@ -1,0 +1,37 @@
+{
+  "label": "v4-dev",
+  "url": "http://127.0.0.1:4184/",
+  "at": "2026-11-08T21:46:11.949Z",
+  "loadMs": 3032,
+  "gpu": {
+    "available": true,
+    "vendor": "Google Inc. (Intel)",
+    "renderer": "ANGLE (Intel, ANGLE Metal Renderer: Intel(R) UHD Graphics 630, Unspecified Version)",
+    "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+    "shadingLanguage": "WebGL GLSL ES 3.00 (OpenGL ES GLSL ES 3.0 Chromium)",
+    "isSoftware": false
+  },
+  "frames": {
+    "frames": 448,
+    "fps": 55.8,
+    "meanMs": 17.93,
+    "medianMs": 16.5,
+    "p95Ms": 34.8,
+    "maxMs": 54.5
+  },
+  "engineStats": {
+    "frames": 240,
+    "fps": 34.2,
+    "frameMs": 29.24,
+    "medianMs": 30,
+    "p95Ms": 45.9,
+    "maxMs": 52.6,
+    "drawCalls": 274,
+    "triangles": 151524,
+    "memoryMb": 0
+  },
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ],
+  "hardware": true
+}

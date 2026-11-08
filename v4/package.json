@@ -1,0 +1,22 @@
+{
+  "name": "minimax-game-studio-ultra-v4",
+  "version": "4.0.0",
+  "private": true,
+  "type": "module",
+  "description": "MiniMax Game Studio Ultra V4 \u2014 3D world editor, runtime and vertical slice",
+  "scripts": {
+    "dev": "vite",
+    "build": "node scripts/prepare-assets.mjs && vite build",
+    "preview": "vite preview --port 4180 --strictPort",
+    "test": "node --test tests/",
+    "check": "node tools/check-syntax.mjs",
+    "slice": "node scripts/launch-slice.mjs",
+    "prepare-assets": "node scripts/prepare-assets.mjs"
+  },
+  "dependencies": {
+    "three": "^0.169.0"
+  },
+  "devDependencies": {
+    "vite": "^5.4.10"
+  }
+}

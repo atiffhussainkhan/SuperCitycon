@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <!-- An inline favicon: without it the browser asks for /favicon.ico and
+         the dev/preview server answers 404, which lands in the console as a
+         spurious error. -->
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b1220'/%3E%3Cpath d='M8 22V10h5a4 4 0 0 1 0 8H8' stroke='%2338bdf8' stroke-width='2.5' fill='none'/%3E%3Cpath d='M18 22l6-12' stroke='%2322d3ee' stroke-width='2.5'/%3E%3C/svg%3E"
+    />
+    <title>MiniMax Game Studio Ultra V4 — Editor</title>
+    <style>
+      /* Bootstrap only: the editor injects its own stylesheet (src/editor/editor.css)
+         as a <style> tag as soon as the module is evaluated. */
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        background: #0b1220;
+        color: #d7e0ef;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        overflow: hidden;
+      }
+      #v4-app {
+        position: fixed;
+        inset: 0;
+      }
+      #v4-boot {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #8ea0bf;
+        font-size: 13px;
+        letter-spacing: 0.06em;
+      }
+      #v4-boot.is-hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- The editor mounts its own DOM (toolbar, hierarchy, viewport, inspector,
+         console) into this container. -->
+    <div id="v4-app"></div>
+    <div id="v4-boot">Loading MiniMax Game Studio Ultra V4…</div>
+
+    <script type="module">
+      // Hide the boot message once the app has had a chance to mount.
+      const boot = document.getElementById('v4-boot');
+      const hide = () => boot?.classList.add('is-hidden');
+      window.addEventListener('load', () => setTimeout(hide, 400));
+      setTimeout(hide, 4000);
+    </script>
+
+    <!-- The application entry point: it creates the world, the renderer and the
+         editor, then drives editor.update(dt, now) every frame. -->
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

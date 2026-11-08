@@ -1,0 +1,8 @@
+{
+  "generatedBy": "v4/scripts/prepare-assets.mjs",
+  "note": "Only licence-cleared 3D models are copied. The 2D art is licence-unverified and quarantined; it is never copied here.",
+  "models": 203,
+  "licenceTexts": 8,
+  "refused": [],
+  "bytes": 74961118
+}
