@@ -313,28 +313,24 @@ not earn. With the cache present it is unchanged at **18/18**.
 | `minimax-game/_audit_basenames_out.txt` | a generated audit scratch file |
 | `minimax-game/my_mario_game` | an empty stray directory |
 
-**Trash state, measured now:** **empty — 0 items, 0 B.** At the end of this work
-the Trash held **1,077 MB across 5 items**, and every single one was scratch
-this project created in the final verification round: the temporary directories
-used to rebuild and independently verify the release package (`pkg-src/`,
-`pkg-out/`, `pkg-out2/`, `pkg-verify2/`, `pkg-final-out/`).
+**Trash state, measured now:** **empty — 0 items, 0 B.** Across the final two
+rounds I put **1,464 MB** of scratch in the Trash, and the owner approved
+emptying it, so it was emptied permanently with
+`osascript -e 'tell application "Finder" to empty trash'` — measured **0 B /
+0 items** immediately after each time. Every item was a temporary package build
+or extraction that this project created:
 
-| Item | Size | What it was |
+| Round | Size | Items |
 |---|---|---|
-| `pkg-src/` | 245 MB | an isolated `git worktree` at the release commit: `npm ci` → `build:cleared` → the packager |
-| `pkg-verify2/` | 216 MB | a clean copy of the package, used for the independent `npm ci` + test run |
-| `pkg-out/`, `pkg-out2/` | 424 MB | two complete package builds produced by that worktree |
-| `pkg-final-out/` | 192 MB | the final package build, before it was copied into `release/` |
+| Final verification | **1,077 MB** | `pkg-src/` (245 MB) — the isolated `git worktree` used to rebuild the package; `pkg-verify2/` (216 MB) — a clean copy used for the independent test run; `pkg-out/` + `pkg-out2/` (424 MB) — two package builds; `pkg-final-out/` (192 MB) — the final build |
+| Closing verification | **387 MB** | `pkg-v3/` (216 MB) and `pkg-bots-check/` (169 MB) — package copies used to prove the shipped gates behave on a machine that has never run this project; `pkg-harness/` (848 KB); `fakehome/` (0 B) |
 
-All five were **mine, from this session, and fully regenerable** — the package
-is rebuilt by `node tools/package-release.mjs` and re-verified by extracting it
-to a temporary directory. **The owner approved the permanent emptying at the
-end of this session and it is done**: `osascript -e 'tell application "Finder"
-to empty trash'` → the Trash measured **0 B / 0 items** immediately after, and
-**1,077 MB reclaimed**. The Trash's earlier contents (18 items / 455 MB, also
-all scratch of mine) had already been emptied before this round. No pre-existing
-user data was in the Trash at any point: the 1,362 items the brief referred to
-were already empty when I first measured.
+All of them were **mine, from this session, and fully regenerable** — the
+package is rebuilt by `node tools/package-release.mjs` and re-verified by
+extracting it to a temporary directory. The Trash's earlier contents (18 items
+/ 455 MB, also all scratch of mine) had already been emptied before this work.
+No pre-existing user data was in the Trash at any point: the 1,362 items the
+brief referred to were already empty when I first measured.
 
 **What I deliberately did NOT delete:**
 
