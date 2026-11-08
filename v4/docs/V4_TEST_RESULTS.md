@@ -90,7 +90,7 @@ screenshots are written to `v4/verification/slice/`.
 
 | # | Check | Result | Observed |
 |---|---|---|---|
-| 1 | the app reaches ready state | **PASS** | 2024 ms |
+| 1 | the app reaches ready state | **PASS** | 2048 ms |
 | 2 | the world is populated | **PASS** | 20 entities |
 | 3 | a player entity exists | **PASS** | entity 11 |
 | 4 | the editor is mounted | **PASS** | — |
@@ -99,13 +99,13 @@ screenshots are written to `v4/verification/slice/`.
 | 7 | the inspector renders the selected entity | **PASS** | 969 chars |
 | 8 | the inspector does not raise errors | **PASS** | 0 new error(s) |
 | 9 | the editor Play button starts the simulation | **PASS** | mode=play |
-| 10 | the character moves on input | **PASS** | 3.079 m |
-| 11 | the character mesh follows the entity | **PASS** | 3.079 m on screen |
+| 10 | the character moves on input | **PASS** | 3.478 m |
+| 11 | the character mesh follows the entity | **PASS** | 3.478 m on screen |
 | 12 | forward walks away from the camera | **PASS** | dot=0.88 (camera dir [0,1]) |
 | 13 | the character has a live animation state | **PASS** | idle |
 | 14 | one key press triggers exactly one interaction | **PASS** | 1 new event(s) of 1 total |
 | 15 | the interaction produces a result | **PASS** | result={"speaker":"Barista","text":"The coffee is fresh. Or it was."} |
-| 16 | the interaction result is shown in the HUD | **PASS** | HP 100 / 100 Explore the district Talk to Barista The coffee is fresh. Or it was. 9 fps · 113.7 ms 4 NPCs anim: idle |
+| 16 | the interaction result is shown in the HUD | **PASS** | HP 100 / 100 Explore the district Talk to Barista The coffee is fresh. Or it was. 8 fps · 121.7 ms 4 NPCs anim: idle |
 | 17 | the player is not inside a building | **PASS** | 4 colliders, none overlapping |
 | 18 | NPCs are simulated | **PASS** | 4 NPCs, states: interact, chase, idle |
 | 19 | at least one NPC walks on screen | **PASS** | 3 of 4 NPCs moved |
@@ -115,7 +115,7 @@ screenshots are written to `v4/verification/slice/`.
 | 23 | the scene saves and reloads | **PASS** | 20 entities |
 | 24 | the reload restores the 3D objects, not just the entity data | **PASS** | prop #2 saved at [-12.0,0.0,-9.0] moved to [-8.0,0.0,-5.0] restored to [-12.0,0.0,-9.0] |
 | 25 | interaction still works after a reload | **PASS** | onInteract present, target #16, 1 new event(s), result="The chest is empty, except for a faded photograph." |
-| 26 | the performance readout is live | **PASS** | 14.1 fps, 70.9 ms/frame, 77 draws |
+| 26 | the performance readout is live | **PASS** | 13.5 fps, 73.93 ms/frame, 77 draws |
 | 27 | no uncaught page errors | **PASS** | — |
 | 28 | no console errors | **PASS** | — |
 

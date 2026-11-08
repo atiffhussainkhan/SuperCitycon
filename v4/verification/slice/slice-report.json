@@ -1,12 +1,12 @@
 {
   "url": "http://127.0.0.1:4180/",
-  "at": "2026-11-08T22:38:39.479Z",
+  "at": "2026-11-08T22:43:59.366Z",
   "headed": false,
   "checks": [
     {
       "name": "the app reaches ready state",
       "ok": true,
-      "detail": "2024 ms"
+      "detail": "2048 ms"
     },
     {
       "name": "the world is populated",
@@ -51,12 +51,12 @@
     {
       "name": "the character moves on input",
       "ok": true,
-      "detail": "3.079 m"
+      "detail": "3.478 m"
     },
     {
       "name": "the character mesh follows the entity",
       "ok": true,
-      "detail": "3.079 m on screen"
+      "detail": "3.478 m on screen"
     },
     {
       "name": "forward walks away from the camera",
@@ -81,7 +81,7 @@
     {
       "name": "the interaction result is shown in the HUD",
       "ok": true,
-      "detail": "HP 100 / 100 Explore the district Talk to Barista The coffee is fresh. Or it was. 9 fps · 113.7 ms 4 NPCs anim: idle"
+      "detail": "HP 100 / 100 Explore the district Talk to Barista The coffee is fresh. Or it was. 8 fps · 121.7 ms 4 NPCs anim: idle"
     },
     {
       "name": "the player is not inside a building",
@@ -131,7 +131,7 @@
     {
       "name": "the performance readout is live",
       "ok": true,
-      "detail": "14.1 fps, 70.9 ms/frame, 77 draws"
+      "detail": "13.5 fps, 73.93 ms/frame, 77 draws"
     },
     {
       "name": "no uncaught page errors",
@@ -147,8 +147,8 @@
   "timeline": [
     {
       "label": "ready",
-      "at": 1794177521639,
-      "readyMs": 2024
+      "at": 1794177841548,
+      "readyMs": 2048
     }
   ],
   "state": {
@@ -179,8 +179,8 @@
     "buttonFound": true,
     "mode": "play"
   },
-  "moved": 3.0789764824780783,
-  "movedMesh": 3.0789764824780783,
+  "moved": 3.4779565315431054,
+  "movedMesh": 3.4779565315431054,
   "forward": {
     "dot": 0.88,
     "cameraDir": [
@@ -196,7 +196,7 @@
     "newEvents": 1
   },
   "interactionShown": {
-    "hud": "HP 100 / 100 Explore the district Talk to Barista The coffee is fresh. Or it was. 9 fps · 113.7 ms 4 NPCs anim: idle",
+    "hud": "HP 100 / 100 Explore the district Talk to Barista The coffee is fresh. Or it was. 8 fps · 121.7 ms 4 NPCs anim: idle",
     "result": {
       "speaker": "Barista",
       "text": "The coffee is fresh. Or it was."
@@ -237,7 +237,7 @@
   },
   "hud": {
     "present": true,
-    "text": "HP 100 / 100\nExplore the district\nTalk to Barista\nThe coffee is fresh. Or it was.\n11 fps · 91.1 ms\n4 NPCs\nanim: idle"
+    "text": "HP 100 / 100\nExplore the district\nTalk to Barista\nThe coffee is fresh. Or it was.\n11 fps · 88.3 ms\n4 NPCs\nanim: idle"
   },
   "keyboardPause": {
     "keyPaused": true,
@@ -296,15 +296,15 @@
     },
     "newResults": 1,
     "result": "The chest is empty, except for a faded photograph.",
-    "text": "HP 100 / 100 Explore the district The chest is empty, except for a faded photograph. 13 fps · 76.6 ms 4 NPCs anim: idle"
+    "text": "HP 100 / 100 Explore the district The chest is empty, except for a faded photograph. 12 fps · 83.0 ms 4 NPCs anim: idle"
   },
   "performance": {
-    "frames": 84,
-    "fps": 14.1,
-    "frameMs": 70.9,
-    "medianMs": 11.9,
-    "p95Ms": 395.8,
-    "maxMs": 1844.4,
+    "frames": 83,
+    "fps": 13.5,
+    "frameMs": 73.93,
+    "medianMs": 12.1,
+    "p95Ms": 385.9,
+    "maxMs": 1889.4,
     "drawCalls": 77,
     "triangles": 42890,
     "memoryMb": 0,

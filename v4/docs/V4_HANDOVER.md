@@ -72,10 +72,10 @@ plus five screenshots.
 
 | The directive's 12 required steps | Evidence |
 |---|---|
-| 1. Start the game | Ready in 2,024 ms; `data-v4-ready="1"` set on the body |
+| 1. Start the game | Ready in 2048 ms; `data-v4-ready="1"` set on the body |
 | 2. Load a real 3D scene | 20 entities, 14 cleared models, 4 colliders, 3 lights |
-| 3. Control a character | 3.079 m travelled on a held `W` |
-| 4. Move through the environment | The **mesh** moved the same 3.079 m on screen — not just the data |
+| 3. Control a character | 3.478 m travelled on a held `W` |
+| 4. Move through the environment | The **mesh** moved the same 3.478 m on screen — not just the data |
 | 5. Observe working character animation | Live state machine on a 30-clip model; the HUD reports `anim: idle`; NPCs animate from their behaviour state |
 | 6. Interact with an object | `E` → exactly **one** event, `result="The chest is empty, except for a faded photograph."`, shown in the HUD |
 | 7. Demonstrate working NPC behaviour | 4 NPCs with distinct behaviours; 3 of 4 observed walking on screen; states observed: `idle`, `patrol`, `chase`, `interact` |
@@ -179,7 +179,7 @@ scene. The comparison is recorded, not used as an excuse: both are real
 hardware measurements on the same machine, and neither is a target.
 
 The **headless** acceptance run uses SwiftShader (software GL) and measures
-around **14 fps / 70.9 ms**. That is a software floor for a headless CI-style
+around **13.5 fps, 73.93 ms/frame, 77 draws**. That is a software floor for a headless CI-style
 run, **not** a GPU figure, and is never presented as one.
 
 Raw evidence: `v4/verification/gpu/v4-real-gpu-final.json` and `.png`.

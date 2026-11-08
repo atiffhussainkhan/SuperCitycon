@@ -32,7 +32,7 @@ The directive's acceptance list, answered honestly.
 | 1 | Previous unfinished work reconciled | **MET** | V2 package re-verified (725 files, 724/724 checksums). **V3 never existed** — recorded as a fact, not invented as work. The six concurrently-edited files were never touched. |
 | 2 | Core game runtime works | **MET** | `npm run slice` → 28/28 checks, 0 console errors. `v4/verification/slice/slice-report.json`. |
 | 3 | 3D scene editor works | **MET** | Hierarchy, inspector, gizmos, undo/redo, save/load, validation, collision visualisation, preview camera — driven in a real browser. Screenshots `01-boot.png`, `01b-inspector.png`. |
-| 4 | Character controls work | **MET** | Measured: 3.479 m travelled on held `W`; the mesh moved the same distance on screen; forward is camera-relative (dot = 0.88 with the camera direction). |
+| 4 | Character controls work | **MET** | Measured: 3.478 m travelled on held `W`; the mesh moved the same distance on screen; forward is camera-relative (dot = 0.88 with the camera direction). |
 | 5 | Animation system works | **MET** | The KayKit player model drives a 30-clip state machine; the HUD reports the live state (`anim: idle`); NPCs animate from their behaviour state. |
 | 6 | NPC behaviour works | **MET** | 4 NPCs with distinct behaviours, 3 of 4 observed walking on screen, states observed: `idle`, `patrol`, `chase`, `interact`. |
 | 7 | Demonstration level is playable | **MET** | Village square, 20 entities, 14 cleared models, 4 colliders, 3 lights, player + camera + environment + 2 interactive props + NPC behaviour + animation + collision + HUD + save/load. |
