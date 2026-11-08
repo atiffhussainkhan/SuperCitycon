@@ -275,29 +275,28 @@ never places the landmark. **Corrected** in §3 and §9.
 | `minimax-game/_audit_basenames_out.txt` | a generated audit scratch file |
 | `minimax-game/my_mario_game` | an empty stray directory |
 
-**Trash state, measured now:** **1,078 MB across 5 items** — and **every single one
-is scratch this project created** in the final verification round: the temporary
-directories used to rebuild and independently verify the release package
-(`pkg-src/`, `pkg-out/`, `pkg-out2/`, `pkg-verify2/`, `pkg-final-out/`). The
-Trash's earlier contents (18 items / 455 MB, all scratch of mine) were **emptied
-before this round** — macOS no longer lists them — so the manual action recorded
-in the previous round has evidently been taken, and it is needed again now for
-these five. There is **no pre-existing user data in the Trash**: the 1,362 items
-the brief referred to were already empty when I first measured, and I did not
-empty anything myself.
+**Trash state, measured now:** **empty — 0 items, 0 B.** At the end of this work
+the Trash held **1,077 MB across 5 items**, and every single one was scratch
+this project created in the final verification round: the temporary directories
+used to rebuild and independently verify the release package (`pkg-src/`,
+`pkg-out/`, `pkg-out2/`, `pkg-verify2/`, `pkg-final-out/`).
 
-| Item | What it is |
-|---|---|
-| `pkg-src/` | an isolated `git worktree` at the release commit: `npm ci` → `build:cleared` → the packager |
-| `pkg-out/`, `pkg-out2/` | two complete package builds produced by that worktree |
-| `pkg-verify2/` | a clean copy of the package, used for the independent `npm ci` + test run |
-| `pkg-final-out/` | the final package build, before it was copied into `release/` |
+| Item | Size | What it was |
+|---|---|---|
+| `pkg-src/` | 245 MB | an isolated `git worktree` at the release commit: `npm ci` → `build:cleared` → the packager |
+| `pkg-verify2/` | 216 MB | a clean copy of the package, used for the independent `npm ci` + test run |
+| `pkg-out/`, `pkg-out2/` | 424 MB | two complete package builds produced by that worktree |
+| `pkg-final-out/` | 192 MB | the final package build, before it was copied into `release/` |
 
-All five are **mine, from this session, and fully regenerable** — the package is
-rebuilt by `node tools/package-release.mjs` and re-verified by extracting it to a
-temporary directory. Nothing of yours is in there, so emptying the Trash is
-safe. **I did not empty it**, because permanently deleting Trash contents was
-reserved for you.
+All five were **mine, from this session, and fully regenerable** — the package
+is rebuilt by `node tools/package-release.mjs` and re-verified by extracting it
+to a temporary directory. **The owner approved the permanent emptying at the
+end of this session and it is done**: `osascript -e 'tell application "Finder"
+to empty trash'` → the Trash measured **0 B / 0 items** immediately after, and
+**1,077 MB reclaimed**. The Trash's earlier contents (18 items / 455 MB, also
+all scratch of mine) had already been emptied before this round. No pre-existing
+user data was in the Trash at any point: the 1,362 items the brief referred to
+were already empty when I first measured.
 
 **What I deliberately did NOT delete:**
 
@@ -455,18 +454,19 @@ have. None is a code fix.
 
 ## 10. Manual actions still necessary
 
-1. **Empty the Trash** (1,078 MB, 5 items). Everything in it is scratch this
-   project created in the final round — the temporary directories used to
-   rebuild and independently verify the release package — so emptying it is
-   safe. The 1,362 pre-existing items the brief referred to were already
-   gone before I started, and the previous round's scratch has since been
-   emptied too. I did not empty it, because permanently deleting Trash
-   contents was reserved for you.
-2. **Clear the 82 2D licences** (publisher's decision) if you want a decorated
+**The Trash no longer needs your attention** — it was emptied with your approval
+at the end of this session (§5): **1,077 MB reclaimed, 0 items left**.
+
+1. **Clear the 82 2D licences** (publisher's decision) if you want a decorated
    build. The published site is already licence-compliant without them.
-3. **Run the harness on an Apple Silicon Mac** to close B-1.
-4. **Review the 4 open design decisions** (`OPEN-002`, `OPEN-005`, and the two
+2. **Run the harness on an Apple Silicon Mac** to close B-1.
+3. **Review the 4 open design decisions** (`OPEN-002`, `OPEN-005`, and the two
    published-value questions in `docs/release/REMAINING-ISSUES.md` §3–§5).
+4. **Adopt or discard the concurrent work in the working tree** — another
+   process is editing this repository (a shop-tab wrap fix, a hardware-GPU
+   performance mode, and new tests). It is uncommitted and deliberately not in
+   the release; it needs a review and a commit, or a discard, by whoever owns
+   that work.
 
 **Done during this session, with your approval:** the corrected build was
 committed and **pushed to `main`** (commit `c58d265`). The GitHub Actions
