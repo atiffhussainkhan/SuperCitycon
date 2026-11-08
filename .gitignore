@@ -20,7 +20,11 @@ game/dist/
 # bundle — so committing it would put a THIRD copy of every model binary in
 # the history. The package lives on disk at `release/`; the recipe for
 # rebuilding it is in `docs/release/RELEASE-MANIFEST.md`.
-release/
+#
+# Root-anchored on purpose: a bare `release/` also matches `docs/release/`,
+# which would silently drop the six release documents from version control.
+# They ARE release content and must be committed.
+/release/
 
 # The raw library archives and their extracted trees. They are source
 # material for the asset curator and live in ~/.minimax/asset-library.
