@@ -235,20 +235,44 @@ async function main() {
       return { movedTo: true, target: target.name };
     });
     await page.waitForTimeout(300);
+    const eventsBefore = await page.evaluate(() => window.__v4?.bus?.history('gameplay:interaction')?.length ?? 0);
     await page.keyboard.press('KeyE');
     await page.waitForTimeout(400);
     const interactionEvents = await page.evaluate(() => window.__v4?.bus?.history('gameplay:interaction')?.length ?? 0);
-    report.interaction = { ...interaction, events: interactionEvents };
-    check('interaction fires an event', interactionEvents > 0, `${interactionEvents} event(s)`);
+    const newInteractionEvents = interactionEvents - eventsBefore;
+    report.interaction = { ...interaction, events: interactionEvents, newEvents: newInteractionEvents };
+    // Exactly one event for one key press: the frame runs several fixed
+    // simulation steps after a slow frame, and every one of them used to
+    // read the same key-down edge.
+    check('one key press triggers exactly one interaction', newInteractionEvents === 1,
+      `${newInteractionEvents} new event(s) of ${interactionEvents} total`);
 
     // The result of the interaction must be *shown*, not just computed.
+    //
+    // The assertion is made on the event payload's `result`, not on the HUD
+    // text: the HUD always shows the prompt ("Open chest"), so matching the
+    // prompt would pass even when the interaction produced nothing at all.
+    // A prop answers with a string, an NPC with a `{speaker, text}` object.
     const shown = await page.evaluate(() => {
-      const hud = document.getElementById('hud');
-      return { text: hud?.innerText ?? '', has: (hud?.innerText ?? '').length > 0 };
+      const history = window.__v4?.bus?.history('gameplay:interaction') ?? [];
+      const last = history[history.length - 1] ?? null;
+      const result = last?.payload?.result ?? null;
+      return {
+        text: document.getElementById('hud')?.innerText ?? '',
+        result,
+        resultText: typeof result === 'string' ? result : (result?.text ?? null),
+        prompt: last?.payload?.prompt ?? null,
+      };
     });
-    report.interactionShown = shown.text.replace(/\s+/g, ' ').slice(0, 160);
-    check('the interaction result is shown in the HUD', /chest|Talk to|photograph/i.test(shown.text),
-      report.interactionShown);
+    report.interactionShown = {
+      hud: shown.text.replace(/\s+/g, ' ').slice(0, 160),
+      result: shown.result,
+    };
+    check('the interaction produces a result', typeof shown.resultText === 'string' && shown.resultText.length > 0,
+      `result=${JSON.stringify(shown.result)}`);
+    check('the interaction result is shown in the HUD', typeof shown.resultText === 'string'
+      && shown.resultText.length > 0 && shown.text.includes(shown.resultText.slice(0, 20)),
+      report.interactionShown.hud);
     await page.screenshot({ path: join(OUT, '03-interaction.png') });
 
     // --- the player must not be able to walk into a building ----------------
@@ -324,6 +348,18 @@ async function main() {
     });
     check('pause and resume work', paused === true && resumed === false, `paused=${paused} resumed=${resumed}`);
 
+    // The Escape key must pause and resume as well. The pause module used to
+    // exist but was never wired into the app, so the key did nothing.
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(400);
+    const keyPaused = await page.evaluate(() => window.__v4.clock.paused);
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(400);
+    const keyResumed = await page.evaluate(() => window.__v4.clock.paused);
+    report.keyboardPause = { keyPaused, keyResumed };
+    check('the Escape key pauses and resumes', keyPaused === true && keyResumed === false,
+      `after Escape: paused=${keyPaused}, after Escape again: paused=${keyResumed}`);
+
     // --- 10: save / reload --------------------------------------------------
     const saveReload = await page.evaluate(async () => {
       const name = 'slice-check';
@@ -335,6 +371,109 @@ async function main() {
     report.saveReload = saveReload;
     check('the scene saves and reloads', saveReload.entities > 0 && saveReload.after === saveReload.entities,
       `${saveReload.entities} entities`);
+
+    // --- 10b: the reload restores the 3D objects, not just the data --------
+    // A reload has to bring the *scene* back: a prop that was moved after the
+    // save must return to the place it was saved at. The mesh position is
+    // read in the same synchronous block as the load, before the frame loop
+    // has had a chance to sync it, so this measures the restore path itself.
+    const restore = await page.evaluate(async () => {
+      const v4 = window.__v4;
+      const name = 'slice-objects';
+      const doc = await v4.sceneManager.save(name);
+
+      // Pick a prop that owns a 3D object.
+      const propId = (v4.level?.propIds ?? []).find((id) => v4.level?.objects?.get(id));
+      const mesh = propId ? v4.level.objects.get(propId) : null;
+      const savedTransform = propId ? v4.world.getComponent(propId, 'transform') : null;
+      const saved = savedTransform ? [...(savedTransform.position ?? [])] : null;
+
+      // Move it away from the saved position, in the data *and* on screen.
+      let moved = null;
+      if (propId && mesh && saved) {
+        moved = [saved[0] + 4, saved[1], saved[2] + 4];
+        savedTransform.position = moved;
+        savedTransform.dirty = true;
+        mesh.position.set(moved[0], moved[1], moved[2]);
+      }
+
+      await v4.sceneManager.load(name);
+
+      // Read the object straight after the load, before any frame runs.
+      const restored = mesh ? [mesh.position.x, mesh.position.y, mesh.position.z] : null;
+      const restoredTransform = propId ? [...(v4.world.getComponent(propId, 'transform')?.position ?? [])] : null;
+      return { entities: doc.entities.length, propId, saved, moved, restored, restoredTransform };
+    });
+    report.objectRestore = restore;
+    const restoredOk = restore.restored && restore.saved
+      && Math.abs(restore.restored[0] - restore.saved[0]) < 0.001
+      && Math.abs(restore.restored[1] - restore.saved[1]) < 0.001
+      && Math.abs(restore.restored[2] - restore.saved[2]) < 0.001;
+    check('the reload restores the 3D objects, not just the entity data', restoredOk,
+      `prop #${restore.propId} saved at [${(restore.saved ?? []).map((n) => n.toFixed(1))}] `
+      + `moved to [${(restore.moved ?? []).map((n) => n.toFixed(1))}] `
+      + `restored to [${(restore.restored ?? []).map((n) => n.toFixed(1))}]`);
+
+    // --- 10c: the behaviour survives the reload ----------------------------
+    // Saving the *data* is not enough: the callbacks that make the world
+    // react are runtime handles and are never part of the save format, so
+    // they have to be re-attached when the scene comes back.
+    const afterReload = await page.evaluate(() => {
+      const v4 = window.__v4;
+      const interactive = v4?.world?.query('interactive') ?? [];
+      const target = interactive.find((e) => e.name?.toLowerCase().includes('chest')) ?? interactive[0];
+      if (!target) return { movedTo: false };
+      const tt = v4.world.getComponent(target.id, 'transform');
+      const pos = tt?.position ?? [0, 0, 0];
+      // Stand exactly on the chest so it is unambiguously the nearest
+      // interactive entity: a villager standing nearby would otherwise be
+      // the target, and the check would measure the wrong thing.
+      v4.controller?.teleport?.(pos[0], pos[1], pos[2]);
+      return {
+        movedTo: true,
+        target: target.name,
+        targetId: target.id,
+        hasCallback: typeof v4.world.getComponent(target.id, 'interactive')?.onInteract === 'function',
+        before: (v4.bus?.history('gameplay:interaction') ?? []).length,
+      };
+    });
+    await page.waitForTimeout(300);
+    const selected = await page.evaluate(() => ({
+      targetId: window.__v4.interaction?.targetId ?? null,
+      prompt: window.__v4.interaction?.prompt?.() ?? null,
+      playerPosition: window.__v4.world?.getComponent?.(window.__v4.player, 'transform')?.position ?? null,
+      candidates: (window.__v4.interaction?.candidates?.() ?? []).map((c) => ({
+        id: c.entity.id, name: c.entity.name, distance: Number(c.distance.toFixed(2)),
+      })),
+    }));
+    await page.keyboard.press('KeyE');
+    await page.waitForTimeout(400);
+    const afterReloadState = await page.evaluate(() => {
+      const history = window.__v4?.bus?.history('gameplay:interaction') ?? [];
+      const last = history[history.length - 1] ?? null;
+      const result = last?.payload?.result ?? null;
+      return {
+        text: document.getElementById('hud')?.innerText ?? '',
+        count: history.length,
+        result,
+        resultText: typeof result === 'string' ? result : (result?.text ?? null),
+      };
+    });
+    const newResults = afterReloadState.count - (afterReload.before ?? 0);
+    report.afterReload = {
+      ...afterReload,
+      selected,
+      newResults,
+      result: afterReloadState.result,
+      text: afterReloadState.text.replace(/\s+/g, ' ').slice(0, 160),
+    };
+    // `newResults === 1` is part of the assertion on purpose: one press of E
+    // must trigger exactly one interaction, not one per fixed simulation step.
+    check('interaction still works after a reload',
+      afterReload.hasCallback && selected.targetId === afterReload.targetId && newResults === 1
+      && typeof afterReloadState.resultText === 'string' && afterReloadState.resultText.length > 0,
+      `onInteract ${afterReload.hasCallback ? 'present' : 'MISSING'}, target #${selected.targetId}, `
+      + `${newResults} new event(s), result=${JSON.stringify(afterReloadState.result)}`);
 
     // --- 11: performance ----------------------------------------------------
     const perf = await page.evaluate(async () => {

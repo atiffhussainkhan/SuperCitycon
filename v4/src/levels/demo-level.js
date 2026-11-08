@@ -193,6 +193,16 @@ export async function buildDemoLevel({ world, registry, bus, renderer = null, ph
   const objects = new Map();
   /** entityId -> the clips its model shipped, so animators can be rebuilt. */
   const clipsByEntity = new Map();
+  /**
+   * entityId -> the callback that makes an interactive entity react.
+   *
+   * A callback is a runtime handle: it is a function, so it can never be part
+   * of the save format. A scene load rebuilds the entities from the saved
+   * *data*, which means every `onInteract` is gone unless it is re-attached.
+   * Keeping the handlers here lets the level put them back on load — the same
+   * way the animation controllers are rebuilt.
+   */
+  const interactionHandlers = new Map();
 
   // ---------------------------------------------------------------- models
   const ids = demoModelIds();
@@ -378,7 +388,9 @@ export async function buildDemoLevel({ world, registry, bus, renderer = null, ph
     // The NPC speaks when the player interacts with it.
     const interactive = world.getComponent(entityId, 'interactive');
     if (interactive) {
-      interactive.onInteract = () => npcSystem.interact(entityId);
+      const handler = () => npcSystem.interact(entityId);
+      interactive.onInteract = handler;
+      interactionHandlers.set(entityId, handler);
     }
 
     const model = modelFor(npc.model, 'character');
@@ -443,16 +455,21 @@ export async function buildDemoLevel({ world, registry, bus, renderer = null, ph
 
     // The behaviour of the interactive props.
     const data = world.getComponent(entityId, 'interactive');
+    let handler = null;
     if (item.kind === 'chest') {
-      data.onInteract = () => {
+      handler = () => {
         bus?.emit?.('gameplay:chest', { entityId });
         return 'The chest is empty, except for a faded photograph.';
       };
     } else {
-      data.onInteract = () => {
+      handler = () => {
         bus?.emit?.('gameplay:sign', { entityId });
         return 'VILLAGE SIGN — "Guard patrols the north road."';
       };
+    }
+    if (data) {
+      data.onInteract = handler;
+      interactionHandlers.set(entityId, handler);
     }
     interactiveIds.push(entityId);
   }
@@ -529,6 +546,26 @@ export async function buildDemoLevel({ world, registry, bus, renderer = null, ph
   }
 
   /**
+   * Re-attach the interaction callbacks after a scene load.
+   *
+   * A callback is a runtime handle, so it is never part of the save format.
+   * A load rebuilds the entities from the saved data, which leaves every
+   * interactive entity inert: pressing E still finds the target and still
+   * shows its prompt, but nothing happens. Putting the handlers back is what
+   * makes the reloaded world behave like the one that was saved.
+   */
+  function rebindInteractions() {
+    const rebound = [];
+    for (const [entityId, handler] of interactionHandlers) {
+      const component = world.getComponent(entityId, 'interactive');
+      if (!component || typeof handler !== 'function') continue;
+      component.onInteract = handler;
+      rebound.push(entityId);
+    }
+    return rebound;
+  }
+
+  /**
    * Copy the world's transforms onto the level's 3D objects.
    *
    * The simulation moves entities, not meshes: the character controller and
@@ -564,6 +601,7 @@ export async function buildDemoLevel({ world, registry, bus, renderer = null, ph
     objects,
     applyScene,
     rebindAnimators,
+    rebindInteractions,
     syncTransforms,
     models: { loaded: models.loaded.map((m) => m.id), failed: models.failed.map((m) => m.id) },
     catalogue: MODEL_CATALOGUE.map((m) => m.id),

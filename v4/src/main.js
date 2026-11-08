@@ -149,6 +149,7 @@ function driveNpcAnimations() {
 let controller = null;
 let interaction = null;
 let objectives = null;
+let pause = null;
 const animators = new Map();
 
 /** The last thing that was said or read, shown by the HUD. */
@@ -222,6 +223,17 @@ async function boot() {
     v4.hud = mod.createHud({ container: hudRoot, bus });
   });
 
+  // --- pause ----------------------------------------------------------------
+  // The pause module is wired here so the Escape key really pauses the game.
+  // It is read from the frame loop rather than from the simulation, because a
+  // paused clock stops the fixed steps — a game paused with the keyboard
+  // could otherwise never be resumed.
+  await loadOptional('pause', () => import('./gameplay/pause.js'), (mod) => {
+    pause = mod.createPause({ clock, bus, input });
+    v4.pause = () => pause.pause();
+    v4.resume = () => pause.resume();
+  });
+
   // --- the demo level -------------------------------------------------------
   try {
     const levels = await import('./levels/demo-level.js');
@@ -261,6 +273,7 @@ async function boot() {
     const doc = sceneManager.current?.doc;
     const applied = v4.level?.applyScene?.(doc);
     const rebound = v4.level?.rebindAnimators?.() ?? [];
+    const reboundInteractions = v4.level?.rebindInteractions?.() ?? [];
     animators.clear();
     for (const entity of world.entities.values()) {
       const anim = world.getComponent(entity.id, 'animation');
@@ -271,7 +284,7 @@ async function boot() {
       v4.player = player.id;
       controller?.setAnimator?.(animators.get(player.id) ?? null);
     }
-    logger.info(`scene "${name}" restored: ${applied?.applied ?? 0} objects, ${rebound.length} animators`);
+    logger.info(`scene "${name}" restored: ${applied?.applied ?? 0} objects, ${rebound.length} animators, ${reboundInteractions.length} interactions`);
   });
 
   // --- keep the app's mode in step with the editor's ------------------------
@@ -312,8 +325,20 @@ function frame(now) {
   const { delta, steps } = clock.tick(now);
   profiler.beginFrame(now);
 
-  if (steps > 0) {
-    for (let i = 0; i < steps; i += 1) simulate(clock.fixedStep);
+  // The pause key is read outside the simulation: a paused clock stops the
+  // fixed steps, so a game paused with the keyboard could never be resumed.
+  pause?.update?.();
+
+  if (!clock.paused && steps > 0) {
+    for (let i = 0; i < steps; i += 1) {
+      simulate(clock.fixedStep);
+      // One key press must trigger one action. The clock catches up with
+      // several fixed steps in a single frame, and every one of them would
+      // otherwise read the same key-down edge: one press of E would
+      // interact five times, one press of Escape would toggle the pause
+      // five times. The first step consumes the edge.
+      if (i === 0) input.consumeEdges();
+    }
   } else if (v4.mode === 'play' && !clock.paused) {
     // A slow frame still needs the NPC/animation state to advance smoothly —
     // but a paused game must not animate either.

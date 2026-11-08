@@ -32,6 +32,17 @@ export function createPause({ clock = null, bus = null, input = null, menus = nu
     return true;
   }
 
+  /**
+   * Toggle between paused and running.
+   *
+   * This is a plain function rather than a method of the returned object:
+   * `update()` needs to call it, and a method would have to be invoked as
+   * `this.toggle()`, which breaks as soon as the caller destructures it.
+   */
+  function toggle() {
+    return setPaused(!paused);
+  }
+
   return {
     /** Is the game paused? */
     get paused() { return paused; },
@@ -43,7 +54,7 @@ export function createPause({ clock = null, bus = null, input = null, menus = nu
     /** Resume the game. */
     resume() { return setPaused(false); },
     /** Toggle between paused and running. */
-    toggle() { return setPaused(!paused); },
+    toggle,
 
     /** Read the pause key and act on it. */
     update() {

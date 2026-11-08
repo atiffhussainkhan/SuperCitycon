@@ -15,6 +15,9 @@ import { createRegistry, deserializeScene, serializeScene, toPlainData } from '.
 import { createTransform, setPosition, updateWorldMatrices } from '../src/core/transform.js';
 import { createPhysicsWorld } from '../src/physics/physics.js';
 import { createAnimator } from '../src/anim/animator.js';
+import { createInput } from '../src/input/input.js';
+import { createEventBus } from '../src/core/events.js';
+import { buildDemoLevel } from '../src/levels/demo-level.js';
 
 /* -------------------------------------------------- physics: static blocks */
 
@@ -218,4 +221,54 @@ test('a quarter turn produces an exact zero instead of float dust', () => {
   t.dirty = true;
   updateWorldMatrices(t);
   assert.equal(t.local[0], 0, 'cos(PI/2) must not leak a 1e-16 into the matrix');
+});
+
+/* ------------------------------------------------- input: one press, one action */
+
+test('one key press triggers one action, however many fixed steps a frame runs', () => {
+  // A frame can run several fixed simulation steps after a slow frame. Every
+  // one of those steps used to see the same key-down edge, so a single press
+  // of E interacted up to five times.
+  const listeners = {};
+  const target = {
+    addEventListener(type, fn) { (listeners[type] ??= []).push(fn); },
+    removeEventListener() {},
+  };
+  const input = createInput({ target, bindings: { 'player.interact': ['KeyE'] } });
+  for (const fn of listeners.keydown ?? []) fn({ code: 'KeyE' });
+
+  assert.equal(input.wasPressed('player.interact'), true, 'the press must be seen');
+  input.consumeEdges();
+  assert.equal(input.wasPressed('player.interact'), false, 'the edge must be consumed by the first step');
+  assert.equal(input.isDown('player.interact'), true, 'the key is still held down');
+});
+
+/* --------------------------------------------- scene load: behaviour restored */
+
+test('a scene reload restores the interactive callbacks, not just the data', async () => {
+  const world = createWorld();
+  const registry = createRegistry();
+  registry.registerBuiltins();
+  const bus = createEventBus();
+  const level = await buildDemoLevel({
+    world, registry, bus, renderer: null, physics: createPhysicsWorld(), logger: null,
+  });
+
+  const chestId = level.interactiveIds.find((id) => world.getComponent(id, 'interactive')?.kind === 'chest');
+  assert.ok(chestId !== undefined, 'the demo level must have a chest');
+  assert.equal(typeof world.getComponent(chestId, 'interactive').onInteract, 'function',
+    'the chest must react before the load');
+
+  // Save and load. The entities are rebuilt from the saved *data*.
+  const doc = serializeScene(world, registry, 'reload-test');
+  deserializeScene(world, registry, doc);
+  assert.equal(typeof world.getComponent(chestId, 'interactive').onInteract, 'undefined',
+    'a callback is a runtime handle, so it cannot survive the save on its own');
+
+  // The level puts the handlers back, the way it rebuilds the animators.
+  const rebound = level.rebindInteractions();
+  assert.ok(rebound.includes(chestId), 'the chest callback must be re-attached');
+
+  const result = world.getComponent(chestId, 'interactive').onInteract();
+  assert.match(String(result), /photograph/i, 'the reloaded chest must produce its line again');
 });

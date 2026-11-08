@@ -1,0 +1,35 @@
+{
+  "label": "v4",
+  "url": "http://127.0.0.1:4187/",
+  "at": "2026-11-08T22:39:32.257Z",
+  "loadMs": 3674,
+  "gpu": {
+    "available": true,
+    "vendor": "Google Inc. (Intel)",
+    "renderer": "ANGLE (Intel, ANGLE Metal Renderer: Intel(R) UHD Graphics 630, Unspecified Version)",
+    "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+    "shadingLanguage": "WebGL GLSL ES 3.00 (OpenGL ES GLSL ES 3.0 Chromium)",
+    "isSoftware": false
+  },
+  "frames": {
+    "frames": 1016,
+    "fps": 100.8,
+    "meanMs": 9.92,
+    "medianMs": 6.3,
+    "p95Ms": 15.7,
+    "maxMs": 182.2
+  },
+  "engineStats": {
+    "frames": 240,
+    "fps": 68.8,
+    "frameMs": 14.53,
+    "medianMs": 9.9,
+    "p95Ms": 25,
+    "maxMs": 188.3,
+    "drawCalls": 312,
+    "triangles": 151980,
+    "memoryMb": 0
+  },
+  "consoleErrors": [],
+  "hardware": true
+}

@@ -131,6 +131,20 @@ export function createInput({ target = globalThis, bindings = DEFAULT_BINDINGS }
       pointer.wheel = 0;
     },
 
+    /**
+     * Forget the key-down edges, keeping the keys that are still held.
+     *
+     * One frame can run several fixed simulation steps (the clock catches up
+     * after a slow frame), and every one of those steps would otherwise see
+     * the same key-down edge: a single press of E would interact up to five
+     * times and a single press of Escape would toggle the pause five times.
+     * The first step consumes the edge; the remaining steps see the key as
+     * *held* rather than *pressed*, which is what they should see.
+     */
+    consumeEdges() {
+      pressed.clear();
+    },
+
     on(event, fn) {
       listeners[event]?.push(fn);
       return () => {
