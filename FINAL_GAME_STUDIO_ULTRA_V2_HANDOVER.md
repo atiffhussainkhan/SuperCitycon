@@ -274,24 +274,25 @@ never places the landmark. **Corrected** in §3 and §9.
 | `minimax-game/_audit_basenames_out.txt` | a generated audit scratch file |
 | `minimax-game/my_mario_game` | an empty stray directory |
 
-**Trash state, measured now:** **886 MB across 4 items** — and **every single one
-is scratch this project created** in the final verification round: four
-temporary directories used to rebuild and independently verify the release
-package (`pkg-src/`, `pkg-out/`, `pkg-out2/`, `pkg-verify2/`). The Trash's
-earlier contents (18 items / 455 MB, all scratch of mine) were **emptied before
-this round** — macOS no longer lists them — so the manual action recorded in the
-previous round has evidently been taken, and it is needed again now for these
-four. There is **no pre-existing user data in the Trash**: the 1,362 items the
-brief referred to were already empty when I first measured, and I did not empty
-anything myself.
+**Trash state, measured now:** **1,078 MB across 5 items** — and **every single one
+is scratch this project created** in the final verification round: the temporary
+directories used to rebuild and independently verify the release package
+(`pkg-src/`, `pkg-out/`, `pkg-out2/`, `pkg-verify2/`, `pkg-final-out/`). The
+Trash's earlier contents (18 items / 455 MB, all scratch of mine) were **emptied
+before this round** — macOS no longer lists them — so the manual action recorded
+in the previous round has evidently been taken, and it is needed again now for
+these five. There is **no pre-existing user data in the Trash**: the 1,362 items
+the brief referred to were already empty when I first measured, and I did not
+empty anything myself.
 
 | Item | What it is |
 |---|---|
 | `pkg-src/` | an isolated `git worktree` at the release commit: `npm ci` → `build:cleared` → the packager |
 | `pkg-out/`, `pkg-out2/` | two complete package builds produced by that worktree |
 | `pkg-verify2/` | a clean copy of the package, used for the independent `npm ci` + test run |
+| `pkg-final-out/` | the final package build, before it was copied into `release/` |
 
-All four are **mine, from this session, and fully regenerable** — the package is
+All five are **mine, from this session, and fully regenerable** — the package is
 rebuilt by `node tools/package-release.mjs` and re-verified by extracting it to a
 temporary directory. Nothing of yours is in there, so emptying the Trash is
 safe. **I did not empty it**, because permanently deleting Trash contents was
@@ -453,8 +454,8 @@ have. None is a code fix.
 
 ## 10. Manual actions still necessary
 
-1. **Empty the Trash** (886 MB, 4 items). Everything in it is scratch this
-   project created in the final round — four temporary directories used to
+1. **Empty the Trash** (1,078 MB, 5 items). Everything in it is scratch this
+   project created in the final round — the temporary directories used to
    rebuild and independently verify the release package — so emptying it is
    safe. The 1,362 pre-existing items the brief referred to were already
    gone before I started, and the previous round's scratch has since been
