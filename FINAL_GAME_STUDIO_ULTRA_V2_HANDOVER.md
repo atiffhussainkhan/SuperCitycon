@@ -115,6 +115,12 @@ Confirmed by the harness against the **built bundle**, not the dev server:
 - **Save/load round-trips**: a slot is written, a fresh session loads it, and
   the buildings reappear in the scene.
 - The **SCC Studio** opens, sculpts a voxel (0 → 2), and exports a valid OBJ.
+- **Construction-slot progression** (FR-ECO-020): the player starts with one
+  slot; two-slot buildings are refused with `not-enough-slots`; placing the
+  **Citycon Building** grants a second permanent slot (`total: 1 → 2`); once
+  that construction completes (120,000 ms) the **Monorail Station** gate flips
+  to `ok: true` and it builds, occupying both slots (`used: 2, free: 0`).
+  Measured directly against the shipped source.
 - **No uncaught page errors and no console errors.**
 - The frame is not a flat colour: 660 distinct colours, mean luma 111.2.
 
@@ -372,8 +378,15 @@ have. None is a code fix.
   Fixing requires `vite@8.3.6`, a semver-major bump that would force
   re-verifying everything. **Deliberately not upgraded**, documented in
   `docs/release/PERFORMANCE.md` §4 and `game/README.md` §7.
-- **One construction slot**, so `trn.monorail_station` (which asks for two) can
-  never be built. Visible, not hidden — the harness reports it.
+- **Two-slot buildings are gated on progression, not broken.** The player starts
+  with **one** construction slot, so `trn.monorail_station` and `eng.coal` (both
+  ask for two) are refused with `not-enough-slots` early on. The **Citycon
+  Building** — a placeable landmark that unlocks at level 8 and carries
+  `grantsConstructionSlot` (FR-ECO-020) — grants a second permanent slot.
+  Measured: slots go `total: 1 → 2`, and once that construction completes the
+  Monorail Station gate flips to `ok: true` (see §3). The acceptance harness
+  reports the refusal because its scenario exercises the early game and never
+  places the landmark.
 - **The shop category bar overflows at 1600 px.** Measured in the browser:
   `.sc-shop-tabs` has `scrollWidth: 2091` in a `clientWidth: 1584` box, so
   four of twelve categories sit outside the viewport by default. **Reachable**
