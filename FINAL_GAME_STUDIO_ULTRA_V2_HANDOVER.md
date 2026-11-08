@@ -5,7 +5,8 @@
 **Branch:** `main` — the licence fix was committed and **pushed** as `c58d265`;
 the workflow ran green and deployed in 9 s, so the corrected build is **live**.
 This report's final wording is in the follow-up commits listed in §12
-(`e59b668`, `9d12462`, `ae40767`), all pushed.
+(`e59b668`, `9d12462`, `ae40767`) and the report's own later commits, all
+pushed to `main`.
 **Machine:** macOS 26.7.1 (25G241), **x86_64 Intel**, Node 22.14.0, npm 10.9.2,
 Python 3.15.2, git 2.50.1
 
@@ -520,6 +521,10 @@ final-prod,final-prod-rerun,final-cleared,final-local,performance}/` ·
 | `e59b668` | the completed deploy and the live verification evidence |
 | `9d12462` | the corrected construction-slot claim (§4.8) |
 | `ae40767` | the `.gitignore` anchor fix and the six release documents (§4.7) |
+
+Two further commits carry this report's own final wording (the §2.3 round, and
+the Trash figure). They change no code, and the last of them is the commit that
+carries this file — `git log --oneline -6` shows the whole series.
 
 The release package is deliberately **not** committed; it is rebuilt by
 `node tools/package-release.mjs` — and now verifiably so, from a clean checkout
