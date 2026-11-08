@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 import { cp, mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
-import { existsSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 /**
@@ -92,6 +92,33 @@ function runtimeAssets() {
 }
 
 /**
+ * Describe the 2D HUD art from the manifest itself.
+ *
+ * The counts are DERIVED, never typed: the manifest holds one record per HUD
+ * slot, some records share a file, and some slots carry no file at all. A
+ * typed number cannot tell those apart, and a licence pass needs to know
+ * exactly how many distinct files a publisher has to clear.
+ *
+ * @returns {string} a label like "84 records → 69 distinct files"
+ */
+function uiArtLabel() {
+  try {
+    const raw = JSON.parse(
+      readFileSync(resolve(process.cwd(), 'src', 'data', 'ui-assets.json'), 'utf8'),
+    );
+    const images = raw && typeof raw.images === 'object' && raw.images ? raw.images : {};
+    const records = Object.keys(images);
+    const refs = records
+      .map((k) => images[k] && images[k].file)
+      .filter((f) => typeof f === 'string' && f.length > 0);
+    const distinct = new Set(refs).size;
+    return `${records.length} records → ${distinct} distinct files`;
+  } catch {
+    return 'count unavailable — the manifest could not be read';
+  }
+}
+
+/**
  * Apply the licence policy to the finished build.
  *
  * In a cleared build the unverified 2D art is REMOVED from `dist/`, so the
@@ -143,11 +170,12 @@ async function applyLicencePolicy() {
   lines.push('| Quaternius Ultimate Animated Character (14 citizens) | CC0-1.0 | cleared |');
   lines.push('| Quaternius Ultimate Animated Animals (8 creatures) | CC0-1.0 | cleared |');
   lines.push('| KayKit Skeletons (2 undead) | CC0-1.0 | cleared |');
-  lines.push(`| 2D HUD icons (82 images) | unverified | ${(manifestStillThere || dirStillThere) ? 'PRESENT — not cleared for release' : 'removed from this build'} |`);
+  lines.push('| 2D HUD icons (' + uiArtLabel() + ') | unverified | ' + ((manifestStillThere || dirStillThere) ? 'PRESENT — not cleared for release' : 'removed from this build') + ' |');
   lines.push('');
   lines.push('## The 2D art');
   lines.push('');
-  lines.push('Every 2D record in the user\'s asset library carries `licence_status: "unverified"`.');
+  lines.push('Every 2D record in the user\'s asset library carries an **unverified** licence');
+  lines.push('(`licence: "unverified"` in the published manifest).');
   lines.push('None of it has been cleared for public release, so it is never presented as');
   lines.push('cleared: the HUD shows "LICENCE CLEARANCE PENDING" on screen whenever the art');
   lines.push('is loaded, and the 3D licence texts ship in `assets/LICENSES/`.');

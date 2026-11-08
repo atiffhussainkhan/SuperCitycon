@@ -3,7 +3,7 @@
   "licenceSummary": {
     "unverifiedCount": 82,
     "shipSafeCount": 0,
-    "note": "All 82 shipped 2D images come from the user's image library, where every record carries licence_status 'unverified'. None is cleared for public release: a licence pass is required before publishing. The 3D models in src/data/manifest.json are separately licensed (CC0-1.0 / MIT) and are unaffected."
+    "note": "All 84 HUD records (82 of them referencing an image file, 69 distinct files) come from the user's image library, where every record carries licence 'unverified'. None is cleared for public release: a licence pass is required before publishing. The 3D models in src/data/manifest.json are separately licensed (CC0-1.0 / MIT) and are unaffected."
   },
   "images": {
     "tool.inspect": {

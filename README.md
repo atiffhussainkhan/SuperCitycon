@@ -89,7 +89,7 @@ else and therefore travels with the game.
 | Asset set | Licence | Status |
 |---|---|---|
 | 3D models and animation (158 assets, 5 packs) | CC0-1.0 / MIT | **cleared to publish** |
-| 2D HUD art (82 images) | `unverified` | **NOT cleared — do not publish** |
+| 2D HUD art (69 distinct images across 84 HUD records) | `unverified` | **NOT cleared — do not publish** |
 
 So publication is a deliberate act:
 

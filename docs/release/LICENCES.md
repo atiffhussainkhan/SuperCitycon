@@ -53,12 +53,14 @@ exact world-space bounding box, footprint, height, scale and ground offset —
 
 ### 2.2 2D — NOT cleared for release
 
-**82 images** (tool icons, category icons, HUD stat icons, backgrounds,
+**69 distinct 2D images** across **84 HUD records** — 82 of those records reference an image file, and 12 files serve more than one slot (tool icons, category icons, HUD stat icons, backgrounds,
 portraits, sprites, effects, tiles and UI chrome) come from the user's image
-library. **Every 2D record in that library carries `licence_status:
-"unverified"`.** Not one has been cleared for public release.
+library. **Every 2D record in that library is licence-unverified** — the
+library's own field is `licence_status: "unverified"`, and the game's published
+manifest records it as `licence: "unverified"`. Not one has been cleared for
+public release.
 
-| Build | Contains the 82? | Publishable? |
+| Build | Contains the 2D art? | Publishable? |
 |---|---|---|
 | `npm run build:cleared` | **No** — stripped, and the build **throws** if either the folder or the manifest survives | **Yes** |
 | `npm run build` | Yes — and it writes `dist/DO-NOT-PUBLISH.txt` saying so | **No** |
@@ -84,7 +86,7 @@ CC0 collection.
 When the 2D art IS loaded (the local build), the HUD shows:
 
 ```
-82 ICON(S) FROM ASSET LIBRARY — LICENCE CLEARANCE PENDING.
+2D icons: your asset library — licence clearance pending.
 ```
 
 An unverified image is never presented as cleared. The 3D packs are separately

@@ -143,9 +143,10 @@ finding below is tracked to its current state.
 
 ## B1 — Unverified 2D art was copied into `dist/` · severity: BLOCKER · **FIXED**
 
-Every 2D record in the user's asset library carries `licence_status:
-unverified`, so none of it is cleared for public release — but the build copied
-all 82 images into `dist/` with no way to publish without them.
+Every 2D record in the user's asset library carries `licence: "unverified"`, so
+none of it is cleared for public release — but the build copied all the 2D art
+(69 distinct 2d images across 84 hud records — 82 of those records reference an image file, and 12 files serve more than one slot — plus the manifest) into `dist/` with no way to
+publish without it.
 
 **Fix:** publication is now a DELIBERATE act.
 

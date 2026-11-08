@@ -14,10 +14,10 @@ are recorded so they are not lost.
 **Status:** open. **Owner:** the publisher. **Severity:** release-gating for any
 build that includes the 2D art.
 
-82 HUD images (tool icons, category icons, HUD stat icons, backgrounds,
+**69 distinct 2D images** across **84 HUD records** — 82 of those records reference an image file, and 12 files serve more than one slot (tool icons, category icons, HUD stat icons, backgrounds,
 portraits, sprites, effects, tiles, UI chrome) come from the user's image
-library. **Every 2D record in that library carries `licence_status:
-"unverified"`.** Not one has been cleared for public release.
+library. **Every 2D record in that library carries `licence: "unverified"`.** Not
+one has been cleared for public release.
 
 **What this means in practice:**
 
@@ -29,42 +29,59 @@ library. **Every 2D record in that library carries `licence_status:
 - `npm run build` — the local build — includes them, for the owner's own use.
   It writes `dist/DO-NOT-PUBLISH.txt` into its own output saying so.
 
-**The fix:** for each of the 82 images, confirm the licence and record it. The
+**The fix:** for each of the 69 distinct images, confirm the licence and record it. The
 field to update is `licence` in `game/src/data/ui-assets.json` (currently
 `"unverified"` for every entry).
 
 > **This was a live defect and has been corrected in the repository.**
 > `.github/workflows/deploy.yml` was running `npm run build` — the LOCAL
 > profile — and deploying it to GitHub Pages. The published site was therefore
-> serving the 82 uncleared images *and* the `DO-NOT-PUBLISH.txt` notice that
+> serving the uncleared 2D images (69 distinct files across 84 HUD records)
+> *and* the `DO-NOT-PUBLISH.txt` notice that
 > says the bundle must not be published. The workflow now runs
 > `npm run build:cleared` and **asserts** that `dist/assets/ui/`,
 > `dist/assets/ui-assets.json` and `dist/DO-NOT-PUBLISH.txt` are all absent
-> before deploying. **The live site is corrected the next time the workflow
-> runs.** See `RELEASE-MANIFEST.md` §7.
+> before deploying. **The correction is deployed and live**: the published site
+> now returns **404** for `DO-NOT-PUBLISH.txt`, `assets/ui-assets.json` and
+> `assets/ui/`, and **200** for `index.html` (verified by HTTP after the
+> workflow ran green). See `RELEASE-MANIFEST.md` §5.
 
 ---
 
-## 2. One construction slot, and no way to earn another
+## 2. One construction slot at the start — and a way to earn a second
 
-**Status:** open. **Owner:** `sc-simulation` (ECO). **Severity:** balance.
+**Status:** resolved — this is progression, not a defect. **Owner:** `sc-simulation`
+(ECO). **Severity:** none.
 
-`state.economy.constructionSlots.total` starts at **1**, and no catalogue entry
-has `grantsConstructionSlot: true`. The player can therefore only ever have one
-building under construction. `trn.monorail_station` asks for **two** slots, so
-**it can never be built at all**.
+An earlier version of this file claimed that "no catalogue entry has
+`grantsConstructionSlot: true`" and that `trn.monorail_station` "can never be
+built at all". **That was wrong**, and it was measured against the shipped
+source rather than argued:
 
-The gate is enforced — which is the point of the integrator's placement gate —
-so this balance problem is **visible rather than hidden**. The acceptance
-harness reports it directly:
+| Step | Measured |
+|---|---|
+| The player starts with one slot | `constructionSlots()` → `{total: 1, used: 0, free: 1}` |
+| A two-slot building is refused | `canPlace(trn.monorail_station)` → `{ok: false, reason: 'not-enough-slots', required: 2, free: 1}` |
+| The **Citycon Building** is a placeable landmark with `grantsConstructionSlot: true` | `spl.citycon_building` (`game/src/buildings/catalogue.js`), unlock `{kind: 'level', level: 8}`, `unlockStage: 'stage-4'` |
+| Placing it grants a second permanent slot (FR-ECO-020) | `constructionSlots()` → `{total: 2, used: 1, free: 1}` |
+| Once that construction completes | `constructionSlots()` → `{total: 2, used: 0, free: 2}` |
+| The two-slot building is now allowed | `canPlace(trn.monorail_station)` → `{ok: true, required: 2, free: 2}` — and it occupies both slots while it builds (`used: 2, free: 0`) |
+
+The acceptance harness reports the refusal —
 
 ```
 PASS  buildings place on the map — 17/18 placed, 1 failed:
       trn.monorail_station@36,34: slot-timeout
 ```
 
-**Proposed `TUNING` keys:** `constructionSlotsTotal` (≥ 3) and
-`constructionMinutesByCategory`.
+— because its scenario exercises the **early** game (before level 8) and never
+places the landmark. The gate is enforced — which is the point of the
+integrator's placement gate — so the refusal is **visible rather than hidden**.
+
+**Remaining design question (optional):** whether the level-8 unlock is the
+right pace for the second slot is a balance decision, not a defect. A
+`TUNING` key would make it tunable:
+`constructionSlotsTotal` and `constructionMinutesByCategory`.
 
 ---
 

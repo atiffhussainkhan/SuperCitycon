@@ -205,12 +205,12 @@ Licence texts are copied verbatim into `game/public/assets/LICENSES/`.
 
 ### The 2D icons — NOT cleared to publish
 
-The asset curator curated **82 2D images** for the HUD and published them as
+The asset curator curated **69 distinct 2D images** across **84 HUD records** — 82 of those records reference an image file, and 12 files serve more than one slot for the HUD and published them as
 `game/public/assets/ui-assets.json` + `game/public/assets/ui/*.png`. The HUD
 loads that manifest at runtime and applies the icons by `slot`; the acceptance
 harness proves every icon file resolves with HTTP 200.
 
-**Every one of those 82 records carries `licence_status: unverified`.** The
+**Every one of those records carries `licence: "unverified"`.** The
 library's 2D image packs have not been licence-cleared. The icons are therefore
 fine to *display* while building and testing, and **not fine to publish** —
 so publication is a deliberate act:
@@ -220,8 +220,9 @@ so publication is a deliberate act:
 | `npm run build` | a LOCAL build that contains the 2D art and says so |
 | `npm run build:cleared` | the SHIPPABLE build: the 2D art is **stripped** from `dist/` |
 
-Either way the build writes `dist/LICENCE-STATUS.md`. The HUD shows
-`82 ICON(S) FROM ASSET LIBRARY — LICENCE CLEARANCE PENDING.` whenever the art
+Either way the build writes `dist/LICENCE-STATUS.md` — which states the 2D art
+count **derived from the manifest**, not typed. The HUD shows
+`2D icons: your asset library — licence clearance pending.` whenever the art
 is loaded — an unverified image is never presented as cleared.
 
 **The cleared build loses no function.** The HUD is complete and correct with
@@ -263,18 +264,23 @@ gets one uniform scale:
 This is the honest list. Everything here is a real gap, not a wish list.
 
 ### 1. The 2D icon licence pass — blocks publication
-The 82 HUD images are `licence_status: unverified`. **Owner: the publisher.**
+The 69 HUD images (84 manifest records) are `licence: unverified`. **Owner: the publisher.**
 Nothing else blocks a release faster. Until it is done, publish with
 `npm run build:cleared`. See `LICENCE-REPORT.md`.
 
-### 2. One construction slot, and no way to earn another
-`state.economy.constructionSlots.total` starts at **1** and no catalogue entry
-has `grantsConstructionSlot: true`, so the player can only ever have one
-building under construction. `trn.monorail_station` asks for **two** slots, so
-it can never be built at all. The gate is enforced (that was the point of the
-integrator's placement gate), which makes this balance problem visible instead
-of hidden. **Owner: `sc-simulation` (ECO).** Proposed `TUNING` keys:
-`constructionSlotsTotal` (≥ 3) and `constructionMinutesByCategory`.
+### 2. One construction slot at the start — and a way to earn a second
+`state.economy.constructionSlots.total` starts at **1**, so a two-slot building
+(`trn.monorail_station`, `eng.coal`) is refused with `not-enough-slots` early on.
+It is **not** unreachable: `spl.citycon_building` — a placeable landmark that
+unlocks at level 8 — carries `grantsConstructionSlot: true` and grants a second
+permanent slot (FR-ECO-020). Measured: slots go `total: 1 → 2`, and once that
+construction completes the Monorail Station gate flips to `ok: true` and it
+builds. The acceptance harness reports the refusal because its scenario
+exercises the early game and never places the landmark — the gate is enforced
+(the point of the integrator's placement gate), so it is visible rather than
+hidden. **Open question (balance, not a defect):** whether the level-8 unlock
+is the right pace. **Owner: `sc-simulation` (ECO).** Proposed `TUNING` keys:
+`constructionSlotsTotal` and `constructionMinutesByCategory`.
 
 ### 3. The x15 / x16 bonus ceiling is unresolved
 The recovered dev-blog text says the six bonuses "together can scale up to

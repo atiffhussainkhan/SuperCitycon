@@ -9,7 +9,7 @@ in the build and what may legally be published.
 | | |
 |---|---|
 | **3D models and animation** | 158 assets across 5 packs — **CC0-1.0 / MIT. Cleared for release.** |
-| **2D HUD art** | 82 images from the user's image library — **`licence_status: unverified`. NOT cleared.** |
+| **2D HUD art** | **69 distinct 2D images** across **84 HUD records** — 82 of those records reference an image file, and 12 files serve more than one slot from the user's image library — **`licence: unverified`. NOT cleared.** |
 | **Shippable build** | `npm run build:cleared` — the 2D art is stripped; only the cleared 3D assets ship. |
 | **Local build** | `npm run build` — contains the 2D art, for the owner's own use. Must not be published. |
 
@@ -39,10 +39,12 @@ code.
 
 ### 2D — not cleared
 
-82 images (tool icons, category icons, HUD stat icons, backgrounds, portraits,
+**69 distinct 2D images** across **84 HUD records** — 82 of those records reference an image file, and 12 files serve more than one slot (tool icons, category icons, HUD stat icons, backgrounds, portraits,
 sprites, effects, tiles and UI chrome) come from the user's image library.
-**Every 2D record in that library carries `licence_status: "unverified"`.** Not
-one of them has been cleared for public release.
+**Every 2D record in that library is licence-unverified** — the library's own
+field is `licence_status: "unverified"`, and the game's published manifest
+records it as `licence: "unverified"`. Not one of them has been cleared for
+public release.
 
 This is why publication is a deliberate act:
 
@@ -80,7 +82,7 @@ absent). The local build passes 40 of 40.
 When the 2D art IS loaded, the HUD shows:
 
 ```
-82 ICON(S) FROM ASSET LIBRARY — LICENCE CLEARANCE PENDING.
+2D icons: your asset library — licence clearance pending.
 ```
 
 An unverified image is never presented as cleared. The 3D packs are separately
@@ -94,7 +96,8 @@ third-party audio to license.
 
 ## What the owner has to do before publishing
 
-1. Run a **licence pass over the 2D art**: for each of the 82 images, confirm
+1. Run a **licence pass over the 2D art**: for each of the 69 distinct images (84
+   HUD records), confirm
    the licence and record it. The manifest field to update is `licence` in
    `src/data/ui-assets.json` (currently `"unverified"` for every entry).
 2. Until then, publish with `npm run build:cleared`, or keep the 2D art behind

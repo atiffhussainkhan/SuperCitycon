@@ -27,8 +27,9 @@ packaging or publishing the 2D game with `npm run build:cleared`.
 Two things are genuinely outside my reach and are stated plainly rather than
 glossed:
 
-1. **The 2D HUD art is licence-unverified.** 82 images carry
-   `licence_status: "unverified"`. The publishable build strips them and the
+1. **The 2D HUD art is licence-unverified.** All **84 HUD records** (82 of them
+   referencing a file, **69 distinct images** on disk) carry `licence:
+   "unverified"`. The publishable build strips them and the
    HUD stays complete; clearing the licences is a **publisher's** decision.
 2. **Apple Silicon was not executed.** This machine is Intel. The shipped
    bundle contains **0 native executables**, so the same artefact runs on ARM,
@@ -99,8 +100,8 @@ Run after the fixes in §4.7 and §4.8, against the release commit itself:
 | # | Command | Result | Verdict |
 |---|---|---|---|
 | 14 | `git worktree add --detach /tmp/pkg-src <commit>` → `npm ci` → `npm run build:cleared` | **218 files, 72.6 MB**, licence policy `CLEARED` (2D art stripped) | **PASS** |
-| 15 | `node tools/package-release.mjs` in that worktree | **720 files, 167.3 MB, 719 hashed**, secret scan clean over 711 files, `DO-NOT-PUBLISH` absent | **PASS** |
-| 16 | `shasum -a 256 -c SHA256SUMS.txt` in the built package | **719/719 OK**, exit 0 | **PASS** |
+| 15 | `node tools/package-release.mjs` in that worktree | **725 files, 167.4 MB, 724 hashed**, secret scan clean, `DO-NOT-PUBLISH` absent | **PASS** |
+| 16 | `shasum -a 256 -c SHA256SUMS.txt` in the built package | **724/724 OK**, exit 0 | **PASS** |
 | 17 | clean copy of the package → `npm ci` → `npm test` | **395/395 pass**, 8 suites, 0 fail | **PASS** |
 | 18 | clean copy of the package → `npm run check` | **56/56 files parse cleanly** | **PASS** |
 | 19 | clean copy → `python3 tools/audit_depth.py` / `verify_devbots.py` | **102/102 implementable** · **0 FAIL, 13 PASS** | **PASS** |
@@ -156,9 +157,9 @@ labels where the uncleared icons would be.
 
 `game/LICENCE-REPORT.md` says the LOCAL build "must not be published".
 `.github/workflows/deploy.yml` ran `npm run build` — the **LOCAL** profile — and
-deployed it. The published site was serving the **82 licence-unverified 2D
-images** *and* the `DO-NOT-PUBLISH.txt` notice that says the bundle must not be
-published. I confirmed both live by HTTP.
+deployed it. The published site was serving the **licence-unverified 2D art**
+(69 distinct images across 84 HUD records) *and* the `DO-NOT-PUBLISH.txt` notice
+that says the bundle must not be published. I confirmed both live by HTTP.
 
 **Fixed**: the workflow now runs `npm run build:cleared` and **asserts** that
 `dist/assets/ui/`, `dist/assets/ui-assets.json` and `dist/DO-NOT-PUBLISH.txt`
@@ -248,7 +249,8 @@ commit: the rebuild produced **708 files instead of 720**, and the missing 12
 were exactly the six documents in `docs/release/` and their six copies at the
 package root. **Fixed**: the pattern is now anchored (`/release/`), the six
 documents are committed, and the same worktree rebuild produces the full
-**720 files / 719 checksums** again.
+**720 files / 719 checksums** again (the package is now **725 / 724** since the
+five development bots were added — see §4.9).
 
 ### 4.8 A claim in this report was wrong about the game's progression
 
@@ -298,6 +300,45 @@ and can only be proven when every cited path resolves. Without the cache it
 died with a raw `AssertionError` traceback. It now **reports `[BLOCKED]`**,
 names the restore command, and exits **2** — it never prints a figure it did
 not earn. With the cache present it is unchanged at **18/18**.
+
+### 4.10 The release documents had drifted from the build
+
+Section 10 asks whether the documentation still matches the actual build. It
+did not — and one drift was worse than a stale number.
+
+**Stale figures**, each measured and corrected:
+
+| Where | Said | Actually |
+|---|---|---|
+| `RELEASE-MANIFEST.md` | game source is "12 modules" | **45** |
+| `RELEASE-MANIFEST.md` | "the 158 model binaries" | **199 files** (117 `.glb`, 41 `.gltf`, 41 `.bin`) — 158 is the *asset* count, which the same document states correctly elsewhere |
+| `RELEASE-MANIFEST.md` | "9 verification gates and scripts" | **10** (8 Python + 2 fetch scripts) |
+| `RELEASE-MANIFEST.md` | "14 review rounds" | **15** |
+| `RELEASE-MANIFEST.md` / `TEST-RESULTS.md` | the live harness scores **40/40** | **40/41, 1 correctly skipped** — the deployed bundle is the cleared profile, so the 2D-art check is skipped |
+| `RELEASE-MANIFEST.md` §5 / `REMAINING-ISSUES.md` §1 | "the live site is corrected the next time that workflow runs" | it **is** corrected and live — verified by HTTP |
+| `game/README.md` | the shippable build is "219 files" | **218** (and the local build is **289**, not 290) |
+
+**The licence figures were wrong in a way that mattered.** Every document said
+"**82 images** … carry `licence_status: unverified`". Measured against
+`game/src/data/ui-assets.json`: the manifest holds **84 HUD records**; **82** of
+them reference an image file; those references point at **69 distinct PNGs** (12
+files serve more than one slot, and 2 records are excluded portraits with no
+file at all). All 69 files exist; none is missing and none is unreferenced.
+
+So "82 images" was a count of *file references*, not of images — a publisher
+doing a licence pass would have been told to clear 82 files and found 69. The
+field name was wrong too: the **library's** records use `licence_status`, but
+the **published manifest** uses `licence`, and the documents attributed the
+library's field to the manifest. The on-screen honesty line was quoted
+throughout as `82 ICON(S) FROM ASSET LIBRARY — LICENCE CLEARANCE PENDING.`,
+but the game actually prints `2D icons: your asset library — licence clearance
+pending.`
+
+**Fixed**: every document now states the real breakdown, distinguishes the two
+field names, and quotes the message the game really prints. And the number is
+no longer typed at all — `game/vite.config.js` now **derives** it from the
+manifest, so `dist/LICENCE-STATUS.md` states *"2D HUD icons (84 records → 69
+distinct files)"* and cannot drift again.
 
 ---
 
@@ -401,13 +442,13 @@ Machine-specific limits are catalogued in `docs/MAC-PORTABILITY.md` §8.
 
 | | |
 |---|---|
-| Files | **720** (719 checksummed + `SHA256SUMS.txt`) |
-| Size | **167.3 MB** |
+| Files | **725** (724 checksummed + `SHA256SUMS.txt`) |
+| Size | **167.4 MB** |
 | Secret scan | **clean** — every text file scanned, no credential pattern matched |
-| Checksums | **719/719 verified OK** by independent `shasum -a 256 -c` |
+| Checksums | **724/724 verified OK** by independent `shasum -a 256 -c` |
 | `DO-NOT-PUBLISH.txt` | **absent** |
 | Independent extract + `npm ci` + `npm test` | **395/395 pass**; harness 40/41 (1 skipped) |
-| Rebuilt from a **clean checkout** of the release commit | **720 files / 719 checksums** — `git worktree` → `npm ci` → `npm run build:cleared` → `node tools/package-release.mjs` |
+| Rebuilt from a **clean checkout** of the release commit | **725 files / 724 checksums** — `git worktree` → `npm ci` → `npm run build:cleared` → `node tools/package-release.mjs` |
 
 **Contents:** the verified game source *and* the built, licence-cleared bundle;
 the 3D design package (documents, inventory, gates, **the five development
@@ -428,7 +469,7 @@ from there — not from the working tree:
 | `python3 tools/verify_devbots.py` | **PASS — 0 FAIL, 13 PASS** — against the bots the package now carries (`minimax-game/agents/`), so the gate passes on a machine that has never run this project |
 | `python3 tools/verify_design.py` | **3 FAIL, 28 PASS** — *correctly*: the package ships without the 2.4 GB cache, so the gate reports the paths as **UNVERIFIED** and names the restore command. The fetch scripts ship with it and resolve their destination from their own location, so `bash tools/fetch-3d-packs.sh` restores the cache in place. |
 | `python3 tools/fault_inject_hardened.py` | **BLOCKED (exit 2)** — *correctly*: this gate needs the archive cache, because some injections mutate the path check and can only be proven when all 849 paths resolve. It prints the restore command instead of a traceback, and publishes no figure. With the cache present it reports **18/18**. |
-| `shasum -a 256 -c SHA256SUMS.txt` | **719/719 OK**, 0 non-matching |
+| `shasum -a 256 -c SHA256SUMS.txt` | **724/724 OK**, 0 non-matching |
 | Independent secret scan (stricter patterns) | **0 findings** across 304 text files |
 
 The package deliberately duplicates ~150 MB — both `game/public/assets`
@@ -449,7 +490,7 @@ have. None is a code fix.
 | # | Blocker | Why it cannot be closed here | Effect |
 |---|---|---|---|
 | **B-1** | **Apple Silicon untested** | This machine is x86_64. The bundle is portable (0 native binaries) but I did not execute an ARM build, and will not claim I did. | A copy/rename risk on ARM only; low. Run the harness on an M-series Mac to close it. |
-| **B-2** | **82 2D HUD images licence-unverified** | Every 2D record in the library carries `licence_status: "unverified"`. Only the publisher can clear them. | The publishable build ships no 2D icons; the HUD falls back to text and stays complete. |
+| **B-2** | **69 distinct 2D HUD images licence-unverified** (84 HUD records) | Every 2D record in the library carries `licence: "unverified"`. Only the publisher can clear them. | The publishable build ships no 2D icons; the HUD falls back to text and stays complete. |
 | **B-3** | **No real-GPU performance figure** | The headless browser here uses software GL. | The 4.2 FPS figure is not representative; no GPU measurement exists. |
 | **B-4** | **The 3D game has no code** | It is a design package by instruction. Its first real gate is **GATE 1**; `DEL-02` blocks its Gate 2. | Not a defect. The design is implementation-ready. |
 
@@ -492,7 +533,8 @@ have. None is a code fix.
 **The Trash no longer needs your attention** — it was emptied with your approval
 at the end of this session (§5): **1,077 MB reclaimed, 0 items left**.
 
-1. **Clear the 82 2D licences** (publisher's decision) if you want a decorated
+1. **Clear the 2D licences** (publisher's decision — 69 distinct images across
+   84 HUD records) if you want a decorated
    build. The published site is already licence-compliant without them.
 2. **Run the harness on an Apple Silicon Mac** to close B-1.
 3. **Review the 4 open design decisions** (`OPEN-002`, `OPEN-005`, and the two
@@ -534,7 +576,11 @@ closed when it cannot derive what the cache should contain.
 ## 12. What changed on disk
 
 **Modified:** `.github/workflows/deploy.yml` (the licence fix) · `.gitignore` ·
-`game/README.md` · `game/tools/verify-production.mjs` (the profile fix) ·
+`game/README.md` · `game/vite.config.js` (the derived 2D-art count) ·
+`game/{LICENCE-REPORT,DEFECTS,AGENTS}.md` · `game/src/data/ui-assets.json` ·
+`game/public/assets/ui-assets.json` · `agents/sc-asset-curator.md` ·
+`README.md` · `docs/dependency-manifest.json` · `docs/release/*.md` ·
+`game/tools/verify-production.mjs` (the profile fix) ·
 `minimax-game/tools/verify_devbots.py` (the portable bot copy) ·
 `minimax-game/tools/fault_inject_hardened.py` (injections on a throwaway copy) ·
 `tools/{scenario,headed,probe-pointer,probe-save,probe,shoot}.mjs` (portable

@@ -29,7 +29,8 @@ generated, nothing substituted, nothing "close enough".
 3. **Never generate art.** If the library has nothing suitable, say
    "not in library" — that is a valid, valuable answer.
 4. **Never silently ship an unverified licence.** All 114,852 2D records carry
-   `licence_status: unverified`. The 3D packs used so far (KayKit City Builder
+   `licence_status: "unverified"` in the library (the game's published
+   manifest records the same status as `licence: "unverified"`). The 3D packs used so far (KayKit City Builder
    Bits, KayKit Adventurers, KayKit Character Animations, Avramania Nature &
    Terrain) are CC0-1.0 and Holokat Game Assets is MIT — those are safe to ship.
    For any 2D image, record the licence status in the manifest and surface the

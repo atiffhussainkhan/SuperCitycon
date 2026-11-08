@@ -69,16 +69,17 @@ MINIMAX-GAME-STUDIO-ULTRA-V2/
 ├── README.md                   the project's front page
 ├── .gitignore
 ├── game/                       THE GAME
-│   ├── src/                    the source (12 modules)
+│   ├── src/                    the source (45 modules)
 │   ├── tests/                  395 tests + a fake-DOM helper
 │   ├── tools/                  check-syntax.mjs, verify-production.mjs
-│   ├── public/assets/          the 158 model binaries + the 2D art + licences
+│   ├── public/assets/          the 199 model binaries (117 .glb, 41 .gltf, 41 .bin) + the 2D art + licences
 │   ├── dist/                   THE BUILT BUNDLE — licence profile: CLEARED
 │   ├── package.json, package-lock.json, vite.config.js, index.html
 │   └── README.md, DEFECTS.md, LICENCE-REPORT.md, PLAY-GUIDE.md, AGENTS.md
 ├── minimax-game/               THE 3D DESIGN PACKAGE (LANTERNWAKE)
-│   ├── platformer-docs/        8 design documents, the asset inventory, 14 review rounds
-│   └── tools/                  9 verification gates and scripts
+│   ├── platformer-docs/        8 design documents, the asset inventory, 15 review rounds
+│   ├── tools/                  10 scripts: 8 Python gates + 2 asset fetch scripts
+│   └── agents/                 the five 3D development bots (pd-dev-*)
 ├── docs/                       the specification dossier + MAC-PORTABILITY.md
 │   └── release/                the release documents
 ├── tools/                      the acceptance harness and the release tooling
@@ -111,9 +112,9 @@ bundle is needed to play. If you only want one, drop `game/dist/` and run
 |---|---|
 | Syntax — 56 files | **56/56 parse cleanly** |
 | Unit + integration — 395 tests, 8 suites | **395 pass, 0 fail, 0 skipped** |
-| Acceptance harness — production bundle, headless Chromium | **40/40** |
+| Acceptance harness — local bundle, headless Chromium | **40/40** |
 | Acceptance harness — licence-cleared bundle | **40/41**, 1 correctly skipped |
-| Acceptance harness — the live deployment | **40/40** |
+| Acceptance harness — the live deployment | **40/41**, 1 correctly skipped |
 | 3D design gates — `verify_design.py` | **0 FAIL, 31 PASS** |
 | 3D design gates — `audit_depth.py` | **102/102 requirements implementable** |
 | 3D design gates — `verify_devbots.py` | **0 FAIL, 13 PASS** |
@@ -138,13 +139,16 @@ The packaging script prints every copy, runs the secret scan, writes
 
 ---
 
-## 5. The one thing to know before publishing
+## 5. What was wrong with the live site, and what it is now
 
 The **live site** was, until this release, being served the **local** build —
-the one that contains the 82 licence-unverified 2D images and a file saying
-"DO NOT PUBLISH THIS BUNDLE". The deploy workflow has been corrected to build
-and assert the cleared profile, but **the live site is corrected the next time
-that workflow runs**. See `REMAINING-ISSUES.md` §1.
+the one that contains the licence-unverified 2D art (69 distinct images across
+84 HUD records) and a file saying
+"DO NOT PUBLISH THIS BUNDLE". The deploy workflow now builds and asserts the
+cleared profile, and **the corrected build is deployed and live**: the published
+site returns **404** for `DO-NOT-PUBLISH.txt`, `assets/ui-assets.json` and
+`assets/ui/`, and **200** for `index.html`, with the acceptance harness at
+**40/41 (1 skipped)** against the live URL. See `REMAINING-ISSUES.md` §1.
 
 ---
 

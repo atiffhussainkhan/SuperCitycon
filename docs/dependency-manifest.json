@@ -85,7 +85,7 @@
       "status": "UNVERIFIED — not cleared for release",
       "licences": ["unverified"],
       "source": "the user's image library",
-      "counts": "82 HUD images",
+      "counts": "69 distinct images across 84 HUD records",
       "shipped": false,
       "note": "Excluded from the publishable build by npm run build:cleared. The local build includes them and writes dist/DO-NOT-PUBLISH.txt."
     },

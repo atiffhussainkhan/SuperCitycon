@@ -149,10 +149,14 @@ as text instead of icons.
 `node tools/scenario.mjs https://atiffhussainkhan.github.io/SuperCitycon/ <outdir> "LIVE"`
 
 ```
-40/40 checks passed
+40/41 checks passed, 1 skipped
 ```
 
-**PASS — 40 of 40** against the published site.
+**PASS — 40 of 41** against the published site, with **1 correctly skipped**:
+the 2D-art check, because the deployed bundle is the licence-cleared profile and
+deliberately ships no 2D art. The site was re-verified by HTTP after the
+licence fix was deployed — `DO-NOT-PUBLISH.txt`, `assets/ui-assets.json` and
+`assets/ui/` all return **404**, `index.html` returns **200**.
 
 ---
 
@@ -200,7 +204,7 @@ npm test        → 395 pass, 0 fail
 | Unit + integration (395) | **PASS** | 0 fail, 0 skipped |
 | Acceptance, production bundle (40) | **PASS** | headless Chromium, real pixels |
 | Acceptance, cleared bundle | **PASS** | 40/41, 1 correctly skipped |
-| Acceptance, live deployment (40) | **PASS** | against the published URL |
+| Acceptance, live deployment (41) | **PASS** | 40/41, 1 correctly skipped — against the published URL |
 | 3D design gates (4 suites) | **PASS** | 31 + 13 checks, 102/102, 18/18 |
 | Reproducible install | **PASS** | `npm ci` |
 | Performance probe | **PASS** | see `PERFORMANCE.md` |
@@ -218,7 +222,7 @@ Stated plainly, because a green table is only worth the gaps it does not hide:
    code, so nothing needs rebuilding — but no ARM build was run on ARM
    hardware.
 2. **No real-GPU performance figure.** Every frame time here is software GL.
-3. **The 2D HUD art is uncleared.** 82 images in the local build, none in the
+3. **The 2D HUD art is uncleared.** 69 distinct images in the local build, none in the
    publishable build. See `REMAINING-ISSUES.md`.
 4. **One balance defect is visible in the harness output by design.** The
    Monorail Station needs two construction slots and the player owns one, so it
