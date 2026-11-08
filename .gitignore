@@ -15,6 +15,13 @@ node_modules/
 # committing it would put a SECOND copy of every model binary in the history.
 game/dist/
 
+# The release package. It is a build artefact, rebuilt byte-for-byte by
+# `node tools/package-release.mjs`, and it deliberately contains the built
+# bundle — so committing it would put a THIRD copy of every model binary in
+# the history. The package lives on disk at `release/`; the recipe for
+# rebuilding it is in `docs/release/RELEASE-MANIFEST.md`.
+release/
+
 # The raw library archives and their extracted trees. They are source
 # material for the asset curator and live in ~/.minimax/asset-library.
 # The KayKit City Builder pack is the exception: it exists nowhere else, so
@@ -30,3 +37,20 @@ Thumbs.db
 
 # Tool runtime state, not project content.
 .serena/
+
+# The 3D design package's downloaded asset archives (2.4 GB, 23 zips).
+#
+# These are NOT project content. They are a cache of archives that already
+# exist in the public upstream repository, re-fetchable with
+# `minimax-game/tools/fetch-3d-packs.sh` and `fetch-remaining-3d.sh`.
+#
+# They ARE required to re-verify the design's 849 cited asset paths: the
+# gate resolves each cited path against the real archive listings, and with
+# the cache removed 721 of the 849 fail to resolve. The path INVENTORY in
+# `minimax-game/platformer-docs/library-inventory/` (10 MB) is what travels
+# with the repository; the archives stay on the machine that fetched them.
+minimax-game/platformer-docs/library-packs/
+
+# Python bytecode cache from the design gates.
+__pycache__/
+*.pyc

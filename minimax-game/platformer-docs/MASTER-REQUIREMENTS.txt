@@ -1,0 +1,347 @@
+MASTER PLATFORM GAME REQUIREMENTS
+Classic 2D Mario Series (1985–1990) • Research-based reference architecture • Original-IP game implementation
+Version 1.0  |  30 October 2026  |  Machine-actionable design handoff for MiniMax
+STATUS: Comprehensive feature and implementation baseline, NOT a reverse-engineered, pixel-accurate or legally licensed Nintendo reproduction.
+Executive control statement
+This single document consolidates five research boards, the reference-game mechanics inventory, original-game functional requirements, data contracts, non-functional requirements, testing matrices, work packages and verification gaps. Build a NEW side-scrolling platform game with original characters, names, audiovisual assets and original level geometry. References to Nintendo games identify precedent only; never copy sprites, maps, music, dialogue, trademarks or proprietary code.
+Operational rules for MiniMax
+Treat every REQ identifier as an individually trackable backlog item; do not mark implemented without its acceptance test.
+Follow dependencies and implementation gates in section 11. Implement data-driven systems, then content, then balancing, then polish.
+Use deterministic simulation for movement and combat, explicit state machines, fixed-step updates, collision layers and versioned saves.
+Where a value is marked TUNE or UNVERIFIED, implement configurable defaults and put it in the verification log; never claim it is an exact Nintendo constant.
+Keep inspiration profiles per game. Shared mechanics coexist, but incompatible rules must be separate selectable rule sets; do not mash contradictory behaviours together.
+Use placeholder original artwork/audio until licensed originals are supplied. No Nintendo-specific art, music, scripts, maps, NPC appearances, character names or level cloning in shipped content.
+Table of contents
+1. Scope and reference boundaries
+2. Five system-level requirement boards
+3. Source-game coverage and special mechanics
+4. Master functional requirements register
+5. Enemy, boss and interaction taxonomy
+6. Stage/world content specification
+7. Machine-readable technical architecture
+8. Non-functional and accessibility requirements
+9. Verification and test programme
+10. Explicit gaps and unverifiable items
+11. MiniMax build sequence and master prompt
+12. Research sources and traceability
+1. Scope and reference boundaries
+Reference set: Super Mario Bros. (1985); Super Mario Bros. 2 Japan / The Lost Levels (1986); Super Mario Bros. 2 USA (1988); Super Mario Bros. 3 (1988); Super Mario World (1990; often referred to as Super Mario Bros. 4 in Japan). The phrase “Super Mario 4” is interpreted here as Super Mario World—not later New Super Mario Bros. titles, 3D Mario entries, or modern remakes.
+Coverage tiers: CONFIRMED = high-level mechanic explicitly documented in accessible reference/manual; DESIGNED = recommended original implementation requirement informed by the genre; VERIFY = fine-grained detail requires primary manual, video capture, controlled gameplay testing or ROM-level research. Exact frame timings, collision boxes, enemy populations and per-stage map data are NOT guaranteed complete.
+2. Five system-level requirement boards
+BOARD A — CONTROL / PHYSICS / PLAYER
+Input abstraction; states; acceleration and friction; air control; variable jump; sprint; swimming; flight; crouch; climbing; carry/throw; damage; transformations; animation and camera.
+BOARD B — LEVEL / WORLD / PROGRESSION
+Tilemap and entities; stage entrance/exit; timers; checkpoints; overworld nodes/paths; secret exits; warp systems; branching; minigames; completion; difficulty.
+BOARD C — NPC / ENEMY / BOSS / COMBAT
+Enemy archetypes; behavioural transitions; patrol/seek; shells; projectiles; stomp; immunity/resistance; boss phases; spawn/despawn; defeat and rewards.
+BOARD D — OBJECTS / PRESENTATION / UX
+Interactive terrain; power-ups; coins; moving platforms; hazards; ambience; backgrounds; animation; sound; interface; HUD; feedback and tutorials.
+BOARD E — ENGINEERING / DATA / QUALITY
+Engine architecture; fixed tick; collision; serialization; content pipeline; state persistence; diagnostics; test automation; budgets; controls and release.
+3. Source-game coverage and special mechanics
+SMB1 — 1985
+Eight worlds with four-stage rhythms, overworld/underground/water/castle variants; linear progression with hidden warp shortcuts
+Two-size character power state plus projectile and temporary invulnerability; item emergence from blocks
+Momentum-based running, variable vertical jump, sprint, swimming, pipe travel, flagpole goal
+Stomp versus side-contact damage; shell conversion and kicking; brick break; invisible blocks; P-switch NOT part of original
+Enemy types: Goomba, green/red Koopa, Paratroopa, Piranha Plant, Buzzy Beetle, Hammer Bro, Lakitu/Spiny, Cheep-cheep, Blooper, Bullet Bill, Podoboo, Bowser
+Bridge/axe boss finale, underwater physics, bonus rooms, timed courses, score/life economy
+LOST LEVELS — 1986
+Difficulty-focused extension; differentiated character traction/jump profile; precision hazards
+Poison mushroom; strong wind stages; reverse warp pipes and demanding hidden paths
+Red aggressive Piranha Plants, upside-down pipes, tricky springboards, unusual enemy placement
+Hidden/bonus world routes and completion-unlock conditions; exact edition differences VERIFY
+Deliberate unfair-seeming obstacle combinations require playtest and telegraphing in original design
+SMB2 USA — 1988
+Four selectable characters with distinct jump, float, speed, carrying and lift properties
+Lift and uproot vegetables, keys, POW blocks, potion doors; pick up enemies and throw them
+Vertical scrolling/climbing, door transitions, subspace-like temporary alternate areas
+Health meter and recovery hearts; cherry/starman interaction; vegetable-based combat
+Enemy roster includes Shy Guy, Snifit, Ninji, Phanto, Panser, Tweeter, Bob-omb, Albatoss, Ostro, Autobomb, Porcupo, Flurry, Hoopster and others
+Boss and mini-boss patterns: Birdo-like projectile-spitting boss, Mouser-like bomb boss, Triclyde-like fire boss, Fryguy-like split boss, Clawgrip-like thrown-rock boss, Wart-like final boss
+20 areas across seven worlds; crystal ball/key-gate end condition; world-based continues
+SMB3 — 1988
+Eight themed kingdoms and selectable overworld routes, locked doors, bridges and moving encounters
+Raccoon/tail glide and flight charge; Frog underwater, Tanooki statue, Hammer suit, Fire suit
+World inventory; mushroom/flower/leaf/suits, P-Wing, cloud stage skip, hammer map obstacle removal, music box, warp whistle, anchor
+P-Switch temporary state, note blocks, donut lifts, huge enemies, quicksand, moving airships, autoscroll, ice and pipe maze
+Fortress and Boom Boom mini-boss, airship Koopaling bosses, boss rewards and world transition
+Coin ships, bonus houses, matching minigames, goal cards and end-of-stage rewards
+SMW — 1990
+Branching map with normal/secret goal links, secret keys/keyholes and alternative map progression
+Rideable companion system: mount/dismount, eating, carrying, spit/spawned effects, egg generation and rescue
+Cape glide/flight, spin jump, reserve item box, growing vine, fences and moving nets
+Switch Palaces convert outlined blocks into solid blocks; colored switch flags persist globally
+Ghost houses with puzzle doors and Boo patterns; Star Road and Special Zone-style hidden routes
+Timed P-switches, directional coins and moving platforms; midpoint gates; visual signs for completed exits
+96 exits is commonly documented for the original; content coverage in this document is SYSTEM-level, not 96 reproduced stages
+4. Master functional requirements register
+Format: ID | Priority | Requirement / expected behaviour | Acceptance evidence. P0 = foundational; P1 = full reference-system coverage; P2 = polish/optional. The requirements are for an original game; equivalent behaviours are allowed without copying expressive content.
+A — INPUT AND PLAYER CONTROLLER
+REQ-A-001 [P0] Remappable keyboard/gamepad/touch action mapping including move, jump, run/action, crouch, interact, pause.  AC: Mapped actions trigger exactly once under press/release and work across menus and play.
+REQ-A-002 [P0] Deterministic fixed-timestep player motion with acceleration, deceleration, top speed, braking, traction and ground/air parameters.  AC: Repeated input replay gives identical transform and state at tick 1000.
+REQ-A-003 [P0] Variable-height jump via jump-hold window and short-hop cut-off.  AC: Short press apex is measurably below full-hold apex.
+REQ-A-004 [P0] Jump buffer and coyote time are independently tuneable modern accessibility options, default adjustable.  AC: Jump within configured windows is accepted; beyond windows rejected.
+REQ-A-005 [P0] Movement states idle, walk, run, sprint, skid, jump, fall, crouch, climb, swim, carry, hurt, dead, victory, transition.  AC: Every state has defined allowed input, collision and exit transitions.
+REQ-A-006 [P0] Head/foot/side collisions use swept or robust tile collision and separated collision masks.  AC: No tunnelling through solid tiles at maximum supported speed.
+REQ-A-007 [P0] Facing, run momentum, jump-from-enemy bounce and stomp attribution resolve from previous/current collision bounds.  AC: Stomp defeats stompable actor; lateral collision causes damage unless protected.
+REQ-A-008 [P1] Directional pipe, door, ladder/vine and screen transition interactions require positional and input predicates.  AC: Invalid direction/proximity cannot activate traversal.
+REQ-A-009 [P1] Water zone changes gravity/drag and supports repeated swim stroke with surface interaction.  AC: Swim and land locomotion have different tuneable movement curves.
+REQ-A-010 [P1] Wind volume applies directional acceleration including airborne movement and projectile responses.  AC: Wind toggling changes trajectory predictably; no physics jitter.
+REQ-A-011 [P1] Ice, mud, conveyor, quicksand and slippery surfaces use material profiles.  AC: Same input creates distinguishable travel distance for each material.
+REQ-A-012 [P1] Vertical wrap / one-way platforms / pass-through jump-through collision configurable per platform.  AC: Player rises through one-way platform and lands from above.
+REQ-A-013 [P1] Lift/carry/throw with object weight, wind-up, direction, release velocity, bounce and ownership.  AC: Carried object follows hand socket and collides only when released.
+REQ-A-014 [P1] Climb ladders/vines/nets; reverse direction and exit at endpoints.  AC: Player cannot accidentally detach through solid wall.
+REQ-A-015 [P1] Character selection supports independently data-driven acceleration, jump height, hover, grab speed and carry strength.  AC: Four original avatar profiles produce distinguishable timings.
+REQ-A-016 [P1] Spin jump, ground pound and downward shell interaction are per-profile optional abilities.  AC: Special jump damages compatible targets but not immune targets.
+REQ-A-017 [P1] Flight and gliding use charge meter, takeoff velocity, lift, gravity, dive, recovery, air time and collision exits.  AC: Glide transitions and charge reset follow documented state diagram.
+REQ-A-018 [P1] Rideable companion mount/dismount, independent damage, tongue/eat, carrying, spit, and reclaim.  AC: Dismount transfers movement without duplicating companions.
+REQ-A-019 [P1] Damage pipeline handles hurt invulnerability, knockback, power downgrade, health decrement, death and checkpoint.  AC: Single hit cannot remove multiple health states during invulnerability.
+REQ-A-020 [P1] Projectile states include spawn, move, bounce, hit, exhaust, lifetime and pooling.  AC: Projectiles respect collision groups and configured maximum count.
+REQ-A-021 [P2] Input recorder and frame-step debug viewer for reproducible movement faults.  AC: Test case replay matches expected result.
+B — WORLDS, STAGES AND PROGRESSION
+REQ-B-001 [P0] Level schema includes id, theme, biome, tile layers, spawn, camera zones, checkpoints, goals, entities, background, music, timer.  AC: Every authored level passes schema validation.
+REQ-B-002 [P0] Scene states title, profile selection, overworld, stage, pause, victory, game-over, credits with explicit transitions.  AC: No transition loses or duplicates player inventory.
+REQ-B-003 [P0] Camera horizontal and vertical follow with bounds, dead zone, look-ahead and scripted tracks.  AC: Camera never reveals outside authored world bounds.
+REQ-B-004 [P0] Primary goal and alternative goal trigger stage-complete flow; each exit has distinct destination metadata.  AC: Normal and secret exits unlock their respective map edges.
+REQ-B-005 [P0] Checkpoint captures restart location and eligible transient character/inventory state.  AC: Death returns to expected checkpoint, not prior level.
+REQ-B-006 [P0] Global state tracks cleared goals, exits, unlocked nodes, secret routes, world flags and endgame status.  AC: Save/reload preserves exactly the same accessible route graph.
+REQ-B-007 [P1] Stage variants include overworld, underground, underwater, castle, fortress, ghost house, sky, desert, ice, giant, forest, lava, airship.  AC: Each biome loads distinct hazards/material set and audio/visual profile.
+REQ-B-008 [P1] Timed level and timeout consequence are configurable at rule-set level.  AC: Timer pauses in menus/cutscenes where configured and never ticks twice.
+REQ-B-009 [P1] World map graph nodes and edges support hidden paths, locked doors, traversable bridges, icons and moving enemy encounters.  AC: World-state delta modifies node accessibility deterministically.
+REQ-B-010 [P1] Warp zones, multi-way pipe intersections, backward warps and secret subareas support return-portal placement.  AC: Warp travel targets correct spawn without stale camera bounds.
+REQ-B-011 [P1] Puzzle progression supports key/lock, carryable key, special block reveal, door-routing and secret-room conditions.  AC: Puzzle has reproducible completion and reset behaviour.
+REQ-B-012 [P1] Autoscrolling stages move camera and spawn entities based on camera-space triggers.  AC: Offscreen and moving-screen death rules tested.
+REQ-B-013 [P1] Vertical climbs and multi-screen ascent update active camera and spawn budgets.  AC: Camera changes axis without trapping the player.
+REQ-B-014 [P1] Companion-accessible exits, special goal items and stage exits with condition predicates.  AC: Exit rejects player unless prerequisites met.
+REQ-B-015 [P1] Global color-switch flags persist and change collision/render state of special outlined blocks.  AC: Switch stays activated across death/save/restart.
+REQ-B-016 [P1] Midpoints, stage-complete replay, lost lives and continue limits configurable by profile.  AC: Continue screen resumes in correct world/level mode.
+REQ-B-017 [P1] Level timer, score, coins, lives, collected items and goal bonus use rule-set strategy.  AC: Score increments match authored score table, no duplicate awards.
+REQ-B-018 [P1] Mini-games and reward chambers selectable by map node or hidden bonus trigger.  AC: Bonus rewards appear once per eligibility rule.
+REQ-B-019 [P1] End-of-world castle/boss/bridge/cutscene sequence updates region state.  AC: Boss defeat unlocks correct target world.
+REQ-B-020 [P2] Secret-completion tracker separates level count, exit count and collectibles.  AC: Percentage never miscounts levels with two exits.
+REQ-B-021 [P2] Adaptive difficulty optional and never silently changes reference mode parameters.  AC: Difficulty setting is explicit and saved.
+C — ENTITIES, ENEMIES AND BOSSES
+REQ-C-001 [P0] Actor base entity declares collision shape, health, damage, tags, immunities, faction, movement controller and animation graph.  AC: Data-only enemy can spawn and update without code subclass.
+REQ-C-002 [P0] Enemy finite-state machine supports idle, patrol, chase, jump, attack, retreat, stunned, shell, thrown, defeated and despawn.  AC: Every state has transition guards and bounded timers.
+REQ-C-003 [P0] Stomp, melee/special, projectile, thrown item, moving shell, invincibility and environmental damage produce typed damage events.  AC: Resistance matrix selects correct outcome on each damage source.
+REQ-C-004 [P0] Spawn triggers, camera-based sleeping, respawn policy and actor pooling prevent unbounded entities.  AC: Backtracking respawns only designated entities.
+REQ-C-005 [P1] Basic walker archetypes support edge turn, obstacle turn, speed variants and stomp immunity flags.  AC: Walkers behave correctly on slopes, ledges and pipes.
+REQ-C-006 [P1] Shell creature archetype retracts on stomp, is kickable/grabbable, chain-hits targets and can re-emerge.  AC: Shell can damage enemy and player based on direction and immunity.
+REQ-C-007 [P1] Winged hopper/flyer supports cyclical arcs and loss-of-wings state.  AC: First compatible hit converts to ground variant.
+REQ-C-008 [P1] Pipe plant uses proximity-gated emergence and aggressive always-cycle variant.  AC: Normal and aggressive emergence differ with adjacent player.
+REQ-C-009 [P1] Spawner/flying-dropper deploys subordinate hazard entities with caps.  AC: Spawn count respects budget and drops are cleanly despawned.
+REQ-C-010 [P1] Projectile turret, cannon, hammer/boomerang thrower and fire shooter support telegraph, arc and cooldown.  AC: Projectile follows configured trajectory and can be dodged.
+REQ-C-011 [P1] Aquatic fish, squid, current-following swimmer and electrical obstacle have water-specific collision.  AC: Underwater enemy behaviour differs from land enemy.
+REQ-C-012 [P1] Ghost AI reacts to facing, visibility, line of sight or proximity as defined by archetype.  AC: Ghost toggles movement on facing transition.
+REQ-C-013 [P1] Ceiling/drop hazard, rotating fire bar, falling weight, rolling boulder, chain tether and roaming flame are parameterised.  AC: All hazards activate predictably and have attack hitbox.
+REQ-C-014 [P1] Carryable enemy and throw-weapon interactions cover pickup immunity, stun time and projectile ownership.  AC: Thrown stunned enemy can hit boss then recover or despawn.
+REQ-C-015 [P1] Boss framework includes arena enter, intro, attack pattern, phase, vulnerability window, damage, stagger, defeat and reward.  AC: Boss may be defeated only during enabled damage windows.
+REQ-C-016 [P1] Boss patterns include projectile-spitter, bomb thrower, split-on-hit, multi-head flame, rock-lobber, hopping fortress guard and mobile-airship boss.  AC: Each test boss changes phase and exits arena safely.
+REQ-C-017 [P1] Bridge-collapse or switch-triggered boss elimination is supported as alternative to direct damage.  AC: Goal mechanism removes boss and advances stage.
+REQ-C-018 [P1] Boss projectile reflection or catch/return cycles are independently configurable.  AC: Reflected object credits correct attacker and damages boss.
+REQ-C-019 [P1] Boss encounter restart, stage checkpoint and post-clear persistence handle death/retry.  AC: Boss returns to correct phase after retry, no duplicate reward.
+REQ-C-020 [P2] Enemy analytics capture hit reason, archetype, location, time and repeated player deaths.  AC: QA report aggregates death locations per build.
+D — OBJECTS, ITEMS, FX, UI AND AUDIO
+REQ-D-001 [P0] Tile materials include solid, breakable, bumpable, invisible, one-way, slope, hurt, liquid and decorative.  AC: Collision flags are enforced and independent of art layer.
+REQ-D-002 [P0] Blocks store state idle/hit/empty, item or coin payload, damage permissions and bounce animation.  AC: Each hit produces exactly one configured reward event.
+REQ-D-003 [P0] Collectable and score system includes currency, extra life, temporary boost, restorative health and score token.  AC: Collection increments correct counters exactly once.
+REQ-D-004 [P0] HUD includes character status, time, coins/points, lives/health, power state and current stage.  AC: HUD displays valid state at spawn, pickup and reload.
+REQ-D-005 [P1] Power-up FSM supports small/large, projectile form, invulnerability, flight/glide, aquatic, transform/statue and hammer throw.  AC: Priority and downgrade rules are explicit and regression tested.
+REQ-D-006 [P1] Growth/power-up appearance from blocks includes emerge, delayed pickup, bounce, fall and moving-item physics.  AC: Item never spawns inside unescapable solid geometry.
+REQ-D-007 [P1] Poison or negative pickup triggers harm with clear identification; fairness setting supports warning cue.  AC: Negative pickup invokes damage rules, not positive inventory.
+REQ-D-008 [P1] Temporary world-state switches trigger coin/block swaps, timed platforms, hidden routes, event countdown.  AC: Expiry restores tiles and handles player overlap safely.
+REQ-D-009 [P1] Moving platforms include loop, oscillate, fall, seesaw, rideable flyer, rotating, weight-sensitive and autoscroll.  AC: Player inherits correct platform delta without slipping.
+REQ-D-010 [P1] Springboard, bounce pad, trampoline and note block offer configurable launch impulse.  AC: Standing/jumping interaction produces expected bounce.
+REQ-D-011 [P1] Keys, locks, doors, potion-like alternate-world portals, secret exit keys and goal objects have data predicates.  AC: Every consumed key remains consumed after save/reload as intended.
+REQ-D-012 [P1] Lava, spikes, crushing ceilings, pits, currents, waterfalls, wind and fireballs use unified hazard events.  AC: All hazards respect immunity and damage cooldown.
+REQ-D-013 [P1] Inventory supports world-use item slots, stored reserve item, stage-use items and profile-specific carry restrictions.  AC: Player cannot consume item twice after scene transition.
+REQ-D-014 [P1] Goal reward system supports flag/pole score, goal-card sequence, orb/bridge unlock and moving goal tape.  AC: End screen reward differs by configured rule set.
+REQ-D-015 [P1] Audio mixer handles looping world music, action SFX, boss music, invincibility priority, pause ducking and UI feedback.  AC: Music switches cleanly without overlapping loops.
+REQ-D-016 [P1] Animation/state effects include skid dust, landing puff, hit flash, item emergence, environmental particles and boss telegraphs.  AC: Effects follow state transitions and do not affect physics.
+REQ-D-017 [P1] Parallax backgrounds, palette variants, screen transitions and light effects load per biome.  AC: Camera displacement produces correct layer parallax.
+REQ-D-018 [P1] Pause/options/rebind/save-slot and confirmation UI work with gamepad and keyboard.  AC: All major menu actions accessible without mouse.
+REQ-D-019 [P2] Tutorial prompts and signage introduce one mechanic at a time; skipped tutorials do not block progress.  AC: Playtester can identify basic controls without external guide.
+REQ-D-020 [P2] Accessibility options include rebind, reduced flashing, scalable UI, audio sliders, assist mode, captions for cues.  AC: Settings persist across sessions and change output immediately.
+E — ENGINEERING, CONTENT AND QUALITY
+REQ-E-001 [P0] Choose target engine and build target explicitly before implementation; default proposal Godot 4.x 2D with GDScript, desktop-first.  AC: Project opens with pinned engine version and deterministic launch scene.
+REQ-E-002 [P0] Fixed update logic separated from render frame; input sampled/queued to simulation tick.  AC: Same gameplay speed at 30/60/120 rendered FPS.
+REQ-E-003 [P0] Event bus implements typed events for damage, pickups, stage clear, checkpoint, unlock and persistence.  AC: Events cannot fire twice for same source interaction.
+REQ-E-004 [P0] Tiled scene composition separates collision, art, triggers, interactive tiles, actors, FX and camera zones.  AC: One level file instantiates without code modification.
+REQ-E-005 [P0] Resource schemas and registries are versioned with unique IDs and validation tooling.  AC: Invalid entity reference fails content validation with clear error.
+REQ-E-006 [P0] Save slots use versioned JSON/binary with atomic write, migration, backups and corruption fallback.  AC: Interrupted save never replaces last valid save.
+REQ-E-007 [P0] Rule-set config isolates SMB1, Lost Levels, SMB2 USA, SMB3 and SMW-inspired gameplay features.  AC: Switching rule-set does not mutate saved data unexpectedly.
+REQ-E-008 [P0] Unit/integration/automated gameplay test runners operate headless in CI.  AC: CI fails build when physics and schema regressions detected.
+REQ-E-009 [P1] World graph editor validates reachability, alternative exits, secret prerequisites and dead ends.  AC: Reachable ending proven for every main progression path.
+REQ-E-010 [P1] Level linter checks camera limits, invalid spawns, unreachable mandatory targets, embedded collision and missing assets.  AC: Broken sample level emits actionable lint errors.
+REQ-E-011 [P1] Actor pooling and activation regions enforce scene entity budget.  AC: Stress scene stays below set frame-time budget on target hardware.
+REQ-E-012 [P1] Animation/audio references are data driven and carry asset licensing metadata.  AC: Missing license tags block release packaging.
+REQ-E-013 [P1] Localization pipeline externalizes UI text, includes font fallbacks and RTL readiness if needed.  AC: Build can switch locale without modifying scripts.
+REQ-E-014 [P1] Telemetry opt-in with no unnecessary personal data; local debug overlay for coordinates, state and FPS.  AC: Telemetry disabled by default, respects settings.
+REQ-E-015 [P1] Input abstraction maps multiple controllers with dead zones and simultaneous press conflict policy.  AC: Hotplug controller reconnect survives pause/resume.
+REQ-E-016 [P1] Scene reload and death handling cleanly reset transient timers/projectiles and retain persistent world switches.  AC: No duplicated enemies or phantom projectiles after retry.
+REQ-E-017 [P1] Automated screenshot comparisons and audio smoke tests for major modes.  AC: Visual changes produce reviewable diffs.
+REQ-E-018 [P1] Release packaging includes attribution, license manifest, privacy notice, build metadata and crash logs.  AC: Release audit reports zero unlicensed assets.
+REQ-E-019 [P2] Speedrun/replay mode records tick-level input and checksum for deterministic replays.  AC: Replay checksum matches at designated checkpoints.
+REQ-E-020 [P2] Editor debug tools support teleport, invincible, speed adjust, item grant, gate unlock and enemy visualizer.  AC: All debug powers disabled in production build.
+Register total: 102 independently numbered high-level requirements. Each may decompose into multiple engineering tickets; the catalogue is a feature specification, not exact source code reconstruction.
+5. Enemy, boss and interaction taxonomy
+Names below are reference-only research tags. In the shipped game, create original designs using the listed generic behavioural archetypes. Behavioural details that vary by edition belong in per-archetype parameter sets.
+Game family | Examples (research labels only) | Implementation archetype
+SMB1 | Goomba; Koopa Troopa; Paratroopa; Buzzy Beetle | ground walker; shell retract/kick; winged jump; armoured shell
+SMB1 | Piranha Plant; Hammer Bro; Lakitu; Spiny | pipe emergence; arced volleys; airborne spawner; spiked floor threat
+SMB1 | Bullet Bill; Cheep-cheep; Blooper; Lava Bubble; Bowser | horizontal projectile; fish; squid homing; vertical lava jumper; arena/bridge boss
+Lost Levels | poison mushroom; red plant; reversed wind; upside-down plant | negative pickup; aggressive proximity variant; directional force; ceiling emitter
+SMB2 USA | Shy Guy; Snifit; Tweeter; Ninji; Hoopster; Phanto | walker; bullet shooter; hopper; leaper; climbing pursuer; key guardian
+SMB2 USA | Panser; Bob-omb; Albatoss; Ostro; Autobomb; Porcupo; Flurry | fire shooter; explosive; aerial carrier; runner; machine rider; spiked hazard; slippery walker
+SMB2 USA | Birdo; Mouser; Triclyde; Fryguy; Clawgrip; Wart | returnable projectile; bombs; multi-headed flame; splitting flame; rock volley; item-fed final boss
+SMB3 | Boom Boom; Koopalings; Rocky Wrench; Chain Chomp | fortress boss; airship boss; emerging wrench thrower; tethered charger
+SMB3 | Boo; Dry Bones; Thwomp; Roto-Disc; Stretch; Hot Foot | facing-based ghost; reassembling skeleton; vertical crusher; orbit hazard; surface ghost; pursuing flame
+SMB3 | Sledge Bro; Boomerang Bro; Fire Bro; Spike; Fire Snake | ground shock; returning projectile; flame volley; spiked ball; segmented pursuit
+SMB3 | Jelectro; Lava Lotus; Micro-Goomba; Para-Beetle | stationary electric hazard; radial projectile; movement impediment; rideable flyer
+SMW | Yoshi; Monty Mole; Rex; Wiggler; Chargin’ Chuck | mount; ambush; multi-stomp; reactive crawler; charging athlete
+SMW | Magikoopa; Banzai Bill; Eerie; Rip Van Fish; Reznor | tile-altering mage; giant projectile; ghost flyer; sleeping pursuer; wheel-platform boss
+SMW | Dino Rhino; Dino Torch; Sumo Bro; Fishin’ Boo; Mechakoopa | fire breathing; small flame; lightning/shock; lure ghost; throwable mechanical enemy
+6. Stage/world content specification
+Original level content checklist: unique theme ID, intended mechanic lesson, length, traversal orientation, safe spawn area, enemies and spawn triggers, hazards, secret path, bonus room, collectible distribution, difficulty, boss specification, checkpoint position, primary exit, optional alternative exit, victory scene, music/ambient cue, background/parallax, hazard resilience, performance test and world-map destination.
+Recommended ORIGINAL campaign breadth (design target, not Nintendo level replication): 8 regions × 5–8 stages + 10–20 optional stages + 8 regional boss encounters + 1 finale. Add secret-path coverage and themed side challenges. This is a proposed production scope, not a factual count from any source game.
+Region 1 — Meadow
+Teach movement, jumps, hidden objects and basic enemies.
+Region 2 — Sand/Temple
+Introduce wind, sinking, moving platforms and switches.
+Region 3 — Water/Coast
+Teach swim controls, current, vertical movement and aquatic hazards.
+Region 4 — Giant/Forest
+Introduce scale variants, carry/throw puzzles and alternate routes.
+Region 5 — Sky
+Charge-based glide, floating platforms and wind.
+Region 6 — Snow/Ghost
+Friction, visibility puzzles, chasing ghost patterns and mazes.
+Region 7 — Forge/Fortress
+Complex traps, boss sequences and item management.
+Region 8 — Storm/Final
+Combine tested mechanics, airship-like autoscroll and multi-phase ending.
+Mandatory original-stage matrix fields: stage_id, world_id, entry_spawn, ruleset_id, dimensions, tile_palette, collision_layers, entities[], triggers[], normal_exit, secret_exits[], prerequisites[], checkpoint_rules, timer_policy, difficulty_tag, music_id, goal_reward, save_flags, QA_tags.
+7. Machine-readable technical architecture
+7.1 Folder and module contract
+project.godot / project settings / autoload singletons
+scenes/core: bootstrap, title, pause, game over, world map, stage, credits
+scenes/actors: player, enemy-base, boss-base, companion, projectile, carried-object
+scenes/objects: interactive block, door, warp, switch, moving-platform, collectible
+scripts/systems: input, physics-profile, damage, states, event-bus, inventory, save, level-loader, world-graph, sound
+data/rulesets: classic_ground, challenge, carry_throw, world_map_suits, branching_companion
+data/characters, enemies, bosses, items, levels, worlds, localization, audio
+tests/unit, integration, physics-replays, end-to-end, fixtures; tools/level-linter, world-map-validator
+assets/original only: sprites, tiles, sound, music, backgrounds, fonts, with license_manifest.json
+7.2 Example JSON resource contracts (illustrative schema)
+ruleset.json
+{"id":"branching_companion","fixed_hz":60,"movement_profile":"glide_v1","features":{"carry_throw":true,"mount":true,"secret_exits":true,"world_inventory":false},"damage_profile":"power_downgrade","lives_enabled":true}
+level.json
+{"id":"region01_stage03","world":"region01","bounds":[0,0,240,28],"spawn":[3,20],"ruleset":"branching_companion","tilemap":"region01_stage03.tres","checkpoint_ids":["cp01"],"exits":[{"id":"normal","to":"region01_stage04"},{"id":"hidden","to":"region01_bonus02","requires":["key_a"]}],"actors":[{"archetype":"ground_walker","x":25,"y":19}],"time_limit_seconds":300}
+enemy.json
+{"id":"ground_walker","ai":"patrol_edge_turn","health":1,"tags":["stompable","shell_immune_false"],"contact_damage":1,"speed":60,"despawn":"camera_margin","drops":[]}
+save.json
+{"schema_version":1,"slot_id":"slot_01","world_graph_flags":[],"completed_exits":[],"switch_flags":[],"inventory":[],"player_stats":{"lives":5,"coins":0},"last_checkpoint":"region01_stage01:start"}
+7.3 Authoritative runtime pipelines
+Input → action map → buffered input → fixed player-state update → kinematic move → contact resolver → damage events → state transitions → animation
+Stage load → schema validation → tilemap instantiation → player spawn → level events → actor activation → camera track → stage goal → world graph update → atomic save
+World-map node selection → requirement validation → stage launch → exit type → unlock transition → save → return to map
+Boss trigger → arena lock → intro → attack state loop → vulnerability/damage → phase change → reward → unlock → stage completion
+7.4 Performance, production and legal requirements
+Target proposal: desktop Windows/macOS/Linux; 16:9 layout with integer or sensible pixel scaling; support 60 FPS on a defined baseline device; gameplay fixed at 60 simulation ticks/s; save operations must not stall the simulation; allow animation/render frame decoupling; original screen-coordinate system rather than mechanically importing Nintendo 256×240 conventions. These are design targets requiring hardware validation.
+Rights: do not import or ship Nintendo ROMs, ripped sprites/samples, copied stage tile layouts, official logos or music. A game can be inspired by generic 2D platformer mechanics, but an “exact Super Mario” game using protected expressive materials may create intellectual-property risk. Obtain specific counsel if planning distribution with references or close audiovisual resemblance.
+8. Non-functional and accessibility requirements
+NFR-01 Performance: define hardware baseline; ≥60 rendered FPS typical gameplay at 1080p, ≥95th percentile frame time under 16.7 ms on target, stress-case exceptions logged.
+NFR-02 Determinism: fixed tick with replay checksum in CI; physics is not tied to render rate.
+NFR-03 Stability: zero uncaught exceptions in 30-minute scripted soak; no entity leaks across 100 retries.
+NFR-04 Usability: first stage teaches movement, interaction, damage and exit via in-world cues, not only text.
+NFR-05 Accessibility: remapping, assist controls, adjustable display scale, reduced flashing and distinct non-colour-only feedback.
+NFR-06 Local saves: schema migrations, checksum/backups and reliable resume, no mandatory online account.
+NFR-07 Data provenance: every imported asset has creator, URL, licence, attribution and modification metadata.
+NFR-08 Localization: no hard-coded presentation strings; tests for longer translations.
+NFR-09 Diagnostics: build ID, structured logs and user-enabled debug overlays.
+NFR-10 Security/privacy: no hidden telemetry; consent and data minimization where analytics are offered.
+9. Verification and test programme
+Physics golden tests
+TEST — standing walk → sprint → skid stop distance
+TEST — short-hop vs full-height jump; double input handling
+TEST — run-off-edge and coyote option; ceiling bump
+TEST — water stroke and surface transition; wind influence
+TEST — flight charge, cape-like glide, landing reset
+TEST — moving-platform carry and side-wall resolution
+Interaction golden tests
+TEST — block hits from below produce one item
+TEST — shell kick collision and chain scoring
+TEST — carry enemy → throw → rebound → boss damage
+TEST — temporary switch expiration with player inside tile area
+TEST — mount companion → damage → separate; regain
+TEST — pipe/door warp with unblocked destination
+Progression golden tests
+TEST — normal exit and hidden exit create distinct map paths
+TEST — checkpoint/death does not duplicate pickups
+TEST — switch-palace-like global flag survives save/reload
+TEST — inventory item use on map and stage transition
+TEST — game over/continue restart and timer reset
+TEST — 100% exit completion counts each alternative only once
+Release gates
+TEST — All P0 requirements complete and reviewed
+TEST — All P1 required for chosen release feature set complete
+TEST — At least one original end-to-end stage for each shipped mechanic
+TEST — No borrowed protected art/audio/level geometry in release bundle
+TEST — Every save migration test passes
+TEST — Player test identifies top 10 frustration/soft-lock cases and confirms fixes
+10. Explicit gaps and unverifiable items
+Important: “every single requirement” cannot be guaranteed by web research alone. No authorised source-code, disassembly, per-frame capture or original complete level database was supplied. These gaps are explicitly NOT represented as verified or fully fetched:
+Gap ID | Missing / intentionally not claimed
+GAP-001 | Exact per-version acceleration, friction, gravity, run speed, jump impulses and subpixel rounding.
+GAP-002 | Pixel-precise hitboxes/hurtboxes and animation frame timing for every actor and state.
+GAP-003 | Complete per-tile geometry and enemy/secret/item placement of every original stage.
+GAP-004 | Exact enemy finite-state logic, timers, pseudorandom generators and offscreen lifecycle for each game revision.
+GAP-005 | Original ROM-level memory layout, object format, streaming and hardware-specific rendering limitations.
+GAP-006 | All regional differences: Famicom Disk System, NES, SNES, All-Stars, GBA, Virtual Console/Switch variants.
+GAP-007 | Complete original music, sound, animation and all original audiovisual assets; intentionally excluded from build.
+GAP-008 | Complete exhaustive named enemy/object/boss rosters and all variants per version; taxonomy above is representative rather than exhaustive.
+GAP-009 | Exact AI/boss cycle timing and damage exceptions in all encounters.
+GAP-010 | Precise scoring tables, combo ladders, timer conversion and lives/continues variations for every edition.
+GAP-011 | Full 96-exit world map geometry for SMW, every stage route, all ghost-house door sequences and maze solutions.
+GAP-012 | Source-specific glitch/quirk compatibility (e.g. wall clips, frame rules, arbitrary input anomalies).
+GAP-013 | Exact sprite memory limits and draw-order bugs of original hardware.
+GAP-014 | Player target platform, monetization, language set, multiplayer scope and final art direction not specified by requester.
+GAP-015 | Platform-specific rights review and trademark/licensing arrangements; no Nintendo licences available.
+Closure procedure: identify exact original edition → record 60 FPS/240 FPS gameplay captures or legitimate manual reference → catalogue behaviour by reproducible scenario → log measured parameters with source/date/timecode → implement independent original analogue → acceptance-test. Do not treat fan-site descriptions as disassembly-level proof.
+11. MiniMax build sequence and master prompt
+11.1 Implementation phases
+Gate | Deliverable
+GATE 0 | Repository, engine pin, CI, scene/bootstrap, schemas, issue backlog and design reference docs.
+GATE 1 | One polished original level: player motion/collisions/camera/goal/checkpoint/basic enemy/block/coin.
+GATE 2 | Rule-set architecture and independent modules: water, carry/throw, shell, combat/damage, menu/save.
+GATE 3 | World map/secret routes, level editor/linter, switches/warps, progression and inventory.
+GATE 4 | Flight, transformations, mount/companion, enemy archetypes, bosses and minigames.
+GATE 5 | Original content pipeline: 8-region goal; add music/art; balance and UX.
+GATE 6 | Performance, deterministic replay, accessibility, full QA and shipping audit.
+11.2 Paste this first into MiniMax
+You are the principal architect and lead programmer for an ORIGINAL 2D side-scrolling platform game. Use the attached MASTER PLATFORM GAME REQUIREMENTS v1.0 as the single source of truth. Do not clone Nintendo's names, characters, sprites, map layouts, music, dialogue, logo or source code. Implement the listed mechanics as original, parameterised systems.
+
+Before writing gameplay code: (1) inspect the environment, target OS and available engine; (2) propose a Godot 4.x architecture unless the workspace requires otherwise; (3) parse REQ-A/B/C/D/E requirements into a machine-readable backlog with status, priority, module, dependencies, acceptance test and evidence; (4) maintain /docs/requirements_traceability.csv and /docs/verification_gaps.md; (5) create a playable vertical slice at Gate 1; (6) run tests and report failures; (7) do not silently skip difficult requirements; flag BLOCKED with a concrete reason.
+
+Use deterministic fixed-tick simulation, versioned JSON data, a finite-state player controller, pooled entities, an event-driven damage pipeline, typed inventory, world map as graph, branching exits, and persistent save flags. Separate five inspiration rulesets instead of conflating their incompatible mechanics. Make every gameplay constant configurable rather than claiming source-accurate numbers. Use placeholder original artwork until original licensed assets are provided.
+
+Deliver in this order: PROJECT_PLAN.md; BACKLOG.csv; SYSTEM_ARCHITECTURE.md; proposed folder tree; running project; unit/integration test output; playable original tutorial level; CHANGELOG.md; outstanding gaps. Do not declare a gate complete until all relevant acceptance tests pass. After Gate 1, request confirmation of the feature set and visual direction before expanding content; continue independent technical tasks where possible.
+11.3 Definition of done for every requirement
+Implemented with production code and original placeholders
+Automated test or reproducible manual test recorded
+Documented interactions and edge cases
+No regression to prior gates
+No known soft lock or critical crash
+Traceability status updated with source, build and test evidence
+12. Research sources and traceability
+Sources reviewed on 30 October 2026. These are public explanatory/manual sources supporting major mechanic categories, not proof of every low-level implementation detail:
+Nintendo Mario Portal — Super Mario Bros. history — https://www.nintendo.com/jp/character/mario/en/history/smb/index.html
+Nintendo official Super Mario Bros. 2 USA manual — https://www.nintendo.co.jp/clv/manuals/en/pdf/CLV-P-NAADE_en.pdf
+Nintendo official Super Mario Bros. 3 manual — https://www.nintendo.co.jp/clv/manuals/en/pdf/CLV-P-NAACE.pdf
+Nintendo Super Mario All-Stars manual — https://csassets.nintendo.com/noaext/image/private/t_KA_PDF/manual-wii_supermarioallstars?_a=BATCtdAA0
+Super Mario Bros. 3 text transcription of manual — https://www.world-of-nintendo.com/manuals/nes/super_mario_bros_3.shtml
+Super Mario World exit/reference guide — https://themushroomkingdom.net/smw_guide.shtml
+Super Mario World secret exits overview (community) — https://www.mariowiki.com/Secret_exit
+Lost Levels mechanics overview (community) — https://www.mariowiki.com/Super_Mario_Bros.%3A_The_Lost_Levels
+Final use instruction: this document is an extensive system-level development specification. It is NOT a claim to list each Nintendo source-game entity, exact frame value, every stage coordinate or every edition-specific exception. Use GAP register as an explicit follow-on research programme.

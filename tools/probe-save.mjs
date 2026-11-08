@@ -8,7 +8,8 @@
  * long session B takes to reach `ready`, with session A OPEN and with session A
  * CLOSED, and reports session B's page errors either way.
  */
-import { chromium } from '/Users/mac/.local/pw/node_modules/playwright/index.mjs';
+import { resolveChromium } from './playwright-resolve.mjs';
+const { chromium } = await resolveChromium();
 
 const url = process.argv[2] || 'http://127.0.0.1:4321/';
 const captureUrl = url.includes('?') ? `${url}&capture=1` : `${url}?capture=1`;

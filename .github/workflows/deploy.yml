@@ -41,17 +41,29 @@ jobs:
 
       - name: Build
         working-directory: game
-        # `npm run build` is the LOCAL build: it carries the curated 2D art
-        # and writes its own licence status (dist/LICENCE-STATUS.md and
-        # dist/DO-NOT-PUBLISH.txt). The build FAILS if the bundle it produces
-        # references a file that is not on disk, so a broken site cannot ship.
-        run: npm run build
+        # `npm run build:cleared` is the PUBLISHABLE build: it strips the 2D art,
+        # every one of whose records carries `licence_status: "unverified"` and
+        # none of which has been cleared for public release (see
+        # game/LICENCE-REPORT.md). The plain `npm run build` is the LOCAL build:
+        # it keeps that art and writes `dist/DO-NOT-PUBLISH.txt` into its own
+        # output. Publishing that one would ship 82 uncleared images and a
+        # notice saying not to publish it — which is exactly what the live site
+        # was serving until this line was corrected.
+        #
+        # The build FAILS if the bundle it produces references a file that is
+        # not on disk, so a broken site cannot ship.
+        run: npm run build:cleared
 
       - name: Check the bundle
         working-directory: game
         run: |
           test -f dist/index.html
           test -d dist/assets/models
+          # The publishable bundle must not carry the uncleared 2D art, and
+          # must not carry the notice that says the bundle must not be published.
+          test ! -d dist/assets/ui
+          test ! -f dist/assets/ui-assets.json
+          test ! -f dist/DO-NOT-PUBLISH.txt
           echo "bundle: $(find dist -type f | wc -l) files"
 
       - uses: actions/upload-pages-artifact@v3

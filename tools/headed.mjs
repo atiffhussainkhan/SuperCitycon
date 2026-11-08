@@ -9,7 +9,8 @@
  * failed request, captures a screenshot, and then leaves the window OPEN for
  * the player to use.
  */
-import { chromium } from '/Users/mac/.local/pw/node_modules/playwright/index.mjs';
+import { resolveChromium } from './playwright-resolve.mjs';
+const { chromium } = await resolveChromium();
 
 const url = process.argv[2] || 'http://127.0.0.1:4321/';
 const stayOpen = Number(process.argv[3] || 0);

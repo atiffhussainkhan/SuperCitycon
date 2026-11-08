@@ -1,0 +1,18 @@
+# minimax-game — the 3D platformer project section
+#
+# The rule, the same one the Super Citycon section already uses: ONE copy of
+# every asset. The library packs below are 2.5 GB of source archives that live
+# in ~/.minimax/asset-library and are re-fetchable with
+#   tools/fetch-3d-packs.sh
+#   tools/fetch-remaining-3d.sh
+# Committing them would put a second copy of every library asset in the history.
+
+platformer-docs/library-packs/
+
+# Generated indexes are derived from the packs above. They ARE committed
+# (10 MB) because the design documents and verify_design.py cite them as the
+# measured authority for asset paths, clip names and licences.
+
+__pycache__/
+*.pyc
+.DS_Store

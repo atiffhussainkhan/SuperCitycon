@@ -8,7 +8,8 @@
  * the click: which element is under the pointer, what the domain says about
  * that cell, and what the game did.
  */
-import { chromium } from '/Users/mac/.local/pw/node_modules/playwright/index.mjs';
+import { resolveChromium } from './playwright-resolve.mjs';
+const { chromium } = await resolveChromium();
 
 const url = process.argv[2] || 'http://localhost:4173/';
 

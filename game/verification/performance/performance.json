@@ -1,0 +1,51 @@
+{
+  "generated_at": "2026-11-08T14:27:45.463Z",
+  "url": "http://localhost:4176/",
+  "label": "PREVIEW :4176",
+  "load_event_ms": 165,
+  "ready_ms": 1539,
+  "city": {
+    "placed": 12,
+    "failed": 5,
+    "roads": 9,
+    "building_instances": 12,
+    "population": 447,
+    "happiness": 65.08679279993193,
+    "treasury": 25393,
+    "day": 3,
+    "vehicles": 60,
+    "citizens_rendered": 18
+  },
+  "frame_times": {
+    "n": 90,
+    "min_ms": 11.1,
+    "median_ms": 240.9,
+    "p95_ms": 627.8,
+    "max_ms": 870.5,
+    "mean_ms": 359.18,
+    "fps_median": 4.2,
+    "fps_p95_worst": 1.6
+  },
+  "renderer": {
+    "draw_calls": 633,
+    "triangles": 1124545,
+    "scene_meshes": 632,
+    "building_instances": 12,
+    "population": 447,
+    "citizens_rendered": 18,
+    "vehicles": 60,
+    "building_render_stats": {
+      "batches": 12,
+      "instances": 12,
+      "drawCalls": 43
+    }
+  },
+  "save_load": {
+    "wrote": true,
+    "restored": true,
+    "save_ms": 23.9,
+    "load_ms": 27.1,
+    "buildings_after_load": 12
+  },
+  "console_errors": []
+}

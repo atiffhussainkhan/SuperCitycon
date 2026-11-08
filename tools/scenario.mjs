@@ -17,7 +17,8 @@
  * Exit code: 0 when every check passed (skips do not fail the run), 1 when
  * any check failed.
  */
-import { chromium } from '/Users/mac/.local/pw/node_modules/playwright/index.mjs';
+import { resolveChromium } from './playwright-resolve.mjs';
+const { chromium } = await resolveChromium();
 import { mkdirSync, writeFileSync } from 'node:fs';
 
 const url = process.argv[2] || 'http://localhost:5177/';

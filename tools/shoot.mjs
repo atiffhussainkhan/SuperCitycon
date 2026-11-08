@@ -9,7 +9,8 @@
  * the file is read from the given path. It may return a value which is
  * printed as JSON (use it to assert on game state).
  */
-import { chromium } from '/Users/mac/.local/pw/node_modules/playwright/index.mjs';
+import { resolveChromium } from './playwright-resolve.mjs';
+const { chromium } = await resolveChromium();
 import { readFileSync } from 'node:fs';
 
 const url = process.argv[2] || 'http://localhost:5177/';

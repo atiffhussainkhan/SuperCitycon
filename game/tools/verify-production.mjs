@@ -16,6 +16,13 @@
  *
  * Usage:
  *   node tools/verify-production.mjs [--port 4173] [--outdir /tmp/sc-prod]
+ *                                    [--profile cleared|local]
+ *
+ * The profile defaults to **cleared** — the publishable build, the same one
+ * `.github/workflows/deploy.yml` produces and deploys. The harness used to
+ * build the LOCAL profile, so "verify:production" was proving a bundle that
+ * CI never ships and that carries the uncleared 2D art. Pass `--profile local`
+ * to verify the LOCAL build instead.
  *
  * Exit code: 0 when the production run passed, 1 when it failed, 2 when the
  * preview server could not be started at all.
@@ -37,6 +44,11 @@ const argOf = (name, fallback) => {
 };
 const PORT = Number(argOf('port', 4173));
 const OUTDIR = argOf('outdir', '/tmp/sc-prod');
+const PROFILE = argOf('profile', 'cleared');
+if (!['cleared', 'local'].includes(PROFILE)) {
+  console.error(`unknown profile "${PROFILE}" — use "cleared" or "local"`);
+  process.exit(2);
+}
 
 /** Report what the build actually produced. */
 function reportDist() {
@@ -93,15 +105,43 @@ async function waitForServer(url, timeoutMs = 30000) {
 
 async function main() {
   console.log('=== 1. build ===');
-  const buildCode = await run('npx', ['vite', 'build']);
+  // The publishable profile is the default, because it is the one CI deploys.
+  // `SC_SHIP_CLEARED=1` is exactly what `npm run build:cleared` sets.
+  const buildEnv = PROFILE === 'cleared'
+    ? { ...process.env, SC_SHIP_CLEARED: '1' }
+    : { ...process.env };
+  const buildCode = await run('npx', ['vite', 'build'], { env: buildEnv });
   if (buildCode !== 0) {
     console.error('the build FAILED — the production bundle cannot be verified');
     return 2;
   }
+  console.log(`profile: ${PROFILE}`
+    + (PROFILE === 'cleared'
+      ? ' (publishable — the same bundle CI deploys)'
+      : ' (local — includes the uncleared 2D art)'));
 
   console.log('\n=== 2. what landed in dist/ ===');
   const dist = reportDist();
   if (!dist) return 2;
+
+  // The publishable bundle must not carry the uncleared 2D art, and must not
+  // carry the notice that says the bundle must not be published. These are the
+  // same three assertions the deploy workflow makes before it publishes, so
+  // this harness cannot pass a bundle that CI would refuse to ship.
+  if (PROFILE === 'cleared') {
+    const forbidden = [
+      ['dist/assets/ui', 'the uncleared 2D art directory'],
+      ['dist/assets/ui-assets.json', 'the uncleared 2D art manifest'],
+      ['dist/DO-NOT-PUBLISH.txt', 'the "must not be published" notice'],
+    ];
+    const present = forbidden.filter(([p]) => existsSync(join(GAME, p)));
+    if (present.length) {
+      for (const [p, what] of present) console.error(`[dist] FORBIDDEN: ${p} — ${what}`);
+      console.error('the CLEARED bundle is not publishable — refusing to verify it');
+      return 2;
+    }
+    console.log('[dist] publishable: no uncleared 2D art, no DO-NOT-PUBLISH.txt');
+  }
 
   console.log('\n=== 3. start the preview server ===');
   const preview = spawn('npx', ['vite', 'preview', '--port', String(PORT), '--strictPort'],

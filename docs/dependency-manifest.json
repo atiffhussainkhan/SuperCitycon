@@ -1,0 +1,103 @@
+{
+  "$comment": "Machine-readable dependency manifest for SuperCitycon / MiniMax Game Studio ULTRA V2. Generated 2026-11-08 from the working tree. Every version here is pinned and reproducible; nothing is a floating range at install time.",
+  "project": {
+    "name": "supercitycon",
+    "version": "1.0.0",
+    "title": "MiniMax Game Studio ULTRA V2",
+    "releaseProfile": "publishable = npm run build:cleared",
+    "liveUrl": "https://atiffhussainkhan.github.io/SuperCitycon/"
+  },
+  "runtime": {
+    "node": {
+      "required": "^18.0.0 || >=20.0.0",
+      "verifiedWith": "22.14.0",
+      "recommended": "20.x or 22.x LTS",
+      "notes": "The CI workflow pins Node 20. The local machine that produced this handover ran Node 22.14.0 and passed every check."
+    },
+    "npm": {
+      "required": ">=9",
+      "verifiedWith": "10.9.2"
+    },
+    "python": {
+      "required": ">=3.11",
+      "verifiedWith": "3.15.2",
+      "usedFor": "the 3D design gates under minimax-game/tools (verify_design.py, verify_devbots.py, audit_depth.py, build_master.py, fault_inject_hardened.py). Standard library only — no pip install is needed."
+    },
+    "git": {
+      "required": ">=2.30",
+      "verifiedWith": "2.50.1 (Apple Git-155)"
+    }
+  },
+  "npmDependencies": {
+    "three": {
+      "declared": "^0.169.0",
+      "installed": "0.169.0",
+      "licence": "MIT",
+      "role": "the 3D renderer"
+    },
+    "vite": {
+      "declared": "^5.4.10",
+      "installed": "5.4.21",
+      "licence": "MIT",
+      "role": "the build tool and dev server",
+      "dev": true
+    }
+  },
+  "transitiveDevTooling": {
+    "esbuild": {
+      "installed": "0.21.5",
+      "licence": "MIT",
+      "role": "Vite's transform pipeline",
+      "platformNote": "ships prebuilt binaries per platform as OPTIONAL dependencies: darwin-x64, darwin-arm64, linux-x64, linux-arm64, win32-x64 and others are all in package-lock.json. npm installs the one matching the host."
+    },
+    "rollup": {
+      "installed": "4.65.0",
+      "licence": "MIT",
+      "role": "Vite's bundler",
+      "platformNote": "same optional per-platform binary scheme as esbuild; darwin-arm64 and darwin-x64 are both in the lockfile."
+    },
+    "fsevents": {
+      "installed": "2.3.3",
+      "licence": "MIT",
+      "role": "macOS file-watching for the dev server",
+      "platformNote": "darwin only, optional; the dev server still works without it, just without instant file-change reload."
+    }
+  },
+  "testOnlyDependency": {
+    "playwright": {
+      "declared": "NOT a package.json dependency — installed out of tree, see portability notes",
+      "installed": "1.64.0",
+      "licence": "Apache-2.0",
+      "role": "drives the headless Chromium that runs the 41-check acceptance harness",
+      "browser": "chromium-1248 / chromium_headless_shell-1248",
+      "resolvedFrom": "tools/playwright-resolve.mjs, which tries PLAYWRIGHT_MODULE, then a normal install, then known local locations"
+    }
+  },
+  "assetLicences": {
+    "3d": {
+      "status": "CLEARED for release",
+      "licences": ["CC0-1.0", "MIT"],
+      "source": "the user's own asset library; five packs",
+      "counts": "158 assets: 41 KayKit City Builder Bits, 41 Avramania Nature & Terrain, 46 Holokat Game Assets, 6 KayKit Adventurers, 14 Quaternius Ultimate Animated Character, 8 Quaternius Ultimate Animated Animals, 2 KayKit Skeletons",
+      "shipped": true
+    },
+    "2d": {
+      "status": "UNVERIFIED — not cleared for release",
+      "licences": ["unverified"],
+      "source": "the user's image library",
+      "counts": "82 HUD images",
+      "shipped": false,
+      "note": "Excluded from the publishable build by npm run build:cleared. The local build includes them and writes dist/DO-NOT-PUBLISH.txt."
+    },
+    "audio": {
+      "status": "no third-party audio",
+      "notes": "The library holds no audio, so the game uses a small procedural WebAudio synth (src/audio/audio.js) — oscillators and noise buffers, no samples. Nothing to license."
+    }
+  },
+  "verificationCommands": {
+    "syntax": "cd game && npm run check",
+    "unitAndIntegration": "cd game && npm test",
+    "acceptanceHarness": "cd game && npm run verify:production",
+    "designGates": "cd minimax-game && python3 tools/verify_design.py && python3 tools/audit_depth.py && python3 tools/verify_devbots.py && python3 tools/fault_inject_hardened.py"
+  }
+}

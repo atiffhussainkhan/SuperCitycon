@@ -308,6 +308,31 @@ in the HUD. **Owner: the publisher** (dossier OQ-ECO-*).
   `SUPERCITYCON.step(dt)` (a fixed step) rather than waiting on wall-clock
   frames — low headless FPS is an environment artefact, not a game defect.
 
+### 7. Two npm advisories in the build toolchain — not in the shipped game
+`npm audit` reports **2 advisories** (1 moderate, 1 high), both in **`vite` and
+its transitive `esbuild`**, both fixed only in `vite@8.3.6` — a semver-major
+jump from the pinned `5.4.x`.
+
+**Neither is present in the shipped artefact.** The bundle is static files
+(JavaScript, glTF/GLB, PNG, JSON) and contains **no Vite or esbuild runtime
+code** — the only occurrence of the string `vite` in the built JavaScript is
+the `vite:preloadError` event name that Vite's build step injects for module
+preload failures. Both advisories affect the **development server**, not the
+build output or the deployed site.
+
+**Mitigation, in force today:** Vite's dev server binds to **loopback only**
+(`server.host` is unset, so it defaults to `localhost`). Do not run
+`npm run dev -- --host` on a shared or untrusted network. To show the game to
+someone else, use the static preview instead — `npm run build:cleared &&
+npm run preview` — which serves plain files with no dev server involved.
+
+**Why it was not upgraded.** The fix is a major-version bump of the build tool,
+which would require re-verifying the whole build, the asset pipeline and the
+acceptance harness, and the pinned Vite 5.4.21 is the stable release this
+project was built and verified against. Upgrading a stable component because a
+newer version exists is not, by itself, a reason. When Vite 8 is adopted
+deliberately, re-run the full verification.
+
 ---
 
 The spec this build implements is `docs/SUPER-CITYCON-MASTER-REQUIREMENTS.md`

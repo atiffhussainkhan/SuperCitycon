@@ -7,7 +7,8 @@
  * Prints: console errors, uncaught page errors, failed network requests,
  * the #fatal pane text, window.SUPERCITYCON.bootLog, and the ready flag.
  */
-import { chromium } from '/Users/mac/.local/pw/node_modules/playwright/index.mjs';
+import { resolveChromium } from './playwright-resolve.mjs';
+const { chromium } = await resolveChromium();
 
 const url = process.argv[2] || 'http://localhost:4173/';
 const waitMs = Number(process.argv[3] || 25000);
