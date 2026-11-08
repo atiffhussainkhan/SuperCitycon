@@ -354,8 +354,8 @@ distinct files)"* and cannot drift again.
 | `minimax-game/_audit_basenames_out.txt` | a generated audit scratch file |
 | `minimax-game/my_mario_game` | an empty stray directory |
 
-**Trash state, measured now:** **empty — 0 items, 0 B.** Across the final two
-rounds I put **1,464 MB** of scratch in the Trash, and the owner approved
+**Trash state, measured now:** **empty — 0 items, 0 B.** Across the final three
+rounds I put **1,683 MB** of scratch in the Trash, and the owner approved
 emptying it, so it was emptied permanently with
 `osascript -e 'tell application "Finder" to empty trash'` — measured **0 B /
 0 items** immediately after each time. Every item was a temporary package build
@@ -365,6 +365,7 @@ or extraction that this project created:
 |---|---|---|
 | Final verification | **1,077 MB** | `pkg-src/` (245 MB) — the isolated `git worktree` used to rebuild the package; `pkg-verify2/` (216 MB) — a clean copy used for the independent test run; `pkg-out/` + `pkg-out2/` (424 MB) — two package builds; `pkg-final-out/` (192 MB) — the final build |
 | Closing verification | **387 MB** | `pkg-v3/` (216 MB) and `pkg-bots-check/` (169 MB) — package copies used to prove the shipped gates behave on a machine that has never run this project; `pkg-harness/` (848 KB); `fakehome/` (0 B) |
+| Documentation round | **219 MB** | `pkg-last-check/` — the package copy used to verify the corrected release documents; `fakehome2/` — the empty home used for the fresh-machine simulation |
 
 All of them were **mine, from this session, and fully regenerable** — the
 package is rebuilt by `node tools/package-release.mjs` and re-verified by
