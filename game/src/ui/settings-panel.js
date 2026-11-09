@@ -166,6 +166,30 @@ export function createSettingsPanel(ctx, deps = {}) {
   /** The action whose next key press is being captured for a rebind. */
   let capturing = null;
 
+  /**
+   * The menu's focus registrar.
+   *
+   * The settings rows are built here, not by the menu, so the menu cannot
+   * know about them on its own. It hands over a registrar and the rows join
+   * the menu's focus ring, which is what makes them reachable with a gamepad
+   * and with the keyboard.
+   */
+  let focusRegistrar = null;
+
+  /**
+   * Join a control to the menu's focus ring.
+   * @param {object} node
+   */
+  function registerFocusable(node) {
+    if (!node) return null;
+    if (typeof focusRegistrar !== 'function') return node;
+    try {
+      return focusRegistrar(node) ?? node;
+    } catch {
+      return node;
+    }
+  }
+
   /** The container that was rendered last, so a change can refresh it. */
   let lastContainer = null;
   let lastView = null;
@@ -305,7 +329,7 @@ export function createSettingsPanel(ctx, deps = {}) {
       btn.type = 'button';
       btn.dataset.scSetToggle = row.key;
       btn.setAttribute('aria-pressed', row.value ? 'true' : 'false');
-      wrap.append(btn);
+      wrap.append(registerFocusable(btn));
       return wrap;
     }
 
@@ -329,7 +353,7 @@ export function createSettingsPanel(ctx, deps = {}) {
           value.textContent = formatSettingValue(row.key, row, next);
           writeSetting(row.key, next, { refresh: false });
         });
-        wrap.append(range);
+        wrap.append(registerFocusable(range));
       }
       const minus = make('button', 'sc-setbtn', '−');
       minus.type = 'button';
@@ -337,7 +361,7 @@ export function createSettingsPanel(ctx, deps = {}) {
       const plus = make('button', 'sc-setbtn', '+');
       plus.type = 'button';
       plus.dataset.scSetStep = `${row.key}:1`;
-      wrap.append(minus, plus);
+      wrap.append(registerFocusable(minus), registerFocusable(plus));
     }
     return wrap;
   }
@@ -417,14 +441,14 @@ export function createSettingsPanel(ctx, deps = {}) {
       const reset = make('button', 'sc-setbtn', 'RESET');
       reset.type = 'button';
       reset.dataset.scResetAction = row.action;
-      wrap.append(rebind, reset);
+      wrap.append(registerFocusable(rebind), registerFocusable(reset));
       container.append(wrap);
     }
 
     const resetAll = make('button', 'sc-setbtn sc-setbtn-wide', 'RESET ALL BINDINGS');
     resetAll.type = 'button';
     resetAll.dataset.scResetAll = '1';
-    container.append(resetAll);
+    container.append(registerFocusable(resetAll));
     container.append(make('div', 'sc-note',
       'Choose REBIND and press the key you want. The bindings are stored in this browser.'));
     return model;
@@ -498,6 +522,18 @@ export function createSettingsPanel(ctx, deps = {}) {
     renderSettings,
     renderAccessibility,
     renderControls,
+    /**
+     * Hand over the menu's focus registrar.
+     *
+     * The rows this panel builds join the menu's focus ring, so they can be
+     * reached with the keyboard and with a gamepad.
+     *
+     * @param {Function|null} fn (node) => node
+     */
+    setFocusRegistrar(fn) {
+      focusRegistrar = typeof fn === 'function' ? fn : null;
+      return true;
+    },
     /** Handle a click on a settings control. */
     onClick,
     /** Write one setting and apply its effects. */

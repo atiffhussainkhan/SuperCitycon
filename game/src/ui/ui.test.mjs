@@ -996,3 +996,81 @@ test('the performance read-out is toggleable and shows the renderer\'s numbers',
   assert.equal(perf.hidden, true, 'the read-out can be switched off again');
   hud.dispose();
 });
+
+// ===========================================================================
+// 8. The analogue gamepad camera (V6, issue KI-05)
+// ===========================================================================
+
+test('the camera pans with the analogue stick', () => {
+  const ctx = makeCtx();
+  const renderer = makeRenderer();
+  const rig = createCameraRig({ ...ctx, renderer }, { listen: false });
+
+  rig.setPadAxes({ panX: 1, panY: 0, rotate: 0, zoom: 0 });
+  rig.update(0.1);
+
+  assert.ok(rig.target.x > 1, `the camera panned east (x=${rig.target.x})`);
+  assert.equal(rig.target.z, 0, 'and it did not drift sideways');
+});
+
+test('the camera follows the analogue speed, not a fixed step', () => {
+  const ctx = makeCtx();
+  const rig = createCameraRig({ ...ctx, renderer: makeRenderer() }, { listen: false });
+
+  rig.setPadAxes({ panX: 0.25, panY: 0, rotate: 0, zoom: 0 });
+  rig.update(0.1);
+  const slow = rig.target.x;
+
+  rig.reset();
+  rig.setPadAxes({ panX: 1, panY: 0, rotate: 0, zoom: 0 });
+  rig.update(0.1);
+  const fast = rig.target.x;
+
+  assert.ok(fast > slow * 2, `a full push moves further than a quarter push (${slow} -> ${fast})`);
+});
+
+test('a released stick leaves the camera where it is', () => {
+  const ctx = makeCtx();
+  const rig = createCameraRig({ ...ctx, renderer: makeRenderer() }, { listen: false });
+
+  rig.setPadAxes({ panX: 1, panY: 0, rotate: 0, zoom: 0 });
+  rig.update(0.1);
+  const after = rig.target.x;
+
+  rig.setPadAxes(null);
+  rig.update(0.5);
+
+  assert.equal(rig.target.x, after, 'the camera stopped when the stick was released');
+});
+
+test('the camera rotates with the right stick and zooms with the trigger', () => {
+  const ctx = makeCtx();
+  const rig = createCameraRig({ ...ctx, renderer: makeRenderer() }, { listen: false });
+
+  const yaw0 = rig.target.yaw;
+  rig.setPadAxes({ panX: 0, panY: 0, rotate: 1, zoom: 0 });
+  rig.update(0.1);
+  assert.ok(rig.target.yaw > yaw0, 'the right stick rotated the camera');
+
+  const distance0 = rig.target.distance;
+  rig.setPadAxes({ panX: 0, panY: 0, rotate: 0, zoom: 1 });
+  rig.update(0.1);
+  assert.ok(rig.target.distance < distance0, 'the trigger zoomed in');
+});
+
+test('the camera does not move while the menu has the focus', () => {
+  const ctx = makeCtx();
+  const rig = createCameraRig({
+    ...ctx,
+    renderer: makeRenderer(),
+    ui: { menu: { isOpen: () => true } },
+  }, { listen: false });
+
+  rig.setPadAxes({ panX: 1, panY: 1, rotate: 1, zoom: 1 });
+  rig.update(0.1);
+
+  assert.equal(rig.target.x, 0, 'the camera did not pan under the menu');
+  assert.equal(rig.target.z, 0, 'nor drift');
+  assert.deepEqual(rig.padAxes, { panX: 0, panY: 0, rotate: 0, zoom: 0 },
+    'the axes were released');
+});

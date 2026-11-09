@@ -7,6 +7,80 @@ and this project uses [semantic versioning](https://semver.org/spec/v2.0.0.html)
 
 ---
 
+## [6.0.0] — V6
+
+**Branch:** `v6/upgrade-Zehe03`
+**Baseline:** V5 merged into `main` @ `69b6579`
+**Engine:** Three.js 0.169 · Vite 7.3.7 (bundler only) · ES modules · no framework
+**Release status:** see [`docs/V6_VERIFICATION.md`](docs/V6_VERIFICATION.md) for
+the gate-by-gate verdict.
+
+V6 is a major-version upgrade that **adds** to the game and changes **nothing**
+about the player's saved cities. The save schema stays at **version 2**, so a
+V5 city opens in V6 exactly as it was.
+
+### Added — gamepad support (V5 issue KI-05)
+
+V5's KI-05 claimed the Gamepad API was already read and routed through the
+input map. It was not — at the V5 baseline the tree contained no gamepad code
+at all. V6 implements the whole path from scratch.
+
+- **The pad rules** (`game/src/core/gamepad.js`, pure and Node-testable) — a
+  0.18 dead zone with the usable range rescaled so a resting stick reads as
+  exactly zero and a full push still reaches 1.0; the dead zone applies to the
+  sticks only, because a trigger rests at zero and a part-pull is deliberate;
+  buttons fire on their **edge**, so a held CONFIRM confirms **once**; a
+  disconnect releases every held button; connect and disconnect are reported.
+- **The pad bindings** (`game/src/core/input-map.js`) live beside the keyboard
+  bindings in the same table — D-pad to move, A to confirm, B to go back,
+  START to pause, the bumpers to zoom, the left stick to reset the camera.
+- **The browser half** (`game/src/ui/gamepad.js`) reads
+  `navigator.getGamepads()`, compares the frames and routes the result.
+- **Directional menu navigation with a visible focus ring**, confirm and back,
+  and a focus target that stays valid after a panel rebuilds itself
+  (`game/src/ui/menu.js`).
+- **Analogue camera movement** (`game/src/ui/camera.js`) — the left stick pans,
+  the right stick rotates, the right trigger zooms in and the left zooms out;
+  the speed follows the deflection, and a held stick keeps moving.
+- **The camera does not move while a modal has the focus**, and the reduced
+  screen shake preference is honoured.
+- **The settings rows are reachable with a pad**, and a slider takes LEFT /
+  RIGHT for itself.
+
+### Added — a V6 gameplay regression suite
+
+- **`tools/scenario-v6.mjs`** drives the assembled game in a real browser
+  through five flows: an authored map launch, the First Light progression, a
+  save and continue round trip, the hazard effects, and the city transitions.
+  The V5 acceptance scenario `tools/scenario.mjs` is untouched, and both are
+  run.
+
+### Added — V5 save compatibility, proved rather than asserted
+
+- **`game/src/core/save-compat.test.mjs`** writes a hand-built V5 record into
+  storage and loads it in V6, asserting the buildings, the treasury, the day,
+  the seed and the progression record all come back; that the stored save is
+  not rewritten; that a V6 save is the same format as a V5 save; and that the
+  v1 → v2 migration still works.
+
+### Changed
+
+- **The product version is 6.0.0** — `game/package.json`,
+  `game/package-lock.json` and the build-identity fallback in
+  `game/src/core/log.js`. The build identity in `game/vite.config.js` reads
+  `package.json`, so the stamped build follows automatically.
+- **`docs/V5_KNOWN_ISSUES.md` is amended** with the correction to KI-05. The
+  V5 document is kept as the historical record; the correction and the open
+  issues live in [`docs/V6_KNOWN_ISSUES.md`](docs/V6_KNOWN_ISSUES.md).
+
+### Not changed
+
+- The **save schema** stays at version 2.
+- The **V5 acceptance scenario**, the shop layout, the performance tools and
+  the cleared build target are all untouched.
+
+---
+
 ## [5.0.0] — V5
 
 **Branch:** `v5/upgrade`
@@ -192,5 +266,6 @@ images.
 
 ---
 
+[6.0.0]: https://github.com/atiffhussainkhan/SuperCitycon/releases/tag/v6.0.0
 [5.0.0]: https://github.com/atiffhussainkhan/SuperCitycon/releases/tag/v5.0.0
 [4.x]: https://github.com/atiffhussainkhan/SuperCitycon/releases

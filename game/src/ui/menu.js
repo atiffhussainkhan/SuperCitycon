@@ -173,6 +173,8 @@ export function createMenu(ctx, deps = {}) {
   let pausedByMenu = false;
   let pendingLevel = null;
   let loadingLevel = false;
+  /** The gamepad hint shown in the footer, or null when no pad is connected. */
+  let padHint = null;
   /**
    * The event that OPENED the menu.
    *
@@ -215,6 +217,59 @@ export function createMenu(ctx, deps = {}) {
       }
     });
     return node;
+  }
+
+  /**
+   * Is a node still part of the menu?
+   *
+   * A view can be re-rendered while it is open — the settings panel rebuilds
+   * its rows after every write — and the rows that were on screen a moment
+   * ago are then detached from the document. A focus ring that still points
+   * at one of them is pointing at nothing: the player presses Enter and
+   * nothing happens, with no way to see why.
+   *
+   * The test is a walk up the parent chain to the menu root, which works in
+   * the browser and in the test DOM shim alike.
+   *
+   * @param {object} node
+   * @returns {boolean}
+   */
+  function isAttached(node) {
+    if (!node) return false;
+    let current = node;
+    while (current) {
+      if (current === root) return true;
+      current = current.parentNode ?? null;
+    }
+    return false;
+  }
+
+  /**
+   * Drop the focusables that are no longer on screen.
+   *
+   * When the focused control is one of the dropped ones, the ring moves to
+   * the last control that is still there and shows itself there — the focus
+   * is never left pointing at nothing.
+   *
+   * @returns {number} how many were dropped
+   */
+  function pruneFocusables() {
+    const before = focusables.length;
+    focusables = focusables.filter((node) => isAttached(node));
+    if (focusables.length === before) return 0;
+    if (focusIndex >= focusables.length) {
+      focusIndex = Math.max(0, focusables.length - 1);
+    }
+    // The ring is re-applied, so the focus always shows where it is.
+    const el = focusables[focusIndex];
+    if (el) {
+      for (const other of focusables) other.classList?.remove?.('is-focused');
+      el.classList?.add?.('is-focused');
+      if (typeof el.focus === 'function') {
+        try { el.focus(); } catch { /* the fake DOM has no focus */ }
+      }
+    }
+    return before - focusables.length;
   }
 
   // ---- the CORE-backed actions ------------------------------------------
@@ -585,6 +640,9 @@ export function createMenu(ctx, deps = {}) {
       body.append(make('div', 'sc-note', 'The settings are not available in this build.'));
       return null;
     }
+    // The panel builds its own rows, so it needs the menu's focus registrar
+    // to put them on the focus ring.
+    settingsPanel.setFocusRegistrar?.(focusable);
     return settingsPanel.render(body, which);
   }
 
@@ -638,6 +696,7 @@ export function createMenu(ctx, deps = {}) {
 
     const foot = make('div', 'sc-menu-foot',
       '↑ ↓ move  ·  Enter select  ·  Esc back');
+    if (padHint) foot.append(make('span', 'sc-menu-padhint', `  ·  ${padHint}`));
     card.append(foot);
 
     root.append(card);
@@ -647,6 +706,9 @@ export function createMenu(ctx, deps = {}) {
   // ---- focus -------------------------------------------------------------
 
   function setFocus(index) {
+    // The ring is rebuilt against the DOM, so a control that was replaced
+    // while the menu was open is never the focus target.
+    pruneFocusables();
     if (!focusables.length) {
       focusIndex = -1;
       return null;
@@ -660,6 +722,55 @@ export function createMenu(ctx, deps = {}) {
       try { el.focus(); } catch { /* the fake DOM has no focus */ }
     }
     return el;
+  }
+
+  /**
+   * Nudge the focused control sideways, if it is a control that can be nudged.
+   *
+   * A range slider takes the LEFT / RIGHT press for itself: that is what a
+   * player expects from a slider, and it is the only way to change a setting
+   * with a pad without a mouse.
+   *
+   * @param {number} delta -1 for left, +1 for right
+   * @returns {boolean} true when the control was adjusted
+   */
+  function adjustFocused(delta) {
+    pruneFocusables();
+    const el = focusables[focusIndex];
+    if (!el) return false;
+    const tag = String(el.tagName ?? '').toUpperCase();
+    if (tag !== 'INPUT') return false;
+    if (String(el.type ?? '').toLowerCase() !== 'range') return false;
+    const min = Number.isFinite(Number(el.min)) ? Number(el.min) : 0;
+    const max = Number.isFinite(Number(el.max)) ? Number(el.max) : 1;
+    const step = Number.isFinite(Number(el.step)) && Number(el.step) > 0 ? Number(el.step) : 0.1;
+    const current = Number(el.value);
+    const base = Number.isFinite(current) ? current : min;
+    const next = Math.min(max, Math.max(min, base + delta * step));
+    if (next === base) return false;
+    el.value = String(next);
+    const event = (typeof Event === 'function')
+      ? new Event('input', { bubbles: true })
+      : { type: 'input', target: el };
+    try { el.dispatchEvent?.(event); } catch { /* the fake DOM has no events */ }
+    return true;
+  }
+
+  /**
+   * Activate the focused control.
+   *
+   * @returns {boolean} true when something was activated
+   */
+  function confirmFocused() {
+    if (!view) return false;
+    pruneFocusables();
+    const el = focusables[focusIndex];
+    if (!el) return false;
+    if (typeof el.click === 'function') {
+      el.click();
+      return true;
+    }
+    return false;
   }
 
   // ---- input -------------------------------------------------------------
@@ -824,6 +935,97 @@ export function createMenu(ctx, deps = {}) {
     isOpen() { return view !== null; },
     /** The open view's id, or null. */
     view() { return view; },
+
+    // ---- the gamepad surface --------------------------------------------
+    //
+    // The pad does not fake key events. It speaks the same ACTIONS the
+    // keyboard does, so the menu routes them through the same focus ring.
+
+    /**
+     * Move the focus by a number of steps.
+     *
+     * @param {number} delta negative moves up / left, positive moves down / right
+     * @returns {object|null} the newly focused element
+     */
+    moveFocus(delta) {
+      if (!view) return null;
+      const step = Number.isFinite(delta) ? Math.trunc(delta) : 0;
+      if (!step) return focusables[focusIndex] ?? null;
+      return setFocus(focusIndex + step);
+    },
+
+    /**
+     * Activate the focused control — the pad's CONFIRM button.
+     *
+     * @returns {boolean} true when something was activated
+     */
+    confirmFocused() {
+      return confirmFocused();
+    },
+
+    /** The focused element, or null. */
+    focusedElement() {
+      pruneFocusables();
+      return focusables[focusIndex] ?? null;
+    },
+
+    /** How many controls are in the focus ring. */
+    focusCount() {
+      pruneFocusables();
+      return focusables.length;
+    },
+
+    /**
+     * Route one pad action to the menu.
+     *
+     * @param {string} action a `menu.*` action
+     * @returns {boolean} true when the action was handled
+     */
+    handlePadAction(action) {
+      if (!view || loadingLevel) return false;
+      switch (action) {
+        case 'menu.up': return !!setFocus(focusIndex - 1);
+        case 'menu.down': return !!setFocus(focusIndex + 1);
+        case 'menu.left':
+          // A slider takes the sideways press for itself; anything else
+          // treats it as "the previous control".
+          if (adjustFocused(-1)) return true;
+          return !!setFocus(focusIndex - 1);
+        case 'menu.right':
+          if (adjustFocused(1)) return true;
+          return !!setFocus(focusIndex + 1);
+        case 'menu.confirm': return confirmFocused();
+        case 'menu.back': return back();
+        default: return false;
+      }
+    },
+
+    /**
+     * Join a control the menu did not create to the focus ring.
+     *
+     * The settings panel builds its own rows, so it registers them here.
+     * A row that is replaced by a re-render is dropped from the ring by the
+     * prune, so the focus can never land on a control that is gone.
+     *
+     * @param {object} node
+     */
+    registerFocusable(node) {
+      if (!node) return null;
+      return focusable(node);
+    },
+
+    /**
+     * Show (or hide) the gamepad hint in the footer.
+     * @param {string|null} text
+     */
+    setPadHint(text) {
+      const next = typeof text === 'string' && text.trim() ? text.trim() : null;
+      if (next === padHint) return false;
+      padHint = next;
+      if (view) render();
+      return true;
+    },
+
     /** The container the overlay is mounted into. */
     mount(el) {
       container = el ?? null;

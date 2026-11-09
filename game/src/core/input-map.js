@@ -18,8 +18,14 @@
  * `key` values: a code names a physical key, so the binding survives a
  * different keyboard layout.
  *
- * Pure: this module imports nothing and touches no DOM.
+ * The GAMEPAD bindings live here too, so one table describes the player's
+ * controls and one place rebinds them. The rules that interpret a pad —
+ * dead zones, button edges, axis resolution — are in `core/gamepad.js`.
+ *
+ * Pure: this module imports nothing but the pad constants, and touches no DOM.
  */
+
+import { PAD_BUTTONS } from './gamepad.js';
 
 /** Every action the player can bind. */
 export const ACTIONS = Object.freeze([
@@ -76,14 +82,58 @@ export const MODIFIER_ACTIONS = Object.freeze({
 });
 
 /**
+ * The actions a gamepad button can trigger.
+ *
+ * These are deliberately SEPARATE from `ACTIONS`: the menu's own keyboard
+ * scheme (arrows, Enter, Escape) is not a rebindable game action, so adding
+ * `menu.*` to the keyboard table would expose them to the rebinding screen
+ * for no reason.
+ */
+export const PAD_ACTIONS = Object.freeze([
+  'menu.up',
+  'menu.down',
+  'menu.left',
+  'menu.right',
+  'menu.confirm',
+  'menu.back',
+  'game.pause',
+  'game.menu',
+  'camera.reset',
+  'camera.zoomIn',
+  'camera.zoomOut',
+]);
+
+/**
+ * The default pad bindings: action -> button indices.
+ *
+ * The indices are the standard gamepad mapping (see `core/gamepad.js`), so
+ * they work on any browser that reports a standard pad.
+ */
+export const DEFAULT_PAD_BINDINGS = Object.freeze({
+  'menu.up': [PAD_BUTTONS.DPAD_UP],
+  'menu.down': [PAD_BUTTONS.DPAD_DOWN],
+  'menu.left': [PAD_BUTTONS.DPAD_LEFT],
+  'menu.right': [PAD_BUTTONS.DPAD_RIGHT],
+  'menu.confirm': [PAD_BUTTONS.A],
+  'menu.back': [PAD_BUTTONS.B],
+  'game.pause': [PAD_BUTTONS.START],
+  'game.menu': [PAD_BUTTONS.GUIDE],
+  'camera.reset': [PAD_BUTTONS.LEFT_STICK],
+  'camera.zoomIn': [PAD_BUTTONS.RIGHT_BUMPER],
+  'camera.zoomOut': [PAD_BUTTONS.LEFT_BUMPER],
+});
+
+/**
  * Build an input map.
  *
  * @param {object} [opts]
  * @param {object} [opts.bindings] an override table (action -> codes)
+ * @param {object} [opts.padBindings] an override table (action -> button indices)
  * @returns {object} the input map service
  */
-export function createInputMap({ bindings = null } = {}) {
+export function createInputMap({ bindings = null, padBindings = null } = {}) {
   let table = { ...DEFAULT_BINDINGS };
+  let padTable = { ...DEFAULT_PAD_BINDINGS };
 
   function applyOverrides(overrides) {
     if (!overrides || typeof overrides !== 'object') return false;
@@ -98,7 +148,21 @@ export function createInputMap({ bindings = null } = {}) {
     return changed;
   }
 
+  function applyPadOverrides(overrides) {
+    if (!overrides || typeof overrides !== 'object') return false;
+    let changed = false;
+    for (const [action, indices] of Object.entries(overrides)) {
+      if (!(action in DEFAULT_PAD_BINDINGS)) continue;
+      if (!Array.isArray(indices)) continue;
+      const clean = indices.filter((i) => Number.isInteger(i) && i >= 0);
+      padTable[action] = clean;
+      changed = true;
+    }
+    return changed;
+  }
+
   if (bindings) applyOverrides(bindings);
+  if (padBindings) applyPadOverrides(padBindings);
 
   return {
     /** The whole table. */
@@ -113,6 +177,28 @@ export function createInputMap({ bindings = null } = {}) {
     primary(action) { return table[action]?.[0] ?? null; },
     /** The modifier an action requires, or null. */
     modifierFor(action) { return MODIFIER_ACTIONS[action] ?? null; },
+
+    // -- the gamepad half of the table ------------------------------------
+    /** The whole pad binding table. */
+    padAll() {
+      const out = {};
+      for (const [action, indices] of Object.entries(padTable)) out[action] = indices.slice();
+      return out;
+    },
+    /** The button indices bound to one action. */
+    padFor(action) { return (padTable[action] ?? []).slice(); },
+    /**
+     * The action a pad button triggers, or null.
+     *
+     * @param {number} buttonIndex
+     * @returns {string|null}
+     */
+    padActionFor(buttonIndex) {
+      for (const [action, indices] of Object.entries(padTable)) {
+        if (indices.includes(buttonIndex)) return action;
+      }
+      return null;
+    },
 
     /**
      * Does this keyboard event trigger the action?
@@ -157,10 +243,13 @@ export function createInputMap({ bindings = null } = {}) {
     /** Restore every default binding. */
     resetAll() {
       table = { ...DEFAULT_BINDINGS };
+      padTable = { ...DEFAULT_PAD_BINDINGS };
       return true;
     },
     /** Apply a stored override table. */
     applyOverrides,
+    /** Apply a stored pad override table. */
+    applyPadOverrides,
   };
 }
 

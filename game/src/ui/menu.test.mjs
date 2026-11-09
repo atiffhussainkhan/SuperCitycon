@@ -89,10 +89,22 @@ class FakeElement {
     if (this.children.length) return this.children.map((c) => c.textContent ?? '').join('');
     return this._text;
   }
-  set textContent(v) { this._text = String(v ?? ''); this.children = []; }
+  set textContent(v) { this._text = String(v ?? ''); this.detachAll(); }
   append(...nodes) { for (const n of nodes) this.appendChild(n); }
   appendChild(node) { node.parentNode = this; this.children.push(node); return node; }
-  replaceChildren(...nodes) { this.children = []; this._text = ''; this.append(...nodes); }
+  /**
+   * Detach every child.
+   *
+   * A real DOM clears the old children's `parentNode` when they are removed.
+   * The shim has to do the same, or a control that was replaced would still
+   * look like part of the tree — and the menu's focus ring would happily
+   * point at a control that is no longer on screen.
+   */
+  detachAll() {
+    for (const child of this.children) child.parentNode = null;
+    this.children = [];
+  }
+  replaceChildren(...nodes) { this._text = ''; this.detachAll(); this.append(...nodes); }
   remove() {
     const parent = this.parentNode;
     if (!parent) return;
@@ -571,5 +583,168 @@ test('the menu overlay is mounted into the container', () => {
   menu.open('main');
   assert.equal(container.children.length, 1, 'the overlay joins the container');
   menu.close();
+  menu.dispose();
+});
+
+// ===========================================================================
+// 4. The gamepad (V6, issue KI-05)
+// ===========================================================================
+//
+// The pad does not fake key events. It speaks the same ACTIONS the keyboard
+// does, and the menu routes them through the same focus ring, so what these
+// tests check is the REAL focus ring — the same `is-focused` class the player
+// sees.
+
+/** Is a node still part of the menu overlay? */
+function attachedTo(menu, node) {
+  let current = node;
+  while (current) {
+    if (current === menu.el) return true;
+    current = current.parentNode ?? null;
+  }
+  return false;
+}
+
+/**
+ * A fake settings panel that renders one row and can re-render itself, the
+ * way the real one does after every write.
+ */
+function fakeSettingsPanel() {
+  const panel = {
+    renders: 0,
+    clicks: 0,
+    registrar: null,
+    render(body) {
+      panel.renders += 1;
+      body.replaceChildren();
+      const btn = fakeDocument.createElement('button');
+      btn.type = 'button';
+      btn.className = 'sc-setbtn';
+      btn.dataset.scSetToggle = 'audio.music';
+      btn.addEventListener('click', () => { panel.clicks += 1; });
+      // The real panel registers its rows with the menu's focus ring.
+      if (typeof panel.registrar === 'function') panel.registrar(btn);
+      body.append(btn);
+      return { rows: [] };
+    },
+    isCapturing() { return false; },
+    setFocusRegistrar(fn) { panel.registrar = fn; return true; },
+  };
+  return panel;
+}
+
+test('the D-pad moves the focus and the ring shows it', () => {
+  const ctx = makeCtx();
+  const menu = createMenu(ctx, {});
+  menu.open('main');
+  const items = menuItems(menu);
+
+  menu.handlePadAction('menu.down');
+  assert.ok(items[1].classList.contains('is-focused'), 'the focus moved down');
+  assert.equal(items[0].classList.contains('is-focused'), false, 'the old focus lost the ring');
+
+  menu.handlePadAction('menu.up');
+  assert.ok(items[0].classList.contains('is-focused'), 'and back up again');
+
+  menu.dispose();
+});
+
+test('the pad confirms the focused item', () => {
+  const ctx = makeCtx();
+  const menu = createMenu(ctx, {});
+  menu.open('main');
+
+  menu.handlePadAction('menu.down');
+  menu.handlePadAction('menu.down');       // "Level Select"
+  menu.handlePadAction('menu.confirm');
+
+  assert.equal(menu.view(), 'levels', 'the focused item was activated');
+  menu.dispose();
+});
+
+test('the pad back button walks out of a view', () => {
+  const ctx = makeCtx();
+  const menu = createMenu(ctx, {});
+  menu.open('main');
+  menu.handlePadAction('menu.down');
+  menu.handlePadAction('menu.down');
+  menu.handlePadAction('menu.confirm');
+  assert.equal(menu.view(), 'levels');
+
+  menu.handlePadAction('menu.back');
+  assert.equal(menu.view(), 'main', 'the back button returned to the main menu');
+
+  menu.handlePadAction('menu.back');
+  assert.equal(menu.isOpen(), false, 'and back again closed the overlay');
+
+  menu.dispose();
+});
+
+test('the focus target stays valid after a panel rebuilds itself', () => {
+  const panel = fakeSettingsPanel();
+  const ctx = makeCtx();
+  const menu = createMenu(ctx, { settingsPanel: panel });
+  menu.open('main');
+  menu.handlePadAction('menu.down');
+  menu.handlePadAction('menu.down');
+  menu.handlePadAction('menu.down');       // "Settings"
+  menu.handlePadAction('menu.confirm');
+  assert.equal(menu.view(), 'settings');
+
+  // The BACK button and the panel's own row are both on the ring.
+  assert.equal(menu.focusCount(), 2, 'the panel row joined the focus ring');
+
+  menu.handlePadAction('menu.down');
+  const focused = menu.focusedElement();
+  assert.ok(focused, 'something is focused');
+  assert.ok(attachedTo(menu, focused), 'the focus is on a live control');
+
+  // The panel re-renders itself after a write: its old row is gone.
+  panel.render(menu.el.querySelector('.sc-menu-body'));
+
+  assert.equal(menu.focusCount(), 2, 'the ring still holds the live controls');
+  const after = menu.focusedElement();
+  assert.ok(after, 'the focus still has a target');
+  assert.ok(attachedTo(menu, after), 'and the target is still on screen');
+  assert.ok(after.classList.contains('is-focused'), 'and it shows the ring');
+
+  menu.dispose();
+});
+
+test('the settings rows are reachable with the pad', () => {
+  const panel = fakeSettingsPanel();
+  const ctx = makeCtx();
+  const menu = createMenu(ctx, { settingsPanel: panel });
+  menu.open('main');
+  menu.handlePadAction('menu.down');
+  menu.handlePadAction('menu.down');
+  menu.handlePadAction('menu.down');
+  menu.handlePadAction('menu.confirm');
+  assert.equal(menu.view(), 'settings');
+
+  menu.handlePadAction('menu.down');
+  const row = menu.focusedElement();
+  assert.equal(row.dataset.scSetToggle, 'audio.music', 'the pad reached the setting');
+
+  menu.handlePadAction('menu.confirm');
+  assert.equal(panel.clicks, 1, 'the pad confirmed the setting');
+
+  menu.dispose();
+});
+
+test('the pad hint appears in the footer when a pad is connected', () => {
+  const ctx = makeCtx();
+  const menu = createMenu(ctx, {});
+  menu.open('main');
+  assert.equal(menu.el.querySelectorAll('.sc-menu-padhint').length, 0, 'no hint without a pad');
+
+  menu.setPadHint('D-pad move');
+  const hints = menu.el.querySelectorAll('.sc-menu-padhint');
+  assert.equal(hints.length, 1, 'the hint is shown');
+  assert.match(hints[0].textContent, /D-pad move/);
+
+  menu.setPadHint(null);
+  assert.equal(menu.el.querySelectorAll('.sc-menu-padhint').length, 0, 'and it can go away');
+
   menu.dispose();
 });

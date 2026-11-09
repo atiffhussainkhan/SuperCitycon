@@ -225,7 +225,7 @@ export function installGlobalHandlers(logger, target = globalThis) {
 export function buildIdentity() {
   const env = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env : {};
   return {
-    version: env.VITE_BUILD_VERSION || '5.0.0-dev',
+    version: env.VITE_BUILD_VERSION || '6.0.0-dev',
     revision: env.VITE_BUILD_REVISION || 'unknown',
     engine: env.VITE_ENGINE_VERSION || 'three.js',
     builtAt: env.VITE_BUILD_TIME || '',

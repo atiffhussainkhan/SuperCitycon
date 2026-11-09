@@ -110,6 +110,22 @@ export const RIG_RATES = Object.freeze({
   lookAhead: 14,
   /** TBD: how fast the look-ahead offset catches up (e-folds / second). */
   lookAheadRate: 4.5,
+  /**
+   * TBD: the analogue pan speed at FULL stick deflection, in world units per
+   * second. It is a little faster than the keyboard's, because a stick can be
+   * deflected gradually and the player expects an analogue ramp.
+   */
+  padPanSpeed: 46,
+  /**
+   * TBD: the analogue yaw rate at full stick deflection, in radians per
+   * second.
+   */
+  padYawRate: 1.15,
+  /**
+   * TBD: the analogue zoom rate at full trigger, in e-folds per second. A
+   * negative rate zooms IN (the camera gets closer).
+   */
+  padZoomRate: -1.6,
 });
 
 /**
@@ -227,6 +243,13 @@ export function createCameraRig(ctx, options = {}) {
 
   // --- the look-ahead offset (the view leads the pan direction) ----------
   const lead = { x: 0, z: 0 };
+
+  // --- the analogue gamepad axes -----------------------------------------
+  //
+  // The axes are pushed in by the gamepad service, which owns the decision
+  // of whether the camera may move at all (a modal has focus, a pad was
+  // unplugged). The rig only turns them into camera motion.
+  let padAxes = { panX: 0, panY: 0, rotate: 0, zoom: 0 };
 
   // --- the shake ----------------------------------------------------------
   let shakeAmplitude = 0;
@@ -414,6 +437,28 @@ export function createCameraRig(ctx, options = {}) {
     return { x: wx, z: wz };
   }
 
+  /**
+   * Set the analogue gamepad axes for this frame.
+   *
+   * The values are the DEAD-ZONED axes from `core/gamepad.js`, so a resting
+   * stick contributes nothing. Passing null (or zeroes) releases the camera:
+   * that is what happens when the pad is unplugged, and when a modal takes
+   * the focus, because a camera that drifts under a dialog is a camera the
+   * player cannot control.
+   *
+   * @param {{panX?:number,panY?:number,rotate?:number,zoom?:number}|null} axes
+   */
+  function setPadAxes(axes) {
+    const src = axes ?? {};
+    padAxes = {
+      panX: Number.isFinite(Number(src.panX)) ? Number(src.panX) : 0,
+      panY: Number.isFinite(Number(src.panY)) ? Number(src.panY) : 0,
+      rotate: Number.isFinite(Number(src.rotate)) ? Number(src.rotate) : 0,
+      zoom: Number.isFinite(Number(src.zoom)) ? Number(src.zoom) : 0,
+    };
+    return padAxes;
+  }
+
   // ---- per-frame ---------------------------------------------------------
 
   /**
@@ -459,6 +504,34 @@ export function createCameraRig(ctx, options = {}) {
         const moved = panRelative((ex / len) * RIG_RATES.edgeSpeed * d, (ez / len) * RIG_RATES.edgeSpeed * d);
         movedX += moved.x;
         movedZ += moved.z;
+      }
+    }
+
+    // --- the analogue gamepad -------------------------------------------
+    // The menu owns the focus while it is open, so the camera must not move
+    // under it. The gamepad service applies the same rule for the HUD
+    // panels; this is the rig's own belt-and-braces guard.
+    const menuOwnsFocus = !!ctx?.ui?.menu?.isOpen?.();
+    if (menuOwnsFocus) {
+      padAxes = { panX: 0, panY: 0, rotate: 0, zoom: 0 };
+    } else {
+      const px = padAxes.panX;
+      const pz = padAxes.panY;
+      if (px || pz) {
+        const len = Math.hypot(px, pz) || 1;
+        // The stick is analogue: the speed follows how far it is pushed.
+        const speed = RIG_RATES.padPanSpeed * Math.min(1, len);
+        const moved = panRelative((px / len) * speed * d, (pz / len) * speed * d);
+        movedX += moved.x;
+        movedZ += moved.z;
+      }
+      if (padAxes.rotate) {
+        rotate(padAxes.rotate * RIG_RATES.padYawRate * d);
+      }
+      if (padAxes.zoom) {
+        // The trigger zooms continuously: a pull that is held keeps closing
+        // in, and the rate follows how far the trigger is pulled.
+        zoomTo(current.distance * Math.exp(padAxes.zoom * RIG_RATES.padZoomRate * d));
       }
     }
 
@@ -669,6 +742,10 @@ export function createCameraRig(ctx, options = {}) {
     reset,
     snap,
     update,
+    /** Push the analogue gamepad axes for this frame (null releases them). */
+    setPadAxes,
+    /** The analogue axes the rig is currently following. */
+    get padAxes() { return { ...padAxes }; },
     /** The smoothed camera state (read-only snapshot). */
     get state() {
       return { x: current.x, z: current.z, distance: current.distance, yaw: current.yaw, pitch: current.pitch };

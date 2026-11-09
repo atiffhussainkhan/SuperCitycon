@@ -1,8 +1,20 @@
 # SuperCitycon — V5 Known Issues
 
-**Document status:** complete (Phase 7 deliverable)
+**Document status:** complete (Phase 7 deliverable) — **historical record**
 **Applies to:** SuperCitycon 5.0.0
 **Branch:** `v5/upgrade`
+
+> **AMENDED IN V6.** This document is kept as the historical record of what
+> V5 claimed. One claim in it was wrong and is corrected here:
+>
+> **KI-05 said "The Gamepad API is read and the bindings are routed through
+> the same `input-map` table as the keyboard."** At the merged V5 baseline
+> (`69b6579`) the tree contained no gamepad code at all — no
+> `navigator.getGamepads()` call, no binding table, no analogue handling.
+> The gamepad support was implemented from scratch in V6.
+>
+> See [`V6_KNOWN_ISSUES.md`](V6_KNOWN_ISSUES.md) for the correction and for the
+> issues that are still open after V6.
 
 ---
 

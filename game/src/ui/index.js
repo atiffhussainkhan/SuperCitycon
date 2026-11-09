@@ -33,6 +33,7 @@ import { TOOLS, SPEED } from '../core/config.js';
 import { EVENTS } from '../core/events.js';
 import { createHUD } from './hud.js';
 import { createCameraRig } from './camera.js';
+import { createGamepadService } from './gamepad.js';
 import { createToastQueue } from './toasts.js';
 import { createMenu } from './menu.js';
 import { createSettingsPanel } from './settings-panel.js';
@@ -101,6 +102,16 @@ export function createUI(ctx) {
     settingsPanel,
     onToast: (message, kind) => showToast(message, kind),
     onPause: (paused) => setPaused(paused),
+  });
+
+  // The gamepad (V6, issue KI-05). The RULES are in `core/gamepad.js`; this
+  // service is the browser half: it reads the pads, compares the frames and
+  // routes the result to the menu and the camera.
+  const gamepad = createGamepadService(ctx, {
+    logger: ctx?.logger,
+    menu,
+    camera,
+    settingsPanel,
   });
 
   let hud = null;
@@ -436,6 +447,9 @@ export function createUI(ctx) {
     update(dt) {
       if (disposed) return;
       const d = Number.isFinite(dt) ? dt : 0;
+      // The pad is read BEFORE the camera, so the axes it pushed are the ones
+      // this frame's camera update applies.
+      gamepad.update(d);
       camera.update(d);
       toasts.tick(d);
       hud?.update(d);
@@ -504,6 +518,11 @@ export function createUI(ctx) {
     /** The settings, accessibility and controls panel service. */
     settingsPanel,
 
+    /** The gamepad service (V6, issue KI-05). */
+    gamepad,
+    /** True while a gamepad is connected. */
+    gamepadConnected() { return gamepad.isConnected(); },
+
     /** Show or hide the performance read-out. */
     togglePerformance(force) { return hud?.togglePerformance?.(force) ?? false; },
     performanceVisible() { return hud?.performanceVisible?.() ?? false; },
@@ -528,6 +547,7 @@ export function createUI(ctx) {
       hud?.dispose();
       menu.dispose();
       settingsPanel.dispose();
+      gamepad.dispose();
       camera.dispose();
       toasts.clear();
       mounted = false;

@@ -3,8 +3,9 @@
 A retro 16-bit-palette **voxel city builder** for the browser. Three.js 0.169 +
 Vite 5, ES modules, no TypeScript.
 
-**Version 5.0.0** — see [`docs/V5_FINAL_VERIFICATION.md`](docs/V5_FINAL_VERIFICATION.md)
+**Version 6.0.0** — see [`docs/V6_VERIFICATION.md`](docs/V6_VERIFICATION.md)
 for the release classification and [`CHANGELOG.md`](CHANGELOG.md) for what changed.
+The V5 record is kept at [`docs/V5_FINAL_VERIFICATION.md`](docs/V5_FINAL_VERIFICATION.md).
 
 ## ▶ Play it
 
