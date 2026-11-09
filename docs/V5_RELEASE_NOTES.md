@@ -15,7 +15,7 @@
 |---|---|
 | **Product** | SuperCitycon — a retro 16-bit-palette voxel city builder for the browser |
 | **Version** | 5.0.0 |
-| **Source revision** | `v5/upgrade` (branch tip — see §2) |
+| **Source revision** | `v5/upgrade` @ `412b066` (the upgrade commit; the branch tip is one documentation commit ahead) |
 | **Baseline revision** | `92c0b37` (`main`, the V4 release) |
 | **Engine** | Three.js 0.169.0 |
 | **Bundler** | Vite 7.3.7 |

@@ -56,13 +56,17 @@ The V5 work is **entirely on the `v5/upgrade` branch**. `main` and
 
 ```
 main        92c0b37   Record the third round of Trash emptying in the handover
-v5/upgrade  <tip>     SuperCitycon V5 — the 4 -> 5 upgrade
+v5/upgrade  412b066   SuperCitycon V5 — the 4 -> 5 upgrade
 ```
 
-The exact tip commit is recorded in §9 and is also embedded in every build:
-`vite.config.js` injects `VITE_BUILD_VERSION`, `VITE_BUILD_REVISION`,
-`VITE_ENGINE_VERSION` and `VITE_BUILD_TIME` into the bundle, and the running
-game exposes them through `window.SUPERCITYCON.diagnostics().build` and
+`412b066` is the commit that carries the whole upgrade. The branch tip is the
+small documentation commit that follows it and records this revision — so the
+tip is one commit ahead of the one named here, by design.
+
+The exact revision is also embedded in every build: `vite.config.js` injects
+`VITE_BUILD_VERSION`, `VITE_BUILD_REVISION`, `VITE_ENGINE_VERSION` and
+`VITE_BUILD_TIME` into the bundle, and the running game exposes them through
+`window.SUPERCITYCON.diagnostics().build` and
 `window.SUPERCITYCON.logger`.
 
 ---
