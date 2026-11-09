@@ -49,6 +49,7 @@ export const OBJECTIVE_TYPES = Object.freeze([
   'population',
   'treasury',
   'buildings',
+  'roads',
   'happiness',
   'coverage',
   'collectible',

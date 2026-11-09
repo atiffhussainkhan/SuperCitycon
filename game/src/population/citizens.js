@@ -590,7 +590,7 @@ export function createCitizens(ctx) {
   /**
    * Spawn one citizen.
    *
-   * @param {object} [options] `{from, to}` - the cells the citizen walks
+   * @param {object} [options] `{from, to, character}` - the cells the citizen walks
    *        between. Without them the citizen walks around its origin.
    * @returns {object|null} the spawned citizen record
    */
@@ -598,7 +598,11 @@ export function createCitizens(ctx) {
     if (disposed) return null;
     if (citizens.length >= MAX_RENDERED_CITIZENS) return null;
 
-    const rig = pool.acquire();
+    const { character } = options;
+    if (character && !library.has(character)) return null;
+    const rig = character
+      ? pool.acquire((entry) => entry.key === character, () => makeRig(character))
+      : pool.acquire();
     if (!rig) return null;
 
     const from = options.from ?? { x: 0, z: 0 };
@@ -620,6 +624,7 @@ export function createCitizens(ctx) {
 
     const citizen = {
       key: rig.key,
+      authored: Boolean(character),
       rig,
       get model() { return rig.model; },
       get mixer() { return rig.mixer; },
@@ -642,9 +647,10 @@ export function createCitizens(ctx) {
    *
    * @returns {boolean} true when a citizen was removed
    */
-  function despawn() {
-    const citizen = citizens.pop();
-    if (!citizen) return false;
+  function despawn(authored = false) {
+    const index = citizens.findLastIndex((citizen) => citizen.authored === authored);
+    if (index < 0) return false;
+    const [citizen] = citizens.splice(index, 1);
     pool.release(citizen.rig);
     return true;
   }
@@ -768,8 +774,9 @@ export function createCitizens(ctx) {
   }
 
   /** The number of rendered citizens. */
-  function count() {
-    return citizens.length;
+  function count(authored) {
+    if (authored === undefined) return citizens.length;
+    return citizens.filter((citizen) => citizen.authored === authored).length;
   }
 
   /** The pool's numbers. */

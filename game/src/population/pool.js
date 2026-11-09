@@ -70,21 +70,20 @@ export function createPool(options = {}) {
    *
    * @returns {any|null} the object, or null when the pool is exhausted
    */
-  function acquire() {
-    if (disposed) return null;
+  function acquire(matches = null, createItem = create) {
+    if (disposed || live.size >= capacity) return null;
 
-    let item = null;
-    let hit = false;
-    if (free.length > 0) {
-      item = free.pop();
-      hit = true;
-    } else if (live.size < capacity) {
-      item = create();
-    } else {
-      return null;
-    }
+    const index = matches ? free.findLastIndex(matches) : free.length - 1;
+    const hit = index >= 0;
+    const item = hit ? free.splice(index, 1)[0] : createItem();
     if (item === null || item === undefined) return null;
 
+    if (!hit && free.length + live.size >= capacity) {
+      const evicted = free.shift();
+      if (destroy) {
+        try { destroy(evicted); } catch { /* ignore */ }
+      }
+    }
     if (hit) hits += 1;
     else misses += 1;
 

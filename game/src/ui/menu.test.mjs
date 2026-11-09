@@ -26,6 +26,7 @@ import {
   MENU_ITEMS, PAUSE_ITEMS, buildCreditsModel,
 } from './menu.js';
 import { CREDIT_PACKS } from './panels.js';
+import { listLevels } from '../content/levels.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 
@@ -448,6 +449,40 @@ test('the level select starts a mode through CORE', () => {
   modeButtons[1].click();
   assert.equal(calls.startMode[0].mode, 'sandbox');
 
+  menu.dispose();
+});
+
+test('the level select confirms an authored map and awaits its actual placement result', async () => {
+  const { core } = makeCore();
+  let finish;
+  const pending = new Promise((resolve) => { finish = resolve; });
+  const calls = [];
+  const toasts = [];
+  const ctx = makeCtx({
+    core,
+    domains: { content: { levels: listLevels, apply(id) { calls.push(id); return pending; } } },
+  });
+  const menu = createMenu(ctx, { onToast: (...args) => toasts.push(args) });
+  menu.open('main');
+  menuItems(menu)[2].click();
+
+  const buttons = menu.el.querySelectorAll('[data-sc-menu-level]');
+  assert.deepEqual(buttons.map((button) => button.dataset.scMenuLevel),
+    ['first-light', 'high-water', 'the-long-night']);
+  press(buttons[0], 'Enter');
+  assert.deepEqual(calls, []);
+  assert.match(menu.el.textContent, /replaces the current city/);
+  const start = menu.el.querySelector('[data-sc-menu-start-level]');
+  press(start, 'Enter');
+  press(start, 'Enter');
+  press(menu.el, 'Escape');
+  assert.equal(menu.view(), 'level-confirm');
+  assert.match(menu.el.textContent, /Loading First Light/);
+  assert.deepEqual(calls, ['first-light']);
+  finish({ ok: true, skipped: [{ type: 'road' }] });
+  await pending;
+  assert.equal(menu.isOpen(), false);
+  assert.deepEqual(toasts, [['First Light loaded with 1 skipped placements', 'warn']]);
   menu.dispose();
 });
 

@@ -16,13 +16,12 @@
  *     domains that own them
  *   - track the level's objective state and emit completion
  *
- * It does NOT own a state subtree of its own: the progression record lives in
- * `state.meta.progress` (core/progress.js owns the rules), the hazard state
- * lives in the hazard domain, and the world/building state lives in WLD/BLD.
+ * Level identity and earned objectives travel with the city in `state.meta`.
+ * Checkpoints and collectibles belong to CORE's progression record.
  */
 
 import { EVENTS, emit } from '../core/events.js';
-import { GRID } from '../core/config.js';
+import { GRID, MODES, TOOLS } from '../core/config.js';
 import { LEVELS, getLevel, listLevels, levelOrder, nextLevel, previousLevel, levelsForMode } from './levels.js';
 import { validateLevel, validateLevels, footprintOf, spawnCells } from './validate.js';
 
@@ -60,34 +59,30 @@ function blockCellsFor(spawn, footprint) {
 }
 
 /**
- * The objective state of a level.
- *
- * `met` records whether the objective's condition was satisfied at least once
- * during the run — objectives are cumulative, not instantaneous, because a
- * city's population can fall again after a hazard and the player must not
- * lose progress they already earned.
- */
-function emptyObjectiveState(level) {
-  const out = new Map();
-  for (const objective of level?.objectives ?? []) {
-    out.set(objective.id, { met: false, current: 0, target: objective.target });
-  }
-  return out;
-}
-
-/**
  * Create the content service.
  *
  * @param {object} ctx the shared context (core/CONTRACT.md §1)
  * @returns {object} the content service
  */
 export function createContent(ctx) {
-  /** The level currently loaded, or null. */
-  let active = null;
-  /** id -> objective state. */
-  let objectives = new Map();
-  /** Whether the level has been completed. */
-  let completed = false;
+  let applying = false;
+  let disposed = false;
+  const unsubscribes = [];
+
+  function activeLevel() {
+    return applying || disposed ? null : getLevel(ctx?.state?.meta?.levelId);
+  }
+
+  function authoredCitizens(level, onSpawn = () => {}) {
+    const population = ctx?.domains?.population;
+    population?.clearAuthoredCitizens?.();
+    for (const spawn of level?.spawns ?? []) {
+      if (spawn.type === 'character') {
+        const result = population?.spawnAuthoredCitizen?.(spawn.key, spawn.x, spawn.z);
+        onSpawn(result, spawn.id, spawn.type);
+      }
+    }
+  }
 
   /** The building catalogue ids, read lazily (the catalogue loads after us). */
   function buildingIds() {
@@ -172,134 +167,102 @@ export function createContent(ctx) {
    * @param {string} id
    * @returns {{ok:boolean, level:object|null, applied:number, skipped:Array}}
    */
-  function apply(id) {
+  async function apply(id) {
     const level = getLevel(id);
-    if (!level) {
-      return { ok: false, level: null, applied: 0, skipped: [] };
-    }
-
-    const state = ctx?.state;
-    const world = ctx?.domains?.world;
-    const buildings = ctx?.domains?.buildings;
-    const mobility = ctx?.domains?.mobility;
-
-    if (!state) {
-      return { ok: false, level, applied: 0, skipped: [] };
-    }
-
-    // The level owns the seed and the mode.
-    state.meta.seed = level.seed;
-    state.meta.levelId = level.id;
-    state.meta.difficulty = level.difficulty;
-
-    // --- terrain ---------------------------------------------------------
-    if (world?.generate) {
-      world.generate(level.seed);
-    }
-
     const skipped = [];
     let applied = 0;
+    const failure = (reason) => ({ ok: false, level, applied, skipped, reason });
+    if (!level) return failure('Unknown level');
+    if (applying || disposed) return failure('Level loading is unavailable');
 
-    // --- roads -----------------------------------------------------------
-    const roads = (level.spawns ?? []).filter((s) => s.type === 'road');
-    for (const road of roads) {
-      const result = mobility?.addRoad?.(road.x, road.z);
-      if (result === false) {
-        skipped.push({ id: road.id, type: 'road', reason: 'the road could not be laid' });
-      } else {
-        applied += 1;
-      }
+    const modes = ctx?.core?.modes;
+    const { wld, world = wld, buildings, mobility, economy, hazards } = ctx?.domains ?? {};
+    // CORE replaces the subtrees in place. Retain the previous ones until
+    // generation succeeds so a failed load can restore the player's city.
+    const previousState = { ...ctx?.state };
+    const previous = previousState.meta;
+    if (!previous || !modes?.startMode || !world?.generate) {
+      return failure('The level services are unavailable');
     }
+    const report = validate(id);
+    if (!report.ok) return failure(report.issues.find((issue) => issue.severity === 'error')?.message);
 
-    // --- buildings -------------------------------------------------------
-    // The starting city of a level ALREADY EXISTED when the player arrived:
-    // it is not player construction. It therefore goes in as `prebuilt`, so
-    // it is neither charged to the treasury nor counted against the
-    // player's construction slots — and it bypasses the placement gate,
-    // whose slot and funds checks exist to gate the PLAYER's placements.
-    const rawPlace = typeof buildings?.place === 'function'
-      ? (buildings.place.__scRawPlace ?? buildings.place)
-      : null;
-    const buildingSpawns = (level.spawns ?? []).filter((s) => s.type === 'building');
-    for (const spawn of buildingSpawns) {
-      // A spawn with a `rect` is a BLOCK: the building type is laid across
-      // the rectangle, stepping by the building's own footprint, so a 2×2
-      // building fills a 2×2 block and the next one starts two cells along.
-      const cells = blockCellsFor(spawn, footprintOfKey(ctx, spawn.key));
-      for (const cell of cells) {
-        const result = rawPlace
-          ? rawPlace(spawn.key, cell.x, cell.z, spawn.rot ?? 0, { prebuilt: true })
-          : { ok: false, reason: 'the buildings domain is unavailable' };
+    applying = true;
+    let meta;
+    let succeeded = false;
+    const stillLoading = () => !disposed && ctx?.state?.meta === meta;
+    try {
+      const mode = previous.mode ?? MODES.play;
+      const started = modes.startMode(mode, {
+        fresh: true,
+        seed: level.seed,
+        entitlements: previous.entitlements,
+        winConditions: previous.winConditions,
+      });
+      if (!started) return failure('The city could not be reset');
+      meta = ctx.state.meta;
+      meta.ready = previous.ready;
+      modes.setPaused?.(true);
+
+      // Clear the old city before allocating new instance ids and terrain.
+      await buildings?.init?.();
+      if (!stillLoading()) return failure('The city changed during level loading');
+      economy?.init?.();
+      const generated = await world.generate(level.seed);
+      if (!stillLoading()) return failure('The city changed during level loading');
+      if (generated === null || generated === false) return failure('The terrain could not be generated');
+      mobility?.dispose?.();
+      mobility?.init?.();
+
+      function count(result, id, type) {
         if (!result || result.ok === false) {
-          skipped.push({
-            id: `${spawn.id}@${cell.x},${cell.z}`,
-            type: 'building',
-            reason: result?.reason ?? 'the buildings domain refused the placement',
-          });
+          skipped.push({ id, type, reason: result?.reason ?? `The ${type} could not be placed` });
         } else {
           applied += 1;
         }
       }
-    }
 
-    // --- nature ----------------------------------------------------------
-    const natureSpawns = (level.spawns ?? []).filter((s) => s.type === 'nature');
-    for (const spawn of natureSpawns) {
-      const result = world?.placeNature?.(spawn.x, spawn.z, spawn.key);
-      if (result === false) {
-        skipped.push({ id: spawn.id, type: 'nature', reason: 'the model could not be placed' });
-      } else {
-        applied += 1;
+      for (const road of level.spawns.filter((s) => s.type === 'road')) {
+        count(mobility?.addRoad?.(road.x, road.z), road.id, road.type);
+      }
+
+      // Prebuilt structures bypass the player's funds and construction gates.
+      const rawPlace = buildings?.place?.__scRawPlace ?? buildings?.place;
+      for (const spawn of level.spawns.filter((s) => s.type === 'building')) {
+        const cells = blockCellsFor(spawn, footprintOfKey(ctx, spawn.key));
+        for (const cell of cells) {
+          const result = rawPlace?.(spawn.key, cell.x, cell.z, spawn.rot ?? 0, { prebuilt: true });
+          count(result, `${spawn.id}@${cell.x},${cell.z}`, spawn.type);
+        }
+      }
+
+      for (const spawn of level.spawns.filter((s) => s.type === 'nature')) {
+        const result = await world.placeNature?.(spawn.x, spawn.z, spawn.key);
+        if (!stillLoading()) return failure('The city changed during level loading');
+        count(result, spawn.id, spawn.type);
+      }
+      authoredCitizens(level, count);
+
+      hazards?.load?.(level.hazards);
+      meta.levelId = level.id;
+      meta.difficulty = level.difficulty;
+      meta.levelObjectives = [];
+      meta.levelComplete = false;
+      succeeded = true;
+    } catch (error) {
+      ctx?.logger?.exception?.(error, { where: 'loadLevel', level: level.id });
+      return failure('The level could not be loaded');
+    } finally {
+      applying = false;
+      if (meta && stillLoading()) {
+        if (succeeded) {
+          modes.setPaused?.(Boolean(previous.paused));
+        } else {
+          Object.assign(ctx.state, previousState);
+          emit(EVENTS.GAME_LOADED, { source: 'level-rollback' });
+        }
       }
     }
-
-    // --- citizens --------------------------------------------------------
-    const citizenSpawns = (level.spawns ?? []).filter((s) => s.type === 'character');
-    for (const spawn of citizenSpawns) {
-      const result = ctx?.domains?.population?.spawnCitizen?.({
-        character: spawn.key,
-        x: spawn.x,
-        z: spawn.z,
-      });
-      if (result === false) {
-        skipped.push({ id: spawn.id, type: 'character', reason: 'the citizen could not be spawned' });
-      } else {
-        applied += 1;
-      }
-    }
-
-    // --- progression -----------------------------------------------------
-    objectives = emptyObjectiveState(level);
-    completed = false;
-
-    // The checkpoint and collectible records travel with the save; a level
-    // starts with a clean slate for the checkpoints it defines, because the
-    // checkpoint ids are level-scoped.
-    const progress = ctx?.progress;
-    if (progress && typeof progress.set === 'function') {
-      const current = progress.record?.() ?? { checkpoints: [], collectibles: [], achievements: [] };
-      const keepCheckpoints = current.checkpoints.filter(
-        (cpId) => !(level.checkpoints ?? []).some((cp) => cp.id === cpId),
-      );
-      const keepCollectibles = current.collectibles.filter(
-        (cId) => !(level.collectibles ?? []).some((c) => c.id === cId),
-      );
-      progress.set({
-        checkpoints: keepCheckpoints,
-        collectibles: keepCollectibles,
-        achievements: current.achievements ?? [],
-      });
-    }
-
-    // --- hazards ---------------------------------------------------------
-    const hazards = ctx?.domains?.hazards;
-    if (hazards?.load) {
-      hazards.load(level.hazards ?? []);
-    } else if (hazards?.reset) {
-      hazards.reset();
-    }
-
-    active = level;
     emit(EVENTS.GAME_RESET, { levelId: level.id, applied, skipped: skipped.length });
     return { ok: true, level, applied, skipped };
   }
@@ -310,32 +273,29 @@ export function createContent(ctx) {
    * @returns {{complete:boolean, objectives:Array<object>}}
    */
   function evaluateObjectives() {
+    const active = activeLevel();
     if (!active) return { complete: false, objectives: [] };
-    const state = ctx?.state ?? {};
-    const rows = [];
-
-    for (const objective of active.objectives ?? []) {
-      const record = objectives.get(objective.id) ?? { met: false, current: 0, target: objective.target };
-      const current = measureObjective(objective, state, ctx);
-      if (!record.met && current >= objective.target) {
-        record.met = true;
-      }
-      record.current = current;
-      objectives.set(objective.id, record);
-      rows.push({
+    const state = ctx.state;
+    const saved = state.meta.levelObjectives;
+    const met = new Set(Array.isArray(saved) ? saved : []);
+    const rows = active.objectives.map((objective) => {
+      const current = measureObjective(objective, state, ctx, active);
+      if (current >= objective.target) met.add(objective.id);
+      return {
         id: objective.id,
         label: objective.label,
         type: objective.type,
         current,
         target: objective.target,
-        met: record.met,
+        met: met.has(objective.id),
         progress: objective.target > 0 ? Math.min(1, current / objective.target) : 0,
-      });
-    }
+      };
+    });
+    if (!Array.isArray(saved) || met.size !== saved.length) state.meta.levelObjectives = [...met];
 
     const complete = rows.length > 0 && rows.every((r) => r.met);
-    if (complete && !completed) {
-      completed = true;
+    if (complete && state.meta.levelComplete !== true) {
+      state.meta.levelComplete = true;
       emit(EVENTS.STAGE_ADVANCED, { levelId: active.id, kind: 'level-complete' });
     }
     return { complete, objectives: rows };
@@ -346,9 +306,13 @@ export function createContent(ctx) {
    * @param {string} id
    */
   function reachCheckpoint(id) {
-    if (!active) return false;
-    const known = (active.checkpoints ?? []).some((cp) => cp.id === id);
-    if (!known) return false;
+    const active = activeLevel();
+    const checkpoint = active?.checkpoints.find((cp) => cp.id === id);
+    if (!checkpoint) return false;
+    const { objectives } = evaluateObjectives();
+    const unlocked = (checkpoint.requires ?? []).every((required) =>
+      objectives.some((objective) => objective.id === required && objective.met));
+    if (!unlocked) return false;
     return ctx?.progress?.reachCheckpoint?.(id, { levelId: active.id }) ?? false;
   }
 
@@ -357,9 +321,8 @@ export function createContent(ctx) {
    * @param {string} id
    */
   function findCollectible(id) {
-    if (!active) return false;
-    const known = (active.collectibles ?? []).some((c) => c.id === id);
-    if (!known) return false;
+    const active = activeLevel();
+    if (!active?.collectibles.some((c) => c.id === id)) return false;
     return ctx?.progress?.findCollectible?.(id, { levelId: active.id }) ?? false;
   }
 
@@ -368,6 +331,7 @@ export function createContent(ctx) {
    * @returns {Array<{id:string,label:string,x:number,z:number,reached:boolean}>}
    */
   function checkpointStatus() {
+    const active = activeLevel();
     if (!active) return [];
     const progress = ctx?.progress;
     return (active.checkpoints ?? []).map((cp) => ({
@@ -384,6 +348,7 @@ export function createContent(ctx) {
    * @returns {Array<{id:string,label:string,x:number,z:number,found:boolean}>}
    */
   function collectibleStatus() {
+    const active = activeLevel();
     if (!active) return [];
     const progress = ctx?.progress;
     return (active.collectibles ?? []).map((c) => ({
@@ -395,11 +360,37 @@ export function createContent(ctx) {
     }));
   }
 
+  /** Inspecting an authored landmark is the in-game way to claim it. */
+  function onClick(cell, button = 0) {
+    if (!cell || cell.outOfBounds || button !== 0 || ctx?.state?.ui?.tool !== TOOLS.inspect) return false;
+    const checkpoint = checkpointStatus().find((cp) => cp.x === cell.x && cp.z === cell.z);
+    const collectible = collectibleStatus().find((c) => c.x === cell.x && c.z === cell.z);
+    const ui = ctx?.ui;
+    if (checkpoint && !checkpoint.reached) {
+      if (reachCheckpoint(checkpoint.id)) {
+        ui?.showToast?.(`${checkpoint.label} reached`, 'success');
+      } else {
+        ui?.showToast?.(`${checkpoint.label} is locked until its objectives are met`, 'warn');
+      }
+    }
+    if (collectible && !collectible.found && findCollectible(collectible.id)) {
+      ui?.showToast?.(`${collectible.label} found`, 'success');
+    }
+    return Boolean(checkpoint || collectible);
+  }
+
   return {
+    init() {
+      if (!ctx?.bus?.on) return;
+      unsubscribes.push(ctx.bus.on(EVENTS.GAME_LOADED, () => authoredCitizens(activeLevel())));
+      unsubscribes.push(ctx.bus.on(EVENTS.GAME_RESET, ({ levelId } = {}) => {
+        if (!levelId) authoredCitizens(null);
+      }));
+    },
     /** The active level, or null. */
-    activeLevel() { return active; },
+    activeLevel,
     /** The level id currently loaded, or null. */
-    activeLevelId() { return active?.id ?? null; },
+    activeLevelId() { return activeLevel()?.id ?? null; },
     /** The library. */
     levels() { return listLevels(); },
     /** The world-map chain. */
@@ -418,6 +409,7 @@ export function createContent(ctx) {
     validateAll,
     /** Apply a level to the city. */
     apply,
+    isLoading() { return applying; },
     /** Evaluate the objectives of the active level. */
     evaluateObjectives,
     /** Record a checkpoint. */
@@ -428,18 +420,17 @@ export function createContent(ctx) {
     checkpointStatus,
     /** The collectible status of the active level. */
     collectibleStatus,
+    onClick,
     /** Whether the active level is complete. */
-    isComplete() { return completed; },
+    isComplete() { return !!activeLevel() && ctx.state.meta.levelComplete === true; },
     /** Per-frame hook — evaluates the objectives. */
     update() {
-      if (!active) return;
       evaluateObjectives();
     },
     /** Teardown. */
     dispose() {
-      active = null;
-      objectives = new Map();
-      completed = false;
+      disposed = true;
+      for (const unsubscribe of unsubscribes.splice(0)) unsubscribe();
     },
   };
 }
@@ -452,10 +443,16 @@ export function createContent(ctx) {
  * @param {object} objective
  * @param {object} state
  * @param {object} ctx
+ * @param {object} [level] limits generic counts to this level's records
  * @returns {number}
  */
-export function measureObjective(objective, state, ctx = {}) {
+export function measureObjective(objective, state, ctx = {}, level = null) {
   const num = (v) => (typeof v === 'number' && Number.isFinite(v) ? v : 0);
+  const countRecords = (records, targetId, definitions) => {
+    if (targetId) return Number(records.includes(targetId));
+    if (!definitions) return records.length;
+    return definitions.filter(({ id }) => records.includes(id)).length;
+  };
 
   switch (objective?.type) {
     case 'population':
@@ -468,6 +465,8 @@ export function measureObjective(objective, state, ctx = {}) {
       if (Array.isArray(instances)) return instances.length;
       return 0;
     }
+    case 'roads':
+      return num(state?.mobility?.roads?.size);
     case 'happiness':
       return num(state?.population?.happiness);
     case 'coverage': {
@@ -479,17 +478,18 @@ export function measureObjective(objective, state, ctx = {}) {
     }
     case 'collectible': {
       const found = ctx?.progress?.collectibles?.() ?? [];
-      return found.length;
+      return countRecords(found, objective.collectibleId, level?.collectibles);
     }
     case 'checkpoint': {
       const reached = ctx?.progress?.checkpoints?.() ?? [];
-      return reached.length;
+      return countRecords(reached, objective.checkpointId, level?.checkpoints);
     }
     case 'hazard': {
       const hazards = ctx?.domains?.hazards;
       if (!hazards) return 0;
       const resolved = hazards.resolved?.() ?? [];
-      return resolved.length;
+      const survived = resolved.filter((record) => record?.outcome !== 'failed');
+      return countRecords(survived.map((record) => record?.id ?? record), objective.hazardId, level?.hazards);
     }
     case 'custom':
       try {

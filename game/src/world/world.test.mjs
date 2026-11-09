@@ -37,7 +37,7 @@ import {
   WLD_TUNING,
 } from './heightfield.js';
 import { computeWaterBodies, floodFill, waterLevelFor } from './water.js';
-import { planScatter, NATURE_KEYS, isPlaceableNatureKey } from './scatter.js';
+import { clearSceneryAt, planScatter, NATURE_KEYS, isPlaceableNatureKey } from './scatter.js';
 import { APRON_CELLS } from './terrain.js';
 import {
   buildTerrainMesh,
@@ -495,4 +495,82 @@ test('createWorld boots, terraforms and disposes', async () => {
   // --- disposal ------------------------------------------------------------
   world.dispose();
   assert.equal(ctx.renderer.world.children.length, 0, 'every mesh was removed');
+});
+
+test('a loaded world rebuilds terrain, water and both scenery layers without changing saved data', async () => {
+  const key = NATURE_KEYS[0];
+  const model = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshBasicMaterial());
+  model.name = 'saved scenery model';
+  const scene = new THREE.Group();
+  const ctx = mockCtx({ renderer: { world: scene } });
+  const world = createWorld(ctx);
+  await world.init();
+  const oldTerrain = scene.getObjectByName('terrain');
+  const oldWater = scene.getObjectByName('water');
+
+  const restored = {
+    ...ctx.state.world,
+    heightmap: new Float32Array(SIZE * SIZE).fill(3),
+    waterLevel: -1.25,
+    modified: 14,
+    scenery: [
+      { model: key, cx: 15, cz: 15, rot: 0, scale: 1, group: key, kind: 'instanced' },
+      { model: key, cx: 16, cz: 15, rot: Math.PI / 2, scale: 1, kind: 'single' },
+    ],
+    sceneryCount: 2,
+  };
+  const expected = structuredClone(restored);
+  const records = restored.scenery;
+  ctx.state.world = restored;
+  ctx.assets.loadModel = async () => model;
+
+  const pending = world.restoreView();
+  assert.equal(oldTerrain.parent, null, 'old terrain is removed immediately');
+  assert.equal(oldWater.parent, null, 'old water is removed immediately');
+  assert.equal(await pending, true);
+  assert.notEqual(scene.getObjectByName('terrain'), oldTerrain);
+  assert.equal(world.heightAt(15, 15), 3);
+  assert.equal(scene.getObjectByName('water').position.y, -1.25);
+  const batch = scene.getObjectByName(`scatter:${key}`);
+  assert.equal(batch.count, 1);
+  const single = scene.getObjectByName(model.name);
+  assert.equal(single.position.y, 3);
+  assert.equal(single.rotation.y, Math.PI / 2);
+  assert.deepEqual(ctx.state.world, expected);
+  assert.equal(ctx.state.world.scenery, records, 'the restored records are retained');
+
+  assert.equal(clearSceneryAt(ctx, [{ x: 15, z: 15 }, { x: 16, z: 15 }]), 2);
+  assert.equal(batch.count, 0, 'normal construction can clear restored batches');
+  assert.equal(single.parent, null, 'normal construction can clear restored props');
+  world.dispose();
+});
+
+test('a later save restore prevents a pending old scenery model from reaching the scene', async () => {
+  const key = NATURE_KEYS[0];
+  const scene = new THREE.Group();
+  let resolveModel;
+  let modelRequested;
+  const modelRequest = new Promise((resolve) => { modelRequested = resolve; });
+  const ctx = mockCtx({
+    renderer: { world: scene },
+    assets: {
+      loadModel: () => new Promise((resolve) => {
+        resolveModel = resolve;
+        modelRequested();
+      }),
+    },
+  });
+  const world = createWorld(ctx);
+  ctx.state.world.heightmap = new Float32Array(SIZE * SIZE).fill(4);
+  ctx.state.world.scenery = [{ model: key, cx: 15, cz: 15, rot: 0, scale: 1, kind: 'single' }];
+  const first = world.restoreView();
+  await modelRequest;
+
+  ctx.state.world = { ...ctx.state.world, scenery: [], sceneryCount: 0, waterLevel: -2 };
+  assert.equal(await world.restoreView(), true);
+  resolveModel(new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshBasicMaterial()));
+  assert.equal(await first, false);
+  assert.deepEqual(scene.children.map((child) => child.name), ['terrain', 'water']);
+  assert.equal(scene.getObjectByName('water').position.y, -2);
+  world.dispose();
 });

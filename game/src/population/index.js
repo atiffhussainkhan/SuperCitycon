@@ -487,15 +487,16 @@ export function createPopulation(ctx) {
 
   /** Keep the rendered sample in step with the population. */
   function syncRenderedCitizens() {
+    const authored = citizens.count(true);
     const target = Math.min(
-      MAX_RENDERED_CITIZENS,
+      MAX_RENDERED_CITIZENS - authored,
       Math.max(0, Math.ceil(state.population.total / 25)),
     );
     let guard = MAX_RENDERED_CITIZENS + 1;
-    while (citizens.count() > target && guard-- > 0) citizens.despawn();
+    while (citizens.count(false) > target && guard-- > 0) citizens.despawn();
     guard = MAX_RENDERED_CITIZENS + 1;
     const from = residentialCell();
-    while (citizens.count() < target && guard-- > 0) {
+    while (citizens.count(false) < target && guard-- > 0) {
       const to = servicedCell() ?? from;
       if (!from && !to) break;
       citizens.spawn({ from: from ?? to, to: to ?? from });
@@ -636,6 +637,17 @@ export function createPopulation(ctx) {
       const to = servicedCell() ?? from;
       if (!from && !to) return null;
       return citizens.spawn({ from: from ?? to, to: to ?? from });
+    },
+
+    /** Place the named library character at the level's authored cell. */
+    spawnAuthoredCitizen(character, x, z) {
+      if (!citizens.availableCharacters().includes(character)) return null;
+      if (citizens.count() >= MAX_RENDERED_CITIZENS) citizens.despawn();
+      return citizens.spawn({ from: { x, z }, character });
+    },
+
+    clearAuthoredCitizens() {
+      while (citizens.despawn(true)) { /* return authored rigs to the pool */ }
     },
 
     /** Remove one rendered citizen. */

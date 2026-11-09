@@ -113,7 +113,7 @@ export const LEVELS = Object.freeze([
       Object.freeze({
         id: 'obj-first-roads',
         label: 'Lay the first streets',
-        type: 'buildings',
+        type: 'roads',
         target: 24,
       }),
       Object.freeze({
@@ -290,7 +290,7 @@ export const LEVELS = Object.freeze([
       Object.freeze({ id: 'spawn-civic-1', type: 'character', key: 'Mage', x: 26, z: 36 }),
       Object.freeze({ id: 'spawn-civic-2', type: 'character', key: 'Rogue', x: 30, z: 36 }),
       Object.freeze({ id: 'spawn-tree-0', type: 'nature', key: 'mdvl_nature_pine_01', x: 10, z: 14 }),
-      Object.freeze({ id: 'spawn-tree-1', type: 'nature', key: 'mdvl_nature_boulder_01', x: 52, z: 24 }),
+      Object.freeze({ id: 'spawn-tree-1', type: 'nature', key: 'mdvl_nature_boulder_01', x: 50, z: 24 }),
     ]),
     exits: Object.freeze([
       Object.freeze({
@@ -461,7 +461,7 @@ export const LEVELS = Object.freeze([
       Object.freeze({ id: 'spawn-civic-3', type: 'character', key: 'Barbarian', x: 32, z: 30 }),
       Object.freeze({ id: 'spawn-tree-0', type: 'nature', key: 'mdvl_nature_deadtree_01', x: 50, z: 46 }),
       Object.freeze({ id: 'spawn-tree-1', type: 'nature', key: 'mdvl_nature_boulder_01', x: 12, z: 20 }),
-      Object.freeze({ id: 'spawn-tree-2', type: 'nature', key: 'mdvl_nature_oak_01', x: 12, z: 46 }),
+      Object.freeze({ id: 'spawn-tree-2', type: 'nature', key: 'mdvl_nature_oak_01', x: 15, z: 42 }),
     ]),
     exits: Object.freeze([
       Object.freeze({

@@ -484,6 +484,24 @@ test('a despawned citizen goes back to the pool and is reused', async (t) => {
   assert.equal(actors.children.length, 1, 'the citizen is back in the scene');
 });
 
+test('authored characters use their named rig and survive crowd retirement', async () => {
+  const { ctx } = await makeCtx();
+  const citizens = createCitizens(ctx);
+  await citizens.preload();
+  citizens.spawn();
+  const cell = { x: 30, z: 34 };
+  const mage = citizens.spawn({ character: 'Mage', from: cell });
+  assert.equal(mage.key, 'Mage');
+  assert.deepEqual(mage.origin, cell);
+  assert.equal(citizens.despawn(), true);
+  assert.equal(citizens.count(false), 0);
+  assert.equal(citizens.count(true), 1);
+  assert.equal(citizens.despawn(true), true);
+  const knight = citizens.spawn({ character: 'Knight', from: cell });
+  assert.equal(knight.key, 'Knight');
+  citizens.dispose();
+});
+
 test('the number of rendered citizens is capped', async (t) => {
   const { ctx, gltf } = await makeCtx();
   if (!gltf) {

@@ -735,7 +735,7 @@ test('tapping the active tool cancels it (FR-UX-058)', () => {
   ui.dispose();
 });
 
-test('the clock opens the time control with the speed buttons (FR-UX-098/099)', () => {
+test('the clock opens the speed controls and sends the selected time preset (FR-UX-098/100)', () => {
   const ctx = makeCtx();
   const ui = createUI(ctx);
   ui.hud.el.querySelector('[data-sc-action="clock"]').click();
@@ -744,7 +744,16 @@ test('the clock opens the time control with the speed buttons (FR-UX-098/099)', 
   assert.equal(speeds.length, 5, 'the time control carries the pause + speed control');
   const presets = ui.hud.el.querySelectorAll('[data-sc-time-preset]');
   assert.equal(presets.length, 4, 'dawn / day / dusk / night');
-  ui.dispose();
+
+  const requests = [];
+  const unsubscribe = on(EVENTS.TIME_SEEKED, (request) => requests.push(request));
+  try {
+    ui.hud.el.querySelector('[data-sc-time-preset="night"]').click();
+    assert.deepEqual(requests, [{ t: 0 }]);
+  } finally {
+    unsubscribe();
+    ui.dispose();
+  }
 });
 
 test('the keyboard scheme works when nothing in the page is focused', () => {

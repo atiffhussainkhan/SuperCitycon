@@ -44,7 +44,7 @@ import { createSettings } from './core/settings.js';
 import { createInputMap } from './core/input-map.js';
 import { createProgress } from './core/progress.js';
 import {
-  makeRng, MODES, SPEED, TUNING, GRID, CELL, PALETTE, WORLD, TOOLS, DAY_LENGTH,
+  makeRng, MODES, SPEED, TUNING, GRID, CELL, PALETTE, WORLD, TOOLS,
   cellToWorld, worldToCell, worldToCellInt, inBounds,
 } from './core/config.js';
 
@@ -135,7 +135,7 @@ async function main() {
     level: 'info',
     build: buildIdentity(),
   });
-  installGlobalHandlers(logger);
+  const uninstallGlobalHandlers = installGlobalHandlers(logger);
 
   // The user's settings: audio levels, display options, accessibility
   // options and the key bindings. They are a user preference, so they live
@@ -218,11 +218,12 @@ async function main() {
   const placementGate = installPlacementGate(ctx);
 
   // ---- 4. audio (optional) ----------------------------------------------
+  let uninstallAudioUnlock;
   try {
     const audioMod = await import('./audio/audio.js');
     ctx.audio = audioMod.createAudio(ctx);
     applyAudioSettings(ctx);
-    installAudioFeedback(ctx);
+    uninstallAudioUnlock = installAudioFeedback(ctx);
   } catch (err) {
     log(`audio unavailable: ${err && err.message}`);
   }
@@ -266,37 +267,17 @@ async function main() {
   // V5 has ONE clock — CORE's `advanceClock`, which owns the elapsed time,
   // the day counter and the year — and ONE fixed simulation step. The
   // domains are ticked a whole number of times per frame with exactly
-  // FIXED_STEP of game time each, so the same inputs always produce the
+  // TUNING.fixedStep of game time each, so the same inputs always produce the
   // same result whatever the frame rate.
-  const FIXED_STEP = TUNING.fixedStep;
-  const MAX_CATCH_UP = TUNING.maxCatchUpSteps;
   /** How many fixed steps one call to the deterministic test hook may run. */
   const MAX_STEPS_PER_CALL = 600;
-  /** The game time that has not been simulated yet. */
-  let accumulator = 0;
-
-  /**
-   * The time of day, as a fraction in [0, 1).
-   *
-   * The sky module's own convention (see the HUD's TIME_PRESETS) is
-   * 0 = night, 0.25 = dawn, 0.5 = day, 0.75 = dusk. A game day therefore
-   * starts at dawn and rolls through day, dusk and night before dawn again.
-   *
-   * The fraction comes from `meta.elapsed`, the accumulated GAME time, so the
-   * sun moves faster when the clock is fast and freezes when the game is
-   * paused — the sky and the day counter can never disagree.
-   */
-  function timeOfDay() {
-    const day = (liveState.meta.elapsed / DAY_LENGTH) % 1;
-    return (TUNING.dayStartFraction + day) % 1;
-  }
 
   // The dome is repainted from vertex colours, so it is refreshed on a
   // throttle rather than every frame: a full day lasts 60 real seconds at
   // normal speed, so this is still far smoother than the eye needs.
   let lastSkyT = null;
   function updateSky() {
-    const t = timeOfDay();
+    const t = coreModes.timeOfDay(liveState);
     if (lastSkyT !== null && Math.abs(t - lastSkyT) < TUNING.skyRepaintStep) return;
     lastSkyT = t;
     try {
@@ -307,40 +288,12 @@ async function main() {
     }
   }
 
-  /**
-   * Move the clock to a given time of day.
-   *
-   * The elapsed game time IS the clock, so a preset has to move it rather
-   * than set the renderer directly — otherwise the next frame would undo the
-   * jump. The shortest way round the cycle is taken, so the sky does not spin
-   * all the way around, and the day counter is kept in step with the elapsed
-   * time so the two can never disagree.
-   *
-   * @param {number} t the target time of day, in [0, 1)
-   */
-  function seekTimeOfDay(t) {
-    const target = ((Number(t) % 1) + 1) % 1;
-    if (!Number.isFinite(target)) return;
-    let delta = target - timeOfDay();
-    if (delta > 0.5) delta -= 1;
-    if (delta < -0.5) delta += 1;
-    const seconds = delta * DAY_LENGTH;
-    liveState.meta.elapsed += seconds;
-    // `dayProgress` is CORE's accumulator for the time already spent inside
-    // the current day; it has to move with the elapsed time or the next
-    // `advanceClock` would roll the day over at the wrong moment.
-    const progress = (Number.isFinite(liveState.meta.dayProgress) ? liveState.meta.dayProgress : 0) + seconds;
-    let remaining = progress;
-    while (remaining >= DAY_LENGTH) { remaining -= DAY_LENGTH; liveState.meta.day += 1; }
-    while (remaining < 0) { remaining += DAY_LENGTH; liveState.meta.day -= 1; }
-    liveState.meta.dayProgress = remaining;
-    lastSkyT = null;            // force the sky to repaint at the new time
-    emit(EVENTS.DAY_CHANGED, { day: liveState.meta.day, year: liveState.meta.year ?? null });
-  }
-
-  // The HUD's time presets seek the clock (the UX domain owns the buttons,
-  // the integrator owns the clock).
-  on(EVENTS.TIME_SEEKED, ({ t }) => seekTimeOfDay(t));
+  // Refresh the renderer before the HUD redraws the clock preset panel.
+  on(EVENTS.TIME_SEEKED, (request) => {
+    if (!coreModes.seekTimeOfDay(request?.t, liveState)) return;
+    lastSkyT = null;
+    updateSky();
+  });
 
   /**
    * One fixed simulation step.
@@ -370,31 +323,7 @@ async function main() {
     }
   }
 
-  /**
-   * Advance the game by `gameDt` seconds of GAME time.
-   *
-   * The time is accumulated and spent in whole FIXED_STEP steps, so the
-   * simulation is frame-rate independent: the same number of seconds of game
-   * time always produces the same number of simulation steps.
-   *
-   * @param {number} gameDt game seconds to advance
-   * @param {number} [maxSteps] the catch-up bound for this call
-   * @returns {number} the number of simulation steps that ran
-   */
-  function stepGame(gameDt, maxSteps = MAX_CATCH_UP) {
-    if (!(gameDt > 0)) return 0;
-    accumulator += gameDt;
-    let steps = 0;
-    while (accumulator >= FIXED_STEP && steps < maxSteps) {
-      accumulator -= FIXED_STEP;
-      steps += 1;
-      simulate(FIXED_STEP);
-    }
-    // A backlog larger than the catch-up bound is dropped: a machine that
-    // cannot keep up must fall behind, not spiral.
-    if (steps >= maxSteps && accumulator >= FIXED_STEP) accumulator = 0;
-    return steps;
-  }
+  const stepGame = coreModes.createFixedStepRunner(simulate);
 
   let last = performance.now();
   function frame(now) {
@@ -428,7 +357,7 @@ async function main() {
   // integrator. Do not add a second update loop here - two drivers fight.
 
   // ---- 7. input ----------------------------------------------------------
-  installInput(ctx, renderer);
+  const uninstallInput = installInput(ctx, renderer);
 
   // ---- 7b. reload the view of a loaded city ------------------------------
   installLoadRelay(ctx);
@@ -454,11 +383,16 @@ async function main() {
   // was no teardown path at all, so the frame loop, the stage timer, the
   // event bus and every GPU resource outlived the page they belonged to.
   let disposed = false;
+  let bootTimer;
   function dispose() {
     if (disposed) return false;
     disposed = true;
     try { clearInterval(stageTimer); } catch { /* optional */ }
     try { cancelAnimationFrame(rafId); } catch { /* optional */ }
+    clearTimeout(bootTimer);
+    uninstallInput();
+    uninstallAudioUnlock?.();
+    uninstallGlobalHandlers();
     for (const [key, svc] of services) {
       try {
         svc?.dispose?.();
@@ -467,8 +401,15 @@ async function main() {
       }
     }
     try { ctx.audio?.dispose?.(); } catch { /* optional */ }
+    try { renderer.dispose(); } catch (err) {
+      logger.exception(err, { subsystem: 'renderer', phase: 'dispose' });
+    }
+    try { assetService.disposeAssets(); } catch (err) {
+      logger.exception(err, { subsystem: 'assets', phase: 'dispose' });
+    }
     try { clearAll(); } catch { /* optional */ }
     try { settings.dispose?.(); } catch { /* optional */ }
+    if (window.SUPERCITYCON?.ctx === ctx) delete window.SUPERCITYCON;
     logger.info('the game was torn down', { domains: services.length });
     return true;
   }
@@ -477,7 +418,7 @@ async function main() {
   liveState.meta.ready = true;
   emit(EVENTS.GAME_READY, { ctx });
   setProgress(1, 'ready');
-  setTimeout(() => bootEl?.classList.add('hidden'), 350);
+  bootTimer = setTimeout(() => bootEl?.classList.add('hidden'), 350);
 
   window.SUPERCITYCON = {
     ctx, renderer, assetService,
@@ -527,7 +468,7 @@ async function main() {
         stage: liveState.meta.stageId,
         paused: !!liveState.meta.paused,
         speed: liveState.meta.speed,
-        timeOfDay: timeOfDay(),
+        timeOfDay: coreModes.timeOfDay(liveState),
       };
     },
     /**
@@ -657,6 +598,9 @@ function installAudioFeedback(ctx) {
   on(EVENTS.TOOL_CHANGED, () => { try { audio.play?.('click'); } catch { /* optional */ } });
   on(EVENTS.OPEN_PANEL, () => { try { audio.play?.('click'); } catch { /* optional */ } });
   on(EVENTS.CLOSE_PANEL, () => { try { audio.play?.('cancel'); } catch { /* optional */ } });
+  return () => {
+    for (const evt of ['pointerdown', 'keydown']) globalThis.removeEventListener?.(evt, unlock);
+  };
 }
 
 /**
@@ -925,24 +869,31 @@ function installInput(ctx, renderer) {
   let lastY = 0;
   let moved = 0;
 
-  el.addEventListener('pointerdown', (e) => {
+  const pointerDown = (e) => {
     dragging = true; moved = 0; lastX = e.clientX; lastY = e.clientY;
-  });
-  el.addEventListener('pointerup', (e) => {
+  };
+  const pointerUp = (e) => {
     dragging = false;
     if (moved < 6) handleClick(ctx, e);
-  });
-  el.addEventListener('pointermove', (e) => {
+  };
+  const pointerMove = (e) => {
     moved += Math.abs(e.clientX - lastX) + Math.abs(e.clientY - lastY);
     lastX = e.clientX; lastY = e.clientY;
     handleHover(ctx, e);
-  });
-  el.addEventListener('contextmenu', (e) => e.preventDefault());
+  };
+  const listeners = {
+    pointerdown: pointerDown, pointerup: pointerUp, pointermove: pointerMove,
+    contextmenu: (e) => e.preventDefault(),
+  };
+  for (const [type, listener] of Object.entries(listeners)) el.addEventListener(type, listener);
 
   // The KEYBOARD scheme belongs to the UX layer: plain 1-7 select a tool,
   // Shift+1-4 set the speed, Space pauses, Ctrl+S saves. This file used to
   // bind the digit keys to the speed as well, so pressing "2" for Build also
   // forced Normal speed. One owner per key.
+  return () => {
+    for (const [type, listener] of Object.entries(listeners)) el.removeEventListener(type, listener);
+  };
 }
 
 function cellFromEvent(ctx, e) {
@@ -979,23 +930,35 @@ function handleClick(ctx, e) {
  * The integrator is the only place that sees the load, so it asks the domains
  * that hold a view of the loaded state to rebuild that view.
  *
- * WLD is deliberately NOT re-initialised: its `init()` regenerates the
- * terrain from the seed, which would destroy the world that was just loaded.
+ * WLD rebuilds its view directly from the loaded terrain and scenery.
  *
  * @param {object} ctx the shared context
  */
 function installLoadRelay(ctx) {
-  on(EVENTS.GAME_LOADED, () => {
-    for (const key of ['buildings', 'mobility']) {
-      const svc = ctx.domains?.[key];
-      if (!svc || typeof svc.init !== 'function') continue;
-      try {
-        svc.init();
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error(`[load] domain "${key}" could not rebuild after a load:`, err);
-      }
+  async function rebuild(key, method = 'init') {
+    try {
+      await ctx.domains?.[key]?.[method]?.();
+    } catch (err) {
+      ctx.logger.exception(err, { subsystem: key, phase: method });
     }
+  }
+
+  on(EVENTS.GAME_LOADED, () => {
+    void rebuild('wld', 'restoreView');
+    void rebuild('buildings');
+    // Roads at the same coordinates may have a different terrain height.
+    void rebuild('mobility', 'dispose');
+    void rebuild('mobility');
+  });
+
+  on(EVENTS.GAME_RESET, ({ levelId } = {}) => {
+    // Authored maps own their ordered terrain and placement pipeline.
+    if (levelId || ctx.domains?.content?.isLoading()) return;
+    liveState.meta.ready = true;
+    void rebuild('wld', 'generate');
+    void rebuild('buildings');
+    void rebuild('economy');
+    void rebuild('mobility');
   });
 }
 

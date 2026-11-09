@@ -9,7 +9,7 @@
  *
  *     New Game      starts a fresh city through CORE's mode registry
  *     Continue      lists the real saves (CORE's `listSaves()`)
- *     Level Select  the modes CORE offers + the published stage track
+ *     Level Select  authored maps, modes and the published chapter track
  *     Settings      every row of the settings SCHEMA
  *     Controls      every bindable action of the input map
  *     Accessibility the accessibility rows of the SCHEMA
@@ -110,19 +110,21 @@ export function buildSavesModel(saves) {
 }
 
 /**
- * The level-select model: the modes CORE offers plus the stage track.
+ * The level-select model: authored maps and modes, plus the chapter track.
  *
  * The modes are selectable. The STAGES are the published chapter track —
  * they are listed with their goals, but CORE publishes no entry point that
  * starts a session at a chosen stage, so they are marked informational
  * instead of pretending to be a button that works.
  *
- * @param {{modes?:Array<string>, stages?:Array}} opts
+ * @param {{modes?:Array<string>, levels?:Array, stages?:Array}} opts
  */
-export function buildLevelSelectModel({ modes = [], stages = STAGES } = {}) {
+export function buildLevelSelectModel({ modes = [], levels = [], stages = STAGES } = {}) {
   const modeList = Array.isArray(modes) ? modes : [];
+  const levelList = Array.isArray(levels) ? levels : [];
   const stageList = Array.isArray(stages) ? stages : [];
   return {
+    levels: levelList.map(({ id, name, description, difficulty }) => ({ id, name, description, difficulty })),
     modes: modeList.map((id) => ({
       id: String(id),
       label: MODE_LABELS[id] ?? String(id),
@@ -169,6 +171,8 @@ export function createMenu(ctx, deps = {}) {
   let focusables = [];
   let focusIndex = -1;
   let pausedByMenu = false;
+  let pendingLevel = null;
+  let loadingLevel = false;
   /**
    * The event that OPENED the menu.
    *
@@ -319,6 +323,34 @@ export function createMenu(ctx, deps = {}) {
     return true;
   }
 
+  async function startLevel() {
+    const content = ctx?.domains?.content;
+    const level = pendingLevel;
+    if (!level || loadingLevel || !content?.apply) return;
+    loadingLevel = true;
+    render();
+    try {
+      const result = await content.apply(level.id);
+      if (!result?.ok) {
+        deps.onToast?.(result?.reason ?? `${level.name} could not be started`, 'error');
+        return;
+      }
+      const skipped = result.skipped?.length ?? 0;
+      if (skipped) {
+        deps.onToast?.(`${level.name} loaded with ${skipped} skipped placements`, 'warn');
+      } else {
+        deps.onToast?.(`${level.name} is ready`, 'success');
+      }
+      close();
+    } catch (err) {
+      logger.exception(err, { where: 'startLevel', level: level.id });
+      deps.onToast?.(`${level.name} could not be started`, 'error');
+    } finally {
+      loadingLevel = false;
+      if (view === 'level-confirm') render();
+    }
+  }
+
   /** Copy the page address, so the player can come back to the city later. */
   function copyLink() {
     const url = (typeof location !== 'undefined' && location.href) ? location.href : '';
@@ -420,7 +452,46 @@ export function createMenu(ctx, deps = {}) {
   }
 
   function renderLevels(body) {
-    const model = buildLevelSelectModel({ modes: availableModes(), stages: STAGES });
+    const content = ctx?.domains?.content;
+    const levels = content?.apply ? content.forMode?.(currentMode()) ?? content.levels?.() : [];
+    const model = buildLevelSelectModel({ modes: availableModes(), levels, stages: STAGES });
+
+    if (model.levels.length) {
+      body.append(make('div', 'sc-sethead', 'Authored maps'));
+      const list = make('div', 'sc-menu-list');
+      for (const level of model.levels) {
+        const row = make('div', 'sc-menu-card');
+        row.append(focusable(menuButton(level.name, {
+          data: { scMenuLevel: level.id },
+          onClick: () => {
+            pendingLevel = level;
+            openView('level-confirm');
+          },
+        })));
+        if (level.description) row.append(make('div', 'sc-note', level.description));
+        list.append(row);
+      }
+      body.append(list);
+    }
+
+    const activeLevel = content?.activeLevel?.();
+    if (activeLevel) {
+      body.append(make('div', 'sc-sethead', `${activeLevel.name} objectives`));
+      const { objectives } = content.evaluateObjectives();
+      for (const objective of objectives) {
+        const status = objective.met ? 'Complete' : `${Math.floor(objective.current)} / ${objective.target}`;
+        body.append(make('div', 'sc-note', `${objective.label} · ${status}`));
+      }
+      body.append(make('div', 'sc-note', 'Select Inspect and click a landmark cell to claim it.'));
+      for (const checkpoint of content.checkpointStatus()) {
+        const status = checkpoint.reached ? 'Reached' : `cell ${checkpoint.x}, ${checkpoint.z}`;
+        body.append(make('div', 'sc-note', `${checkpoint.label} · ${status}`));
+      }
+      for (const collectible of content.collectibleStatus()) {
+        const status = collectible.found ? 'Found' : `cell ${collectible.x}, ${collectible.z}`;
+        body.append(make('div', 'sc-note', `${collectible.label} · ${status}`));
+      }
+    }
 
     body.append(make('div', 'sc-sethead', 'Modes'));
     if (!model.modes.length) {
@@ -453,6 +524,21 @@ export function createMenu(ctx, deps = {}) {
     body.append(make('div', 'sc-note',
       'The chapters are the published progression track. CORE publishes no entry point that starts a session at a chosen chapter, so they are listed for reference.'));
     return model;
+  }
+
+  function renderLevelConfirm(body) {
+    if (!pendingLevel) return;
+    if (loadingLevel) {
+      const status = make('div', 'sc-note', `Loading ${pendingLevel.name}…`);
+      status.setAttribute('role', 'status');
+      body.append(status);
+      return;
+    }
+    body.append(make('div', 'sc-note', `Starting ${pendingLevel.name} replaces the current city. Saved slots are kept.`));
+    body.append(focusable(menuButton(`Start ${pendingLevel.name}`, {
+      data: { scMenuStartLevel: pendingLevel.id },
+      onClick: () => startLevel(),
+    })));
   }
 
   function renderCredits(body) {
@@ -509,6 +595,7 @@ export function createMenu(ctx, deps = {}) {
     pause: 'PAUSED',
     continue: 'CONTINUE',
     levels: 'LEVEL SELECT',
+    'level-confirm': 'START LEVEL',
     settings: 'SETTINGS',
     controls: 'CONTROLS',
     accessibility: 'ACCESSIBILITY',
@@ -525,7 +612,7 @@ export function createMenu(ctx, deps = {}) {
     const card = make('div', 'sc-menu-card-main');
     const head = make('div', 'sc-menu-head');
     head.append(make('h1', 'sc-menu-title', VIEW_TITLES[view] ?? 'SUPERCITYCON'));
-    if (view !== 'main' && view !== 'pause') {
+    if (view !== 'main' && view !== 'pause' && !loadingLevel) {
       const backBtn = menuButton('BACK', {
         className: 'sc-menu-btn sc-menu-back',
         data: { scMenuBack: '1' },
@@ -542,6 +629,7 @@ export function createMenu(ctx, deps = {}) {
     else if (view === 'pause') renderPause(body);
     else if (view === 'continue') renderContinue(body);
     else if (view === 'levels') renderLevels(body);
+    else if (view === 'level-confirm') renderLevelConfirm(body);
     else if (view === 'credits') renderCredits(body);
     else if (view === 'exit') renderExit(body);
     else if (view === 'settings') renderSettingsView(body, 'settings');
@@ -577,7 +665,7 @@ export function createMenu(ctx, deps = {}) {
   // ---- input -------------------------------------------------------------
 
   function onKeyDown(e) {
-    if (!view) return;
+    if (!view || loadingLevel) return;
     // The key press that opened the menu must not act on it.
     if (e && e === openingEvent) { openingEvent = null; return; }
     openingEvent = null;

@@ -343,6 +343,9 @@ export function createBuildings(ctx) {
     async init() {
       ensureState(state);
       disposed = false;
+      tool = null;
+      selectedTypeId = null;
+      selectedRotation = 0;
       state.buildings.catalogue = new Map(BUILDING_DEFS.map((d) => [d.id, d]));
       state.buildings.catalogueSize = catalogueSize();
       state.buildings.availableCount = availableCount();

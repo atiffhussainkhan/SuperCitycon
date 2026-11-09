@@ -15,7 +15,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { createState, restore, setState, snapshot, state as liveState } from './state.js';
-import { TUNING, TUNING_TBD, tuningIsTbd, tuningTbd } from './config.js';
+import { DAY_LENGTH, TUNING, TUNING_TBD, tuningIsTbd, tuningTbd } from './config.js';
 import { EVENTS, on, clearAll } from './events.js';
 import {
   STAGES,
@@ -50,8 +50,11 @@ import {
   availableModes,
   setSpeed,
   setPaused,
+  timeOfDay,
+  seekTimeOfDay,
   advanceDay,
   advanceClock,
+  createFixedStepRunner,
   dayIndex,
   currentSpeedName,
   clearParkedCities,
@@ -570,6 +573,90 @@ test('modes: the clock advances the day on a day boundary', () => {
   assert.equal(dayIndex(), 1);
   assert.equal(dayEvents.length, 1);
   assert.equal(liveState.meta.elapsed, 61);
+});
+
+test('modes: fixed steps agree across frame partitions and drop excess backlog', () => {
+  function tickSizes(frames) {
+    const sizes = [];
+    const run = createFixedStepRunner((dt) => sizes.push(dt));
+    for (const dt of frames) run(dt, 600);
+    return sizes;
+  }
+
+  const ticks = Array(60).fill(TUNING.fixedStep);
+  assert.deepEqual(tickSizes([1]), ticks);
+  assert.deepEqual(tickSizes(Array(100).fill(0.01)), ticks);
+  assert.deepEqual(tickSizes(ticks), ticks);
+
+  const run = createFixedStepRunner(() => {});
+  assert.equal(run(1, 2), 2);
+  assert.equal(run(TUNING.fixedStep / 2, 2), 0);
+  assert.equal(run(TUNING.fixedStep / 2, 2), 1);
+});
+
+test('modes: a complete day of fixed ticks rolls the calendar on the last tick', () => {
+  const state = resetLive();
+  const run = createFixedStepRunner((dt) => advanceClock(state, dt));
+  for (let second = 0; second < DAY_LENGTH - 1; second += 1) run(1, 600);
+  run(1 - TUNING.fixedStep, 600);
+  assert.equal(state.meta.day, 1);
+
+  run(TUNING.fixedStep, 600);
+  assert.equal(state.meta.tick, Math.round(DAY_LENGTH / TUNING.fixedStep));
+  assert.equal(state.meta.day, 2);
+  assert.equal(state.meta.elapsed, DAY_LENGTH);
+  assert.equal(state.meta.dayProgress, 0);
+
+  for (let second = 0; second < DAY_LENGTH; second += 1) run(1, 600);
+  assert.equal(state.meta.day, 3);
+  assert.equal(state.meta.dayProgress, 0);
+  assert.equal(timeOfDay(state), TUNING.dayStartFraction);
+});
+
+test('modes: a save without day progress resumes from its recorded time of day', () => {
+  const state = resetLive();
+  state.meta.day = 7;
+  state.meta.elapsed = DAY_LENGTH * 1.25;
+  assert.equal(timeOfDay(state), 0.5);
+
+  advanceClock(state, DAY_LENGTH * 0.75);
+  assert.equal(state.meta.day, 8);
+  assert.equal(timeOfDay(state), TUNING.dayStartFraction);
+});
+
+test('modes: selecting Night on day one preserves the date until the next dawn', () => {
+  const state = resetLive();
+  const dayEvents = [];
+  const off = on(EVENTS.DAY_CHANGED, (event) => dayEvents.push(event));
+
+  try {
+    assert.equal(seekTimeOfDay(0, state), true);
+    assert.equal(state.meta.elapsed, DAY_LENGTH * 0.75);
+    assert.equal(state.meta.dayProgress, DAY_LENGTH * 0.75);
+    assert.equal(state.meta.day, 1);
+    assert.equal(state.meta.tick, 0);
+    assert.equal(timeOfDay(state), 0);
+    assert.deepEqual(dayEvents, []);
+
+    advanceClock(state, DAY_LENGTH * 0.25);
+    assert.equal(state.meta.elapsed, DAY_LENGTH);
+    assert.equal(state.meta.dayProgress, 0);
+    assert.deepEqual(dayEvents, [{ day: 2, year: 0 }]);
+  } finally {
+    off();
+  }
+});
+
+test('modes: a preset keeps the saved calendar and elapsed periods', () => {
+  const state = resetLive();
+  Object.assign(state.meta, { day: 366, year: 1, elapsed: 4 * DAY_LENGTH + 51, tick: 17, paused: true });
+  const before = { ...state.meta };
+
+  assert.equal(seekTimeOfDay(Infinity, state), false);
+  assert.deepEqual(state.meta, before);
+
+  assert.equal(seekTimeOfDay(1 + TUNING.dayStartFraction, state), true);
+  assert.deepEqual(state.meta, { ...before, elapsed: 4 * DAY_LENGTH, dayProgress: 0 });
 });
 
 test('modes: choosing a speed resumes, and a no-op emits nothing', () => {

@@ -9,8 +9,8 @@
  * counters, and takes the screenshot the instant the wanted effect is
  * spawned — so the pixels are the effect, not a coincidence.
  *
- * It uses the REAL event path: the hazard is started through the hazard
- * service, the hazard emits HAZARD_STARTED, the integrator's bridge spawns
+ * It uses the REAL event path: the loaded hazard enters its active phase,
+ * emits HAZARD_STARTED, and the integrator's bridge spawns
  * the effect, and the effect service renders it. Nothing is faked.
  */
 import { resolveChromium } from './playwright-resolve.mjs';
@@ -46,7 +46,10 @@ await page.waitForTimeout(1500);
 const setup = await page.evaluate(async ({ level }) => {
   const S = window.SUPERCITYCON;
   const nextFrame = () => new Promise((r) => requestAnimationFrame(() => r()));
-  S.loadLevel(level);
+  const modes = S.ctx.core.modes;
+  modes.setPaused(true);
+  const loaded = await S.loadLevel(level);
+  if (!loaded?.ok) throw new Error(`Could not load level ${level}`);
   await nextFrame();
   const dayBtn = document.querySelector('[data-sc-time-preset="day"]');
   if (dayBtn) dayBtn.click();
@@ -58,10 +61,10 @@ const setup = await page.evaluate(async ({ level }) => {
   const wz = (hz?.z ?? 0) * WORLD + ORIGIN;
   if (S.renderer.focus) { S.renderer.focus.x = wx; S.renderer.focus.z = wz; }
   for (let i = 0; i < 120; i += 1) await nextFrame();
-  const started = hz ? S.ctx.domains.hazards.start?.(hz.id) : null;
+  const armed = hz && S.ctx.domains.hazards.active().some((entry) => entry.id === hz.id);
   return {
     hazard: hz ? { id: hz.id, type: hz.type, cell: [hz.x, hz.z] } : null,
-    started: started?.ok !== false,
+    armed: Boolean(armed),
     terrainHeight: S.ctx.domains.wld?.heightAt?.(hx0(hz), hz?.z) ?? null,
     camera: S.renderer.camera.position.toArray().map((v) => +v.toFixed(1)),
   };
@@ -73,6 +76,7 @@ const spawned = await page.evaluate(async ({ kind }) => {
   const S = window.SUPERCITYCON;
   const nextFrame = () => new Promise((r) => requestAnimationFrame(() => r()));
   const before = S.renderer.fx?.stats?.()?.byKind?.[kind] ?? 0;
+  S.ctx.core.modes.setPaused(false);
   for (let i = 0; i < 1200; i += 1) {
     const now = S.renderer.fx?.stats?.()?.byKind?.[kind] ?? 0;
     if (now > before) return { spawned: now - before, waitedFrames: i };
@@ -87,4 +91,4 @@ const stats = await page.evaluate(() => window.SUPERCITYCON.renderer.fx?.stats?.
 writeFileSync(`${OUT}.json`, `${JSON.stringify({ setup, spawned, stats, errors }, null, 2)}\n`);
 process.stdout.write(`${JSON.stringify({ setup, spawned, stats, errors, out: OUT }, null, 2)}\n`);
 await browser.close();
-process.exit(errors.length ? 2 : 0);
+process.exit(errors.length || !setup.armed || !spawned.spawned ? 2 : 0);

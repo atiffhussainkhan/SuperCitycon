@@ -180,23 +180,25 @@ export function installGlobalHandlers(logger, target = globalThis) {
   const previousError = target?.onerror ?? null;
   const previousRejection = target?.onunhandledrejection ?? null;
 
-  const onError = (event) => {
+  const onError = (...args) => {
+    const [message, source, line, column, error] = args;
+    const event = message && typeof message === 'object' ? message : null;
     try {
-      logger.exception(event?.error ?? event?.message, {
+      logger.exception(error ?? event?.error ?? event?.message ?? message, {
         source: 'window.onerror',
-        filename: event?.filename,
-        line: event?.lineno,
-        column: event?.colno,
+        filename: event?.filename ?? source,
+        line: event?.lineno ?? line,
+        column: event?.colno ?? column,
       });
     } catch { /* never throw from the error handler */ }
-    if (typeof previousError === 'function') previousError.call(target, event);
+    if (typeof previousError === 'function') return previousError.apply(target, args);
   };
 
   const onRejection = (event) => {
     try {
       logger.exception(event?.reason, { source: 'unhandledrejection' });
     } catch { /* never throw from the error handler */ }
-    if (typeof previousRejection === 'function') previousRejection.call(target, event);
+    if (typeof previousRejection === 'function') return previousRejection.call(target, event);
   };
 
   if (target) {
@@ -206,10 +208,8 @@ export function installGlobalHandlers(logger, target = globalThis) {
 
   return function uninstall() {
     if (!target) return;
-    if (previousError) target.onerror = previousError;
-    else if (target.onerror === onError) target.onerror = null;
-    if (previousRejection) target.onunhandledrejection = previousRejection;
-    else if (target.onunhandledrejection === onRejection) target.onunhandledrejection = null;
+    if (target.onerror === onError) target.onerror = previousError;
+    if (target.onunhandledrejection === onRejection) target.onunhandledrejection = previousRejection;
   };
 }
 

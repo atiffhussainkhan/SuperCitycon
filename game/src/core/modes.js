@@ -671,6 +671,56 @@ export function dayIndex(state = liveState) {
   return Math.max(0, (typeof day === 'number' && Number.isFinite(day) ? day : 1) - 1);
 }
 
+function clockDayProgress(state, secondsPerDay = DAY_LENGTH) {
+  if (Number.isFinite(state.meta.dayProgress)) return state.meta.dayProgress;
+
+  // Older saves only recorded elapsed time.
+  const elapsed = Number.isFinite(state.meta.elapsed) ? state.meta.elapsed : 0;
+  const remainder = elapsed % secondsPerDay;
+  return remainder < 0 ? remainder + secondsPerDay : remainder;
+}
+
+/** The sky clock fraction. Night is 0 and a calendar day starts at dawn. */
+export function timeOfDay(state = liveState) {
+  return (TUNING.dayStartFraction + clockDayProgress(state) / DAY_LENGTH) % 1;
+}
+
+// Bound floating-point drift at a tick or day boundary to one nanosecond.
+const TIME_ROUNDING_TOLERANCE = 1e-9;
+
+/**
+ * Accumulate game time and run whole simulation ticks, dropping excess backlog.
+ */
+export function createFixedStepRunner(simulate) {
+  const step = TUNING.fixedStep;
+  let accumulator = 0;
+  return (gameDt, maxSteps = TUNING.maxCatchUpSteps) => {
+    if (!(gameDt > 0)) return 0;
+    accumulator += gameDt;
+    const available = Math.floor((accumulator + TIME_ROUNDING_TOLERANCE) / step);
+    const steps = Math.min(available, maxSteps);
+    accumulator = available > maxSteps ? 0 : Math.max(0, accumulator - steps * step);
+    for (let i = 0; i < steps; i += 1) simulate(step);
+    return steps;
+  };
+}
+
+/**
+ * Set the time within the current calendar day without advancing the simulation.
+ */
+export function seekTimeOfDay(t, state = liveState) {
+  const target = Number(t) % 1;
+  if (!Number.isFinite(target)) return false;
+
+  const offset = target - TUNING.dayStartFraction;
+  const phase = (offset - Math.floor(offset)) % 1;
+  const elapsed = Number.isFinite(state.meta.elapsed) ? Math.max(0, state.meta.elapsed) : 0;
+  const progress = phase * DAY_LENGTH;
+  state.meta.elapsed = elapsed - (elapsed % DAY_LENGTH) + progress;
+  state.meta.dayProgress = progress;
+  return true;
+}
+
 /**
  * Advance the authoritative clock (FR-CORE-003 / FR-CORE-004).
  *
@@ -691,15 +741,16 @@ export function dayIndex(state = liveState) {
 export function advanceClock(state = liveState, gameDt = 0) {
   const dt = Number.isFinite(gameDt) && gameDt > 0 ? gameDt : 0;
   const secondsPerDay = Number.isFinite(DAY_LENGTH) && DAY_LENGTH > 0 ? DAY_LENGTH : 60;
+  let remaining = clockDayProgress(state, secondsPerDay) + dt;
 
   state.meta.elapsed = (Number.isFinite(state.meta.elapsed) ? state.meta.elapsed : 0) + dt;
   state.meta.tick = (Number.isFinite(state.meta.tick) ? state.meta.tick : 0) + 1;
 
-  // Time already spent inside the current day.
-  let remaining = (Number.isFinite(state.meta.dayProgress) ? state.meta.dayProgress : 0) + dt;
   let daysAdvanced = 0;
-  while (remaining >= secondsPerDay && daysAdvanced < 1000) {
-    remaining -= secondsPerDay;
+  while (remaining >= secondsPerDay - TIME_ROUNDING_TOLERANCE && daysAdvanced < 1000) {
+    state.meta.elapsed += Math.max(0, secondsPerDay - remaining);
+    remaining = Math.max(0, remaining - secondsPerDay);
+    state.meta.dayProgress = remaining;
     advanceDay(state); // increments meta.day and emits DAY_CHANGED
     daysAdvanced += 1;
   }

@@ -41,7 +41,16 @@ import {
   blockCells,
 } from './levels.js';
 
-import { measureObjective } from './index.js';
+import { createContent, measureObjective } from './index.js';
+import { BUILDING_DEFS } from '../buildings/catalogue.js';
+import { EVENTS, on } from '../core/events.js';
+import { TOOLS } from '../core/config.js';
+import { setPaused, startMode } from '../core/modes.js';
+import { createProgress } from '../core/progress.js';
+import { buildRecord, importSave } from '../core/save.js';
+import { createState, setState, state } from '../core/state.js';
+import { generateHeightmap, sampleHeight } from '../world/heightfield.js';
+import { waterLevelFor } from '../world/water.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -798,6 +807,12 @@ test('measureObjective counts building instances', () => {
   assert.equal(value, 3);
 });
 
+test('the First Light street objective counts roads independently of buildings', () => {
+  const objective = getLevel('first-light').objectives[0];
+  const current = { mobility: { roads: new Map([[1, {}]]) }, buildings: { instances: new Map() } };
+  assert.equal(measureObjective(objective, current), 1);
+});
+
 test('measureObjective averages service coverage', () => {
   const value = measureObjective(
     { type: 'coverage' },
@@ -828,4 +843,154 @@ test('measureObjective counts the progression records', () => {
   };
   assert.equal(measureObjective({ type: 'collectible' }, {}, ctx), 2);
   assert.equal(measureObjective({ type: 'checkpoint' }, {}, ctx), 1);
+});
+
+test('authored objectives count their exact records and reject failed hazards', () => {
+  const ctx = {
+    progress: { checkpoints: () => ['cp-landing'], collectibles: () => ['col-lifebuoy'] },
+    domains: { hazards: { resolved: () => [
+      { id: 'hz-flood', outcome: 'survived' },
+      { id: 'hz-fire', outcome: 'failed' },
+    ] } },
+  };
+  assert.equal(measureObjective({ type: 'checkpoint', checkpointId: 'cp-ridge' }, {}, ctx), 0);
+  assert.equal(measureObjective({ type: 'collectible', collectibleId: 'col-seal' }, {}, ctx), 0);
+  assert.equal(measureObjective({ type: 'collectible' }, {}, ctx, getLevel('the-long-night')), 0);
+  assert.equal(measureObjective({ type: 'hazard', hazardId: 'hz-fire' }, {}, ctx), 0);
+  assert.equal(measureObjective({ type: 'hazard', hazardId: 'hz-flood' }, {}, ctx), 1);
+});
+
+test('every authored nature spawn is dry on the level’s generated terrain', () => {
+  for (const level of LEVELS) {
+    const heightmap = generateHeightmap(level.seed);
+    const waterLevel = waterLevelFor(heightmap);
+    for (const { type, id, x, z } of level.spawns) {
+      if (type !== 'nature') continue;
+      assert.ok(sampleHeight(heightmap, x, z) >= waterLevel, `${level.id} ${id} is underwater`);
+    }
+  }
+});
+
+test('loading an authored level resets the city, awaits terrain, and reports placement failures', async () => {
+  setState(createState());
+  state.meta.ready = true;
+  state.meta.paused = true;
+  state.buildings.instances.set(999, { id: 999 });
+  const catalogue = new Map(BUILDING_DEFS.map((def) => [def.id, def]));
+  state.buildings.catalogue = catalogue;
+  let generated = false;
+  let firstRoad = true;
+  const ctx = {
+    get state() { return state; },
+    core: { modes: { startMode, setPaused } },
+    domains: {
+      wld: {
+        async generate(seed) {
+          assert.equal(seed, getLevel('first-light').seed);
+          await Promise.resolve();
+          generated = true;
+        },
+        async placeNature() { return { ok: false, reason: 'water' }; },
+      },
+      buildings: {
+        init() { state.buildings.catalogue = catalogue; },
+        place() { return { ok: true }; },
+      },
+      mobility: {
+        addRoad() {
+          assert.equal(generated, true);
+          if (!firstRoad) return { ok: true };
+          firstRoad = false;
+          return { ok: false, reason: 'occupied' };
+        },
+      },
+      population: { spawnAuthoredCitizen() { return null; } },
+    },
+  };
+  const content = createContent(ctx);
+  assert.equal((await content.apply('missing')).ok, false);
+  assert.equal(state.buildings.instances.has(999), true);
+  const loading = content.apply('first-light');
+  assert.equal((await content.apply('high-water')).ok, false);
+  const result = await loading;
+  assert.equal(result.ok, true);
+  assert.equal(state.buildings.instances.has(999), false);
+  assert.equal(state.meta.paused, true);
+  assert.equal(state.meta.ready, true);
+  assert.equal(content.activeLevelId(), 'first-light');
+  assert.equal(result.applied, 100);
+  assert.deepEqual(result.skipped.map(({ type, reason }) => [type, reason]), [
+    ['road', 'occupied'],
+    ['nature', 'water'], ['nature', 'water'], ['nature', 'water'],
+    ['character', 'The character could not be placed'],
+    ['character', 'The character could not be placed'],
+  ]);
+});
+
+test('authored checkpoint requirements and earned objectives survive a save round trip', () => {
+  setState(createState());
+  state.meta.levelId = 'first-light';
+  state.ui.tool = TOOLS.inspect;
+  const ctx = { get state() { return state; }, bus: { on } };
+  ctx.progress = createProgress(ctx);
+  const content = createContent(ctx);
+  content.init();
+  const plain = JSON.stringify(buildRecord(createState()));
+  const complete = [];
+  const unsubscribe = on(EVENTS.STAGE_ADVANCED, (event) => complete.push(event));
+  try {
+    ctx.progress.reachCheckpoint('cp-ridge');
+    content.onClick({ x: 32, z: 16 });
+    assert.equal(ctx.progress.hasCheckpoint('cp-bridge'), false);
+    state.mobility.roads = new Map(Array.from({ length: 24 }, (_, id) => [id, { id }]));
+    state.population.total = 12;
+    content.onClick({ x: 32, z: 16 });
+    assert.equal(ctx.progress.hasCheckpoint('cp-bridge'), true);
+    assert.equal(content.evaluateObjectives().complete, true);
+    assert.equal(complete.length, 1);
+
+    state.population.total = 0;
+    state.mobility.roads.clear();
+    const authored = JSON.stringify(buildRecord(state));
+    assert.ok(importSave(plain));
+    assert.equal(content.activeLevelId(), null);
+    assert.ok(importSave(authored));
+    assert.equal(content.activeLevelId(), 'first-light');
+    assert.equal(createContent(ctx).activeLevelId(), 'first-light');
+    assert.equal(content.evaluateObjectives().complete, true);
+    assert.equal(complete.length, 1);
+  } finally {
+    content.dispose();
+    unsubscribe();
+  }
+});
+
+test('a failed terrain load puts the previous authored city back', async () => {
+  setState(createState());
+  state.meta.levelId = 'first-light';
+  state.meta.ready = true;
+  state.meta.paused = true;
+  state.buildings.catalogue = new Map(BUILDING_DEFS.map((def) => [def.id, def]));
+  state.buildings.instances.set(99, { id: 99 });
+  const before = state.meta;
+  const ctx = {
+    get state() { return state; },
+    core: { modes: { startMode, setPaused } },
+    domains: {
+      wld: { async generate() { throw new Error('injected terrain failure'); } },
+    },
+  };
+  const content = createContent(ctx);
+  const events = [];
+  const off = on(EVENTS.GAME_LOADED, (event) => events.push(event.source));
+  try {
+    assert.equal((await content.apply('high-water')).ok, false);
+    assert.equal(state.meta, before);
+    assert.equal(state.meta.paused, true);
+    assert.equal(state.buildings.instances.has(99), true);
+    assert.equal(content.activeLevelId(), 'first-light');
+    assert.deepEqual(events, ['level-rollback']);
+  } finally {
+    off();
+  }
 });
