@@ -6,7 +6,7 @@
  * and it measures the shipped bundle rather than the dev server:
  *
  *   1. start a static preview of `game/dist`,
- *   2. open it in a headless browser,
+ *   2. open it in the default software browser, or explicit headed hardware mode,
  *   3. wait for the game to report ready,
  *   4. measure boot time, first-frame time, and the frame-time distribution over
  *      a fixed number of rendered frames,
@@ -16,8 +16,8 @@
  *
  * IMPORTANT — what these numbers are and are not:
  *
- * The headless browser runs on a **software GL implementation** (SwiftShader),
- * so the absolute frame times here are a FLOOR, not a measurement of what a real
+ * The default headless browser forces **software GL** (SwiftShader),
+ * so default absolute frame times are not a measurement of what a real
  * GPU delivers. They are useful for comparison and for spotting a regression
  * between runs, not as a claim about the game on real hardware.
  *
@@ -26,30 +26,65 @@
  * speed and a slow headless frame rate does not change the simulation's
  * behaviour — it only changes how much wall-clock time the frames take.
  *
+ * Hardware mode rejects software/unknown renderer identity before publishing FPS.
+ * It records actual context identity plus browser GPU evidence and uses a finite deadline.
+ *
  * Usage:
  *   node tools/performance.mjs [--port 4176] [--outdir <dir>] [--frames 120]
+ *   node tools/performance.mjs --hardware --outdir <separate-dir>
  *
- * Exit code: 0 when the probe completed, 1 when the game never became ready.
+ * Exit: 0 measured, 1 error/deadline, 2 blocked/unverified hardware or invalid options.
  */
 import { spawn } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { resolveChromium } from './playwright-resolve.mjs';
+import { classifyHardwareRenderer, withTimeout, stopPreview } from './performance-gpu.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const WORKSPACE = resolve(HERE, '..');
 const GAME = join(WORKSPACE, 'game');
 
 const argv = process.argv.slice(2);
+if (argv.includes('--help') || argv.includes('-h')) {
+  console.log(`Usage: node tools/performance.mjs [--hardware] [--port 4176]
+  [--outdir PATH] [--frames 120] [--warmup-frames 30] [--timeout-ms 180000]
+  [--no-screenshot]
+Default: original software-GL comparison. --hardware opens a headed browser,
+requires a verified physical GPU on the actual game WebGL context, and records
+GPU identity, browser evidence, focus, quality and frame times. Unknown/software
+renderers are BLOCKED (exit 2); no hardware FPS result is emitted for them.
+Hardware reports default to game/verification/performance-hardware/.
+No build, installation, existing-browser reuse or publication is performed.`);
+  process.exit(0);
+}
+const valued = new Set(['--port', '--outdir', '--frames', '--warmup-frames', '--timeout-ms']);
+for (let i = 0; i < argv.length; i += 1) {
+  if (['--hardware', '--no-screenshot'].includes(argv[i])) continue;
+  if (!valued.has(argv[i]) || !argv[i + 1] || argv[i + 1].startsWith('--')) {
+    console.error(`Unknown or incomplete option: ${argv[i]}`); process.exit(2);
+  }
+  i += 1;
+}
 const argOf = (name, fallback) => {
   const i = argv.indexOf(`--${name}`);
-  return i >= 0 && argv[i + 1] ? argv[i + 1] : fallback;
+  return i >= 0 ? argv[i + 1] : fallback;
 };
-const PORT = Number(argOf('port', 4176));
-const OUTDIR = argOf('outdir', join(WORKSPACE, 'game', 'verification', 'performance'));
-const FRAMES = Number(argOf('frames', 120));
-
+function numberOption(name, fallback, min, max) {
+  const n = Number(argOf(name, fallback));
+  if (!Number.isInteger(n) || n < min || n > max) {
+    console.error(`--${name} must be an integer from ${min} to ${max}`); process.exit(2);
+  }
+  return n;
+}
+const HARDWARE = argv.includes('--hardware');
+const PORT = numberOption('port', 4176, 1, 65535);
+const FRAMES = numberOption('frames', 120, 1, 10000);
+const WARMUP = numberOption('warmup-frames', HARDWARE ? 30 : 0, 0, 1000);
+const TIMEOUT = numberOption('timeout-ms', 180000, 1000, 600000);
+const OUTDIR = argOf('outdir', join(WORKSPACE, 'game', 'verification', HARDWARE ? 'performance-hardware' : 'performance'));
+const SCREENSHOT = !argv.includes('--no-screenshot');
 mkdirSync(OUTDIR, { recursive: true });
 
 function run(cmd, args, opts = {}) {
@@ -60,9 +95,11 @@ function run(cmd, args, opts = {}) {
   });
 }
 
-async function waitForServer(url, timeoutMs = 30000) {
+async function waitForServer(url, timeoutMs = 30000, ready = () => true, exited = () => false) {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
+    if (exited()) return false;
+    if (!ready()) { await new Promise((r) => setTimeout(r, 100)); continue; }
     try {
       const res = await fetch(url, { redirect: 'follow' });
       if (res.ok) return true;
@@ -90,26 +127,39 @@ function stats(values) {
 }
 
 async function main() {
-  console.log('=== 1. start a static preview of game/dist ===');
-  const preview = spawn('npx', ['vite', 'preview', '--port', String(PORT), '--strictPort'],
-    { cwd: GAME, stdio: ['ignore', 'pipe', 'pipe'] });
-  let log = '';
-  preview.stdout.on('data', (d) => { log += d.toString(); });
-  preview.stderr.on('data', (d) => { log += d.toString(); });
-  const url = `http://localhost:${PORT}/`;
-  if (!await waitForServer(url)) {
-    console.error(`preview did not start on ${url}\n${log.slice(0, 600)}`);
-    preview.kill('SIGTERM');
-    return 1;
-  }
-  console.log(`preview up on ${url}`);
-
-  const { chromium } = await resolveChromium();
-  const browser = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'] });
-  const report = { generated_at: new Date().toISOString(), url, label: `PREVIEW :${PORT}` };
-
+  const url = `http://127.0.0.1:${PORT}/`;
+  const launch = HARDWARE
+    ? { headless: false, chromiumSandbox: true, timeout: Math.min(30000, TIMEOUT) }
+    : { args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'], timeout: Math.min(30000, TIMEOUT) };
+  const report = {
+    generated_at: new Date().toISOString(), url, label: `PREVIEW :${PORT}`,
+    mode: HARDWARE ? 'hardware-requested' : 'software-baseline',
+    verdict: 'RUNNING', hardware_verified: false,
+    launch: { headless: !HARDWARE, forced_software: !HARDWARE, args: launch.args || [] },
+    requested_frames: FRAMES, timeout_ms: TIMEOUT,
+    claim_scope: HARDWARE ? 'Observed hardware, viewport, scene and quality only; no other host certification.' : 'Software GL comparison only; not physical GPU performance.',
+  };
+  let preview = null;
+  let browser = null;
+  let exitCode = 1;
   try {
+    const probe = async () => {
+      console.log('=== 1. start a static preview of game/dist ===');
+      preview = spawn(process.execPath, [join(GAME, 'node_modules', 'vite', 'bin', 'vite.js'), 'preview', '--host', '127.0.0.1', '--port', String(PORT), '--strictPort'],
+        { cwd: GAME, stdio: ['ignore', 'pipe', 'pipe'] });
+      let log = '';
+      preview.stdout.on('data', (d) => { log += d.toString(); });
+      preview.stderr.on('data', (d) => { log += d.toString(); });
+      preview.on('error', (error) => { log += String(error); });
+      const ready = () => log.includes(`http://127.0.0.1:${PORT}/`);
+      if (!await waitForServer(url, Math.min(30000, TIMEOUT), ready, () => preview.exitCode !== null || preview.signalCode !== null)) {
+        throw new Error(`Own preview did not start on ${url}\n${log.slice(0, 600)}`);
+      }
+      console.log(`preview up on ${url}`);
+      const { chromium } = await resolveChromium();
+      browser = await chromium.launch(launch);
     const context = await browser.newContext({ viewport: { width: 1600, height: 900 } });
+    context.setDefaultTimeout(Math.min(30000, TIMEOUT));
     // The same helper the acceptance harness injects: wait for a construction
     // slot by advancing the economy's own update, not by waiting on frames.
     await context.addInitScript(() => {
@@ -145,13 +195,52 @@ async function main() {
 
     console.log('\n=== 2. boot ===');
     const t0 = Date.now();
-    await page.goto(url, { waitUntil: 'domcontentloaded' });
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: Math.min(30000, TIMEOUT) });
     report.load_event_ms = Date.now() - t0;
 
     await page.waitForFunction(
       () => window.SUPERCITYCON?.state?.meta?.ready === true,
-      null, { timeout: 120000 });
+      null, { timeout: Math.min(120000, TIMEOUT) });
     report.ready_ms = Date.now() - t0;
+
+    await page.bringToFront();
+    report.browser_version = browser.version();
+    let systemInfo = null;
+    let cdp;
+    try {
+      cdp = await browser.newBrowserCDPSession();
+      const raw = await withTimeout(cdp.send('SystemInfo.getInfo'), 5000, 'GPU metadata');
+      systemInfo = { gpu: raw.gpu, modelName: raw.modelName, modelVersion: raw.modelVersion };
+    } catch (error) { report.gpu_metadata_error = String(error.message || error); }
+    finally { if (cdp) await withTimeout(cdp.detach(), 2000, 'CDP detach').catch(() => {}); }
+    const readEnvironment = async () => page.evaluate(() => {
+      const service = window.SUPERCITYCON.renderer;
+      const gl = service.renderer.getContext();
+      const extension = gl.getExtension('WEBGL_debug_renderer_info');
+      return {
+        unmasked_renderer: extension ? gl.getParameter(extension.UNMASKED_RENDERER_WEBGL) : null,
+        unmasked_vendor: extension ? gl.getParameter(extension.UNMASKED_VENDOR_WEBGL) : null,
+        gl_renderer: gl.getParameter(gl.RENDERER), gl_vendor: gl.getParameter(gl.VENDOR),
+        gl_version: gl.getParameter(gl.VERSION), context_lost: gl.isContextLost(),
+        visibility: document.visibilityState, focused: document.hasFocus(),
+        viewport: { width: innerWidth, height: innerHeight }, device_pixel_ratio: devicePixelRatio,
+        render_pixel_ratio: service.renderer.getPixelRatio(),
+        drawing_buffer: { width: gl.drawingBufferWidth, height: gl.drawingBufferHeight },
+        adaptive_quality: service.adaptive?.state?.() ?? null,
+        camera: { position: service.camera.position.toArray(), zoom: service.camera.zoom, fov: service.camera.fov },
+      };
+    });
+    report.environment_before = await readEnvironment();
+    report.gpu_system_info = systemInfo;
+    report.gpu_classification = classifyHardwareRenderer(report.environment_before, systemInfo);
+    report.hardware_verified = HARDWARE && report.gpu_classification.verified;
+    if (HARDWARE && !report.hardware_verified) {
+      const error = new Error(report.gpu_classification.reason); error.code = 'HARDWARE_BLOCKED'; throw error;
+    }
+    if (HARDWARE && (report.environment_before.visibility !== 'visible' || !report.environment_before.focused || report.environment_before.context_lost)) {
+      const error = new Error('Hardware measurement needs a visible, focused page and a live context.'); error.code = 'HARDWARE_BLOCKED'; throw error;
+    }
+
 
     console.log('\n=== 3. build a realistic city ===');
     // An empty map is not a realistic workload. The city is built the same way
@@ -214,13 +303,24 @@ async function main() {
     console.log(`built ${report.city.placed} buildings, ${report.city.roads} roads, `
       + `${report.city.population ?? '?'} residents, ${report.city.vehicles ?? '?'} vehicles`);
 
+    if (WARMUP) {
+      await page.evaluate(async (count) => {
+        for (let i = 0; i < count; i += 1) await new Promise((r) => requestAnimationFrame(r));
+      }, WARMUP);
+    }
+    report.warmup_frames = WARMUP;
+    report.sample_environment = await readEnvironment();
+
     console.log('\n=== 4. frame times over ' + FRAMES + ' rendered frames ===');
-    const frames = await page.evaluate(async (n) => {
+    const frames = await page.evaluate(async ({ n, hardware }) => {
       const times = [];
-      await new Promise((done) => {
+      await new Promise((done, reject) => {
         let last = performance.now();
         let count = 0;
         const tick = () => {
+          if (hardware && (document.visibilityState !== 'visible' || !document.hasFocus())) {
+            reject(new Error('Page lost visibility/focus during hardware sampling.')); return;
+          }
           const now = performance.now();
           times.push(now - last);
           last = now;
@@ -230,7 +330,7 @@ async function main() {
         requestAnimationFrame(tick);
       });
       return times;
-    }, FRAMES);
+    }, { n: FRAMES, hardware: HARDWARE });
     report.frame_times = stats(frames);
 
     console.log('\n=== 5. renderer counters ===');
@@ -271,18 +371,43 @@ async function main() {
     });
 
     report.console_errors = consoleErrors;
-    await page.screenshot({ path: join(OUTDIR, 'performance-frame.png') });
-  } finally {
-    await browser.close();
-    preview.kill('SIGTERM');
-    await new Promise((r) => setTimeout(r, 300));
-  }
+    report.environment_after = await readEnvironment();
+    const finalClass = classifyHardwareRenderer(report.environment_after, systemInfo);
+    if (HARDWARE && (!finalClass.verified || report.environment_before.unmasked_renderer !== report.environment_after.unmasked_renderer || report.environment_after.context_lost)) {
+      report.hardware_verified = false;
+      const error = new Error('Hardware renderer became unknown, changed, or lost its context during measurement.'); error.code = 'HARDWARE_BLOCKED'; throw error;
+    }
+    if (HARDWARE && consoleErrors.length) throw new Error('Game emitted console/page errors; see console_errors.');
+    if (SCREENSHOT) await page.screenshot({ path: join(OUTDIR, 'performance-frame.png'), timeout: Math.min(10000, TIMEOUT) });
 
-  writeFileSync(join(OUTDIR, 'performance.json'), JSON.stringify(report, null, 2));
-  console.log('\n=== 7. report ===');
-  console.log(JSON.stringify(report, null, 2));
-  console.log(`\nwritten: ${join(OUTDIR, 'performance.json')}`);
-  return 0;
+    };
+    await withTimeout(probe(), TIMEOUT, 'performance probe');
+    report.verdict = HARDWARE ? 'HARDWARE_MEASURED' : 'SOFTWARE_BASELINE_MEASURED';
+    exitCode = 0;
+  } catch (error) {
+    report.verdict = error.code === 'HARDWARE_BLOCKED' || (HARDWARE && !report.hardware_verified) ? 'BLOCKED' : 'ERROR';
+    report.error = String(error.stack || error);
+    exitCode = report.verdict === 'BLOCKED' ? 2 : 1;
+    if (HARDWARE && !report.hardware_verified) delete report.frame_times;
+    console.error(`${report.verdict}: ${error.message || error}`);
+  } finally {
+    const cleanup = [];
+    if (browser) {
+      try { await withTimeout(browser.close(), 10000, 'browser close'); }
+      catch (error) { cleanup.push(String(error.message || error)); }
+    }
+    try { await stopPreview(preview); }
+    catch (error) { cleanup.push(String(error.message || error)); }
+    if (cleanup.length) {
+      report.cleanup_errors = cleanup; report.verdict = 'ERROR'; exitCode = 1;
+    }
+    report.completed_at = new Date().toISOString();
+    writeFileSync(join(OUTDIR, 'performance.json'), JSON.stringify(report, null, 2));
+    console.log('\n=== report ===');
+    console.log(JSON.stringify(report, null, 2));
+    console.log(`\nwritten: ${join(OUTDIR, 'performance.json')}`);
+  }
+  return exitCode;
 }
 
 process.exit(await main());

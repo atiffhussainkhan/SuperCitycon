@@ -255,8 +255,8 @@ export const HUD_STYLES = `
   flex-direction: column;
   gap: 5px;
 }
-.sc-shop-tabs { display: flex; gap: 4px; overflow-x: auto; pointer-events: none; scrollbar-width: none; }
-.sc-shop-tabs::-webkit-scrollbar { display: none; }
+/* Keep every category visible, including on platforms with overlay scrollbars. */
+.sc-shop-tabs { display: flex; flex-wrap: wrap; gap: 4px; overflow: visible; pointer-events: none; }
 .sc-tab {
   pointer-events: auto;
   min-height: 34px;
