@@ -29,6 +29,7 @@ import {
   PLACEHOLDER, TOOL_LABELS, TOOL_ORDER, TOOL_KEYS,
   buildTopBarModel, buildDemandModel, buildUsageModel, buildGovernmentModel,
   buildBuildingInfoModel, buildShopModel, buildSpeedModel, deriveShopTabs,
+  buildHelpModel, buildPerformanceModel, buildCreditsModel,
   normaliseCatalogue, formatInt, titleCase,
 } from './panels.js';
 import { ensureStyles } from './styles.js';
@@ -77,7 +78,18 @@ export const ICON_SLOTS = Object.freeze({
 });
 
 /** The panel ids the HUD can open. */
-export const PANEL_IDS = Object.freeze(['shop', 'building', 'government', 'saves', 'time', 'help']);
+export const PANEL_IDS = Object.freeze([
+  'shop', 'building', 'government', 'saves', 'time', 'help',
+  'settings', 'controls', 'accessibility', 'credits',
+]);
+
+/**
+ * The panels whose contents are NOT refreshed on the periodic tick.
+ *
+ * They hold live controls: rebuilding them four times a second would
+ * destroy a slider mid-drag. They refresh themselves when a value changes.
+ */
+export const STATIC_PANELS = Object.freeze(new Set(['settings', 'controls', 'accessibility']));
 
 /** The named times of day the time control offers (FR-UX-100). */
 export const TIME_PRESETS = Object.freeze([
@@ -230,7 +242,20 @@ export function createHUD(ctx, deps = {}) {
     speedButtons.set(name, btn);
   }
 
-  topbar.append(mayorBtn, statsWrap, clockWrap(), speedWrap);
+  // --- the menu button (the main menu / pause overlay) --------------------
+  const menuBtn = make('button', 'sc-btn sc-menu-open', 'MENU');
+  menuBtn.type = 'button';
+  menuBtn.dataset.scAction = 'menu';
+  menuBtn.title = 'Main menu';
+
+  // --- the performance read-out toggle ------------------------------------
+  const perfBtn = make('button', 'sc-btn sc-perf-toggle', 'FPS');
+  perfBtn.type = 'button';
+  perfBtn.dataset.scAction = 'toggle-perf';
+  perfBtn.title = 'Show the frame time and the draw calls';
+  perfBtn.setAttribute('aria-pressed', 'false');
+
+  topbar.append(mayorBtn, statsWrap, clockWrap(), speedWrap, perfBtn, menuBtn);
 
   // --- demand + usage strip (FR-UX-002/003) ---
   // It lives INSIDE the top bar as a second full-width row: a separate
@@ -359,7 +384,13 @@ export function createHUD(ctx, deps = {}) {
   licenceEl.setAttribute('data-sc-licence', '1');
   licenceEl.textContent = '2D icons: your asset library — licence clearance pending.';
 
-  root.append(topbar, tickerEl, toolsEl, shopEl, camEl, toastEl, panelEl, licenceEl);
+  // --- performance read-out ---
+  const perfEl = make('div', 'sc-perf');
+  perfEl.hidden = true;
+  perfEl.setAttribute('data-sc-perf', '1');
+  perfEl.setAttribute('aria-live', 'off');
+
+  root.append(topbar, tickerEl, toolsEl, shopEl, camEl, toastEl, panelEl, perfEl, licenceEl);
 
   function clockWrap() { return clockBtn; }
 
@@ -666,6 +697,49 @@ export function createHUD(ctx, deps = {}) {
     else if (currentPanel === 'saves') renderSavesPanel();
     else if (currentPanel === 'time') renderTimePanel();
     else if (currentPanel === 'help') renderHelpPanel();
+    else if (currentPanel === 'credits') renderCreditsPanel();
+    else if (currentPanel === 'settings') renderSettingsPanel('settings');
+    else if (currentPanel === 'controls') renderSettingsPanel('controls');
+    else if (currentPanel === 'accessibility') renderSettingsPanel('accessibility');
+  }
+
+  /**
+   * The settings / controls / accessibility panels.
+   *
+   * They are rendered by the settings panel service (`settings-panel.js`),
+   * which owns the SCHEMA-driven rows and the live effects. The HUD only
+   * supplies the container.
+   */
+  function renderSettingsPanel(which) {
+    panelTitle.textContent = which.toUpperCase();
+    const panel = deps.settingsPanel;
+    if (!panel || typeof panel.render !== 'function') {
+      panelBody.append(make('div', 'sc-note', 'The settings are not available in this build.'));
+      return null;
+    }
+    // The panel owns its controls (it binds them itself), so the HUD only
+    // supplies the container.
+    return panel.render(panelBody, which);
+  }
+
+  /**
+   * The credits panel — the real asset packs and their real licences.
+   */
+  function renderCreditsPanel() {
+    panelTitle.textContent = 'CREDITS';
+    const model = buildCreditsModel();
+    const list = make('div', 'sc-list');
+    for (const pack of model.packs) {
+      const row = make('div');
+      row.dataset.scCredit = pack.id;
+      row.append(make('span', null, pack.display));
+      row.append(make('span', 'sc-dim', `${pack.author} — ${pack.licence}`));
+      list.append(row);
+    }
+    panelBody.append(list);
+    for (const note of model.notes) {
+      panelBody.append(make('div', 'sc-note', note));
+    }
   }
 
   /**
@@ -890,36 +964,64 @@ export function createHUD(ctx, deps = {}) {
     panelBody.append(make('div', 'sc-note', 'Saves are written to this browser\'s local storage. Ctrl+S saves, Ctrl+Shift+L loads the newest slot.'));
   }
 
+  /**
+   * The help panel.
+   *
+   * The key list is GENERATED from `core/input-map.js`, so it can never
+   * drift from the code that reads the keys again (the hand-written list
+   * had already drifted: it was missing `T` for the time control).
+   */
   function renderHelpPanel() {
     panelTitle.textContent = 'HOW TO PLAY';
-    const help = [
-      ['1 - 7', 'Select a tool'],
-      ['W A S D', 'Pan the camera'],
-      ['Q / E', 'Rotate the camera'],
-      ['R', 'Reset the camera'],
-      ['Wheel', 'Zoom'],
-      ['Right-drag', 'Rotate + tilt'],
-      ['Left-drag', 'Pan'],
-      ['Space', 'Pause / resume'],
-      ['Shift + 1..4', 'Simulation speed'],
-      ['Ctrl + S', 'Save'],
-      ['B', 'Building shop'],
-      ['G', 'Government overview'],
-      ['I', 'Selected building'],
-      ['L', 'Save / load'],
-      ['H', 'This help'],
-      ['Esc', 'Close / cancel the tool'],
-    ];
+    const model = buildHelpModel({ inputMap: ctx?.inputMap, toolKeys: TOOL_KEYS });
     const list = make('div', 'sc-list');
-    for (const [key, text] of help) {
-      const row = make('div');
-      row.append(make('span', null, key));
-      row.append(make('span', 'sc-dim', text));
-      list.append(row);
+    for (const row of model.rows) {
+      const line = make('div');
+      line.append(make('span', null, row.keys));
+      line.append(make('span', 'sc-dim', row.text));
+      list.append(line);
     }
     panelBody.append(list);
     panelBody.append(make('div', 'sc-legend',
       'The published rules this HUD follows: below 90 % usage is fine; from 90 % city growth is reduced; at 100 % the city stops growing. A full demand bar means you need more of that type.'));
+  }
+
+  /**
+   * The performance read-out: the frame rate, the frame time, the draw
+   * calls and the triangles — straight from the renderer's own monitor.
+   */
+  function renderPerformance() {
+    if (perfEl.hidden) return;
+    const model = buildPerformanceModel({ perf: readPerformance() });
+    if (!model.available) {
+      setText(perfEl, 'PERF: the renderer does not publish a frame time');
+      return;
+    }
+    const fps = model.fps === null ? '—' : `${Math.round(model.fps)}`;
+    const ms = model.frameMs === null ? '—' : `${model.frameMs.toFixed(1)}ms`;
+    const calls = model.drawCalls === null ? '—' : String(Math.round(model.drawCalls));
+    const tris = model.triangles === null ? '—' : String(Math.round(model.triangles));
+    setText(perfEl, `${fps} FPS · ${ms} · ${calls} CALLS · ${tris} TRIS`);
+  }
+
+  /** The renderer's performance snapshot, if it publishes one. */
+  function readPerformance() {
+    try {
+      const perf = ctx?.renderer?.getPerformance?.();
+      return perf ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  /** Show or hide the performance read-out. */
+  function togglePerformance(force) {
+    const next = force === undefined ? perfEl.hidden : !!force;
+    perfEl.hidden = !next;
+    perfBtn.setAttribute('aria-pressed', next ? 'true' : 'false');
+    perfBtn.classList.toggle('is-active', next);
+    if (next) renderPerformance();
+    return next;
   }
 
   // -------------------------------------------------------------------------
@@ -1046,15 +1148,27 @@ export function createHUD(ctx, deps = {}) {
     const timePreset = target.closest('[data-sc-time-preset]');
     if (timePreset) {
       const preset = TIME_PRESETS.find((p) => p.id === timePreset.dataset.scTimePreset);
+      const t = preset ? preset.t : 0.5;
+      // The clock drives the sky, so a preset SEEKS the clock. Setting the
+      // renderer directly would be undone by the next frame.
+      let handled = 0;
       try {
-        ctx?.renderer?.setTimeOfDay?.(preset ? preset.t : 0.5);
-      } catch { /* the renderer owns the cycle */ }
+        handled = ctx?.bus?.emit?.(EVENTS.TIME_SEEKED, { t }) ?? 0;
+      } catch { /* the bus is optional */ }
+      if (!handled) {
+        // Nobody owns the clock (the HUD is running on its own): set the sky.
+        try {
+          ctx?.renderer?.setTimeOfDay?.(t);
+        } catch { /* the renderer owns the cycle */ }
+      }
       renderPanel();
       return;
     }
     if (target.closest('[data-sc-action="close-panel"]')) { closePanel(); return; }
     if (target.closest('[data-sc-action="mayor"]')) { openPanel('government'); return; }
     if (target.closest('[data-sc-action="clock"]')) { openPanel('time'); return; }
+    if (target.closest('[data-sc-action="menu"]')) { deps.onMenu?.(e); return; }
+    if (target.closest('[data-sc-action="toggle-perf"]')) { togglePerformance(); return; }
     const toast = target.closest('[data-sc-toast]');
     if (toast) { toasts?.dismiss?.(); return; }
     // Clicking the backdrop dismisses the panel (FR-UX-032).
@@ -1063,6 +1177,10 @@ export function createHUD(ctx, deps = {}) {
 
   function onKeyDown(e) {
     if (!e) return;
+    // The menu owns the keyboard while it is open, and a rebind capture
+    // owns the next key press.
+    if (deps.isOverlayOpen?.()) return;
+    if (deps.isCapturing?.()) return;
     const tag = e.target?.tagName || '';
     if (/^(INPUT|TEXTAREA|SELECT)$/.test(tag)) {
       if (e.key === 'Escape') e.target.blur();
@@ -1079,7 +1197,10 @@ export function createHUD(ctx, deps = {}) {
 
     if (e.key === ' ') {
       e.preventDefault();
-      deps.onSpeed?.(state?.meta?.paused ? 'normal' : 'paused');
+      // Space opens the pause overlay: the simulation is paused through
+      // CORE and the player gets the pause menu, not a silent freeze.
+      if (deps.onPause) deps.onPause(e);
+      else deps.onSpeed?.(state?.meta?.paused ? 'normal' : 'paused');
       return;
     }
     if (e.shiftKey) {
@@ -1186,10 +1307,15 @@ export function createHUD(ctx, deps = {}) {
       renderToasts();
       renderTicker();
       renderMayor();
+      renderPerformance();
       // Panels show LIVE values (FR-UX-033), but rebuilding their DOM 60
       // times a second is wasteful: refresh them four times a second.
+      //
+      // The settings panels are EXEMPT: their rows hold live controls (a
+      // slider that is being dragged must not be rebuilt under the
+      // player's finger), and they refresh themselves when a value changes.
       panelClock += Number.isFinite(dt) ? dt : 0;
-      if (currentPanel && panelClock >= 0.25) {
+      if (currentPanel && panelClock >= 0.25 && !STATIC_PANELS.has(currentPanel)) {
         panelClock = 0;
         renderPanel();
       }
@@ -1206,6 +1332,10 @@ export function createHUD(ctx, deps = {}) {
     /** The tab the shop is showing. */
     activeTab: () => activeTab,
     setActiveTab(id) { activeTab = id; renderShop(); },
+    /** Show or hide the performance read-out. */
+    togglePerformance,
+    /** True when the performance read-out is on screen. */
+    performanceVisible: () => !perfEl.hidden,
     dispose() {
       for (const un of unsubscribes) { try { un(); } catch { /* ignore */ } }
       unsubscribes.length = 0;

@@ -23,6 +23,14 @@ export const EVENTS = Object.freeze({
   DAY_CHANGED: 'time:day',
   SPEED_CHANGED: 'time:speed',
   PAUSE_CHANGED: 'time:pause',
+  /**
+   * The player asked for a particular time of day.
+   *
+   * The clock is the single source of truth for the sky (the integrator drives
+   * it from the elapsed game time), so a preset must MOVE the clock rather
+   * than set the renderer directly — otherwise the next frame would undo it.
+   */
+  TIME_SEEKED: 'time:seeked',
 
   // economy
   MONEY_CHANGED: 'economy:money',
@@ -60,6 +68,27 @@ export const EVENTS = Object.freeze({
   STUDIO_OPEN: 'studio:open',
   STUDIO_CLOSE: 'studio:close',
   STUDIO_DIRTY: 'studio:dirty',
+
+  // --- V5 -----------------------------------------------------------------
+  // feedback
+  FX_SPAWN: 'fx:spawn',
+  SETTINGS_CHANGED: 'settings:changed',
+  BINDINGS_CHANGED: 'input:bindings',
+
+  // menus
+  MENU_OPENED: 'menu:opened',
+  MENU_CLOSED: 'menu:closed',
+
+  // hazards (the multi-phase threats)
+  HAZARD_STARTED: 'hazard:started',
+  HAZARD_PHASE: 'hazard:phase',
+  HAZARD_DAMAGE: 'hazard:damage',
+  HAZARD_RESOLVED: 'hazard:resolved',
+
+  // progression
+  CHECKPOINT_REACHED: 'progress:checkpoint',
+  COLLECTIBLE_FOUND: 'progress:collectible',
+  ACHIEVEMENT_UNLOCKED: 'progress:achievement',
 });
 
 /** Subscribe to an event. Returns an unsubscribe function. */

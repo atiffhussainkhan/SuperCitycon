@@ -3,6 +3,9 @@
 A retro 16-bit-palette **voxel city builder** for the browser. Three.js 0.169 +
 Vite 5, ES modules, no TypeScript.
 
+**Version 5.0.0** — see [`docs/V5_FINAL_VERIFICATION.md`](docs/V5_FINAL_VERIFICATION.md)
+for the release classification and [`CHANGELOG.md`](CHANGELOG.md) for what changed.
+
 ## ▶ Play it
 
 **https://atiffhussainkhan.github.io/SuperCitycon/**
@@ -22,6 +25,26 @@ docs/     the requirements dossier this build implements (1,168 requirements)
 tools/    the manifest builder and the browser acceptance harness
 agents/   the five master bots that built it
 ```
+
+---
+
+## What V5 adds
+
+V5 is a major-version upgrade of the city builder. It is not a new game and it
+does not replace anything V4 did — every V4 feature still works.
+
+| Area | What V5 adds |
+|---|---|
+| **Architecture** | one clock (CORE owns time), a fixed-timestep simulation, structured logging, a validated settings store, one key-binding table, an explicit teardown path, a diagnostics surface |
+| **Save** | a versioned save format with a migration chain — a V4 save loads into V5, a newer save is refused rather than guessed at |
+| **Presentation** | a pooled, instanced VFX service with nine effect kinds, wired to the game's own events; the audio mixer (built in V4 and never called) is now connected |
+| **Gameplay** | the **hazard system**: multi-phase city crises with telegraphed escalation, a damage pipeline, mitigation from the city's own service coverage, and checkpoint integration |
+| **Content** | a level-content pipeline — a level schema, three original levels, a validator with an offline CLI, and a service that loads a level into the live city |
+| **Access** | remappable controls, reduced effects and shake, text scaling, high contrast, colour-blind indicators, keyboard navigation |
+
+The full mapping, the verification evidence and what V5 deliberately does **not**
+deliver are in [`docs/V5_UPGRADE_PLAN.md`](docs/V5_UPGRADE_PLAN.md) and
+[`docs/V5_REQUIREMENTS_MATRIX.md`](docs/V5_REQUIREMENTS_MATRIX.md).
 
 ---
 
@@ -75,6 +98,15 @@ else and therefore travels with the game.
 
 | Document | What it is |
 |---|---|
+| [`docs/V5_FINAL_VERIFICATION.md`](docs/V5_FINAL_VERIFICATION.md) | the eight V5 acceptance gates, with evidence, and the release classification |
+| [`docs/V5_UPGRADE_PLAN.md`](docs/V5_UPGRADE_PLAN.md) | the V5 plan, the genre mapping, and what V5 deliberately does not deliver |
+| [`docs/V5_REQUIREMENTS_MATRIX.md`](docs/V5_REQUIREMENTS_MATRIX.md) | every requirement: id, status, dependencies, acceptance criteria, evidence |
+| [`docs/V5_SYSTEM_ARCHITECTURE.md`](docs/V5_SYSTEM_ARCHITECTURE.md) | the V5 architecture and every change made to reach it |
+| [`docs/V5_TEST_REPORT.md`](docs/V5_TEST_REPORT.md) | every suite that ran and what it returned |
+| [`docs/V5_PERFORMANCE_REPORT.md`](docs/V5_PERFORMANCE_REPORT.md) | the measured numbers and the machine they came from |
+| [`docs/V5_KNOWN_ISSUES.md`](docs/V5_KNOWN_ISSUES.md) | what is still open |
+| [`docs/V5_RISK_REGISTER.md`](docs/V5_RISK_REGISTER.md) | every risk, with likelihood, impact, mitigation and status |
+| [`docs/V4_BASELINE_AUDIT.md`](docs/V4_BASELINE_AUDIT.md) | what V4 actually was, measured |
 | [`game/README.md`](game/README.md) | the game's architecture, the five master bots, the honesty rule, and what is **not** finished |
 | [`game/DEFECTS.md`](game/DEFECTS.md) | every integration defect and senior-review finding, with its status |
 | [`game/LICENCE-REPORT.md`](game/LICENCE-REPORT.md) | exactly which art is cleared to publish and which is not |
@@ -108,11 +140,12 @@ The evidence for the current build is committed in `game/verification/`.
 
 | Gate | Result |
 |---|---|
-| `npm run check` | 56/56 files parse cleanly |
-| `node --test src/*/*.test.mjs tests/*.test.mjs` | 395/395 pass, 0 fail |
-| Browser harness — production build | **40/40 checks passed** |
-| Browser harness — cleared build | 40/41 (the 2D-art check is skipped when the art is absent) |
-| Real browser window, real GPU | ready in ~2 s, 0 console / 0 page / 0 failed requests |
+| `npm run check` | **79/79 files parse cleanly** |
+| `npm test` | **687/687 pass, 0 fail, 0 skipped** |
+| Browser harness — cleared build | **40/41 pass**, 1 correctly skipped (the 2D-art check) |
+| `npm run verify:production -- --profile cleared` | **PRODUCTION BUILD VERIFIED** |
+| Content validator | **3 levels, 0 errors, 0 warnings** |
+| Real browser window, real GPU | 0 console / 0 page errors / 0 failed requests; 16.7 ms mean frame at boot, 18.2 ms in a populated city |
 
 The acceptance harness (`tools/scenario.mjs`) drives the **real** game in a
 browser: it boots the page, builds a city, plays the simulation, drives the

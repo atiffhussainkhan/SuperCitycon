@@ -1,0 +1,92 @@
+{
+  "tool": "profile-gpu",
+  "url": "http://127.0.0.1:4190/",
+  "measuredAt": "2026-11-09T09:27:02.683Z",
+  "machine": {
+    "platform": "darwin",
+    "arch": "x64",
+    "node": "v22.14.0",
+    "cpu": null
+  },
+  "hardware": {
+    "kind": "hardware",
+    "verified": true,
+    "reason": "The actual WebGL context names a physical GPU and the browser reports GPU device metadata.",
+    "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5500M, Unspecified Version)",
+    "vendor": "Google Inc. (AMD)"
+  },
+  "bootMs": 1206,
+  "scene": {
+    "scene": "city",
+    "built": {
+      "placed": 186,
+      "roads": 254,
+      "failed": [
+        "prk.park@18,18: no-free-cell",
+        "res.house@20,18: no-free-cell",
+        "res.house@18,20: no-free-cell",
+        "hea.medical_center@20,20: no-free-cell",
+        "prk.park@34,44: slot-timeout",
+        "res.house@36,44: slot-timeout",
+        "hea.medical_center@38,44: slot-timeout",
+        "prk.park@40,44: slot-timeout",
+        "res.house@42,44: slot-timeout",
+        "hea.medical_center@44,44: slot-timeout"
+      ],
+      "citizens": 40,
+      "residents": 2473,
+      "vehicles": 60,
+      "instances": 186
+    }
+  },
+  "frames": {
+    "counted": 300,
+    "meanMs": 23.445,
+    "medianMs": 17.7,
+    "p95Ms": 33.8,
+    "p99Ms": 35.4,
+    "minMs": 14.6,
+    "maxMs": 83.3,
+    "fpsMean": 42.7,
+    "fpsP95Worst": 29.6,
+    "negativeSamples": 0
+  },
+  "counters": {
+    "drawCalls": 1633,
+    "triangles": 1817791,
+    "geometries": 142,
+    "textures": 227,
+    "programs": 16
+  },
+  "rendererPerformance": {
+    "fps": 35.7,
+    "frameMs": 16.7,
+    "drawCalls": 1633,
+    "triangles": 1817791,
+    "points": 0,
+    "lines": 0,
+    "geometries": 142,
+    "textures": 227,
+    "programs": 16,
+    "peakDrawCalls": 1649,
+    "peakTriangles": 1935209,
+    "samples": 44,
+    "quality": "high"
+  },
+  "memory": {
+    "usedJSHeapMB": 86.55,
+    "totalJSHeapMB": 150.99,
+    "jsHeapLimitMB": 4192
+  },
+  "state": {
+    "buildings": 186,
+    "citizens": 2473,
+    "treasury": 3366,
+    "day": 1,
+    "elapsed": 45.46
+  },
+  "fx": null,
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": []
+}

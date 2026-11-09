@@ -129,6 +129,31 @@ export const TUNING = Object.freeze({
   residentsPerLevel1: 8,
   /** TBD: residents added per level-up of a residential building. */
   residentsPerUpgrade: 6,
+  /**
+   * TBD: how many citizens are rendered at once.
+   *
+   * The pool keeps the rest alive but invisible, so the city can have more
+   * citizens than the scene can afford to draw.
+   */
+  maxRenderedCitizens: 40,
+  /** TBD: the walking speed of a citizen, in world units per second. */
+  citizenWalkSpeed: 2.2,
+  /** TBD: the speed above which a citizen is running rather than walking. */
+  citizenRunSpeed: 4,
+  /** TBD: the share of citizens that is running rather than walking. */
+  citizenRunShare: 0.25,
+  /** TBD: how long a citizen pauses before walking again, in seconds. */
+  citizenDwellSeconds: 2.4,
+  /** TBD: the happiness at or above which a standing citizen cheers. */
+  citizenCheerHappiness: 75,
+  /** TBD: how long a citizen cheers for, in seconds. */
+  citizenCheerSeconds: 2,
+  /** TBD: how long a citizen waits before it can cheer again, in seconds. */
+  citizenCheerCooldown: 9,
+  /** TBD: the share of the citizen roster drawn from the city crowd. */
+  citizenCityShare: 0.8,
+  /** TBD: the default cross-fade between two citizen animations, in seconds. */
+  citizenCrossfadeSeconds: 0.25,
   /** TBD: maximum residential levels per building. */
   maxLevels: 3,
   /** TBD: happiness ceiling and floor (0..100). */
@@ -176,9 +201,96 @@ export const TUNING = Object.freeze({
   cameraPitch: 55,
   /** TBD: default camera distance from the focus point. */
   cameraDistance: 66,
+  /** TBD: the amplitude of a full camera shake, in world units. */
+  cameraShakeAmplitude: 0.9,
+  /** TBD: how fast a camera shake decays, in e-folds per second. */
+  cameraShakeDecay: 4.2,
+  /** TBD: the frequency of a camera shake, in radians per second. */
+  cameraShakeFrequency: 34,
+  /** TBD: the largest camera shake amplitude that is ever applied. */
+  cameraShakeMaxAmplitude: 2,
+  /** TBD: how far the camera leads the cursor, in world units. */
+  cameraLookAhead: 14,
+  /** TBD: how fast the look-ahead catches up, in e-folds per second. */
+  cameraLookAheadRate: 4.5,
   /** TBD: min/max camera zoom distance. */
   cameraMinDistance: 22,
   cameraMaxDistance: 220,
+
+  // --- CORE ------------------------------------------------------------
+  /**
+   * TBD: the fraction of the day cycle at which the game starts.
+   *
+   * The sky module's own convention is 0 = night, 0.25 = dawn, 0.5 = day,
+   * 0.75 = dusk. A game day therefore begins at dawn.
+   */
+  dayStartFraction: 0.25,
+  /**
+   * TBD: how finely the sky is repainted.
+   *
+   * The dome is repainted from vertex colours, so it is refreshed on a
+   * throttle rather than every frame. This is the smallest change in the
+   * time of day that triggers a repaint.
+   */
+  skyRepaintStep: 1 / 600,
+  /**
+   * TBD: the simulation's fixed step, in seconds of game time.
+   *
+   * The simulation runs on a fixed step so the same inputs always produce
+   * the same result, whatever the frame rate. Presentation (the camera, the
+   * animation) still uses the real frame time.
+   */
+  fixedStep: 1 / 60,
+  /**
+   * TBD: how many fixed steps one frame may catch up.
+   *
+   * A slow frame must not fast-forward the city, but the simulation also
+   * must not fall behind: a backlog larger than this is dropped.
+   */
+  maxCatchUpSteps: 8,
+
+  // --- HAZ (the multi-phase city hazards) ---------------------------------
+  /**
+   * The lull between two phases of an ORDINARY hazard, in seconds.
+   * A crisis has no lull — its phases run back to back.
+   */
+  hazardPhaseGapSeconds: 4,
+  /** How much of the damage a fully mitigated hazard cancels, 0..1. */
+  hazardMitigationDamageReduction: 0.8,
+  /** How much of a phase's duration a fully mitigated hazard removes, 0..1. */
+  hazardMitigationResolveScale: 0.5,
+  /** The mitigation level at which a vulnerable hazard can be contained. */
+  hazardEarlyResolveMitigation: 0.85,
+  /** How long a phase must have been active before containment can fire (s). */
+  hazardEarlyResolveHoldSeconds: 6,
+  /** The extra damage every later phase carries, per phase index. */
+  hazardEscalationStep: 0.15,
+  /** How fast the city-wide panic builds during a crisis, per game second. */
+  hazardCrisisPanicPerSecond: 0.004,
+  /** The panic added every time a crisis changes phase. */
+  hazardCrisisPanicPerPhase: 0.06,
+  /** How much of the panic build the city's mitigation cancels, 0..1. */
+  hazardCrisisPanicRelief: 0.5,
+  /** How much of the panic build a held checkpoint cancels, 0..1. */
+  hazardCrisisCheckpointRelief: 0.5,
+  /** The panic level at which the crisis is lost. */
+  hazardCrisisFailurePanic: 1,
+  /** The happiness points lost per damage point per second of exposure. */
+  hazardMoraleLossPerDps: 0.05,
+  /** The loyalty points lost per damage point per second of exposure. */
+  hazardLoyaltyLossPerDps: 0.03,
+  /** The treasury coins spent on repairs per damage point per second. */
+  hazardRepairCostPerDps: 0.8,
+  /** The damage a building takes before it is destroyed. */
+  hazardBuildingHealth: 100,
+  /** How much city-wide coverage a mitigation may draw on, 0..1. */
+  hazardCityCoverageWeight: 0.5,
+  /** The cells sampled around a hazard when its mitigation is measured. */
+  hazardMitigationSamples: 8,
+  /** The minimum seconds between two aggregate HAZARD_DAMAGE events. */
+  hazardDamageEventInterval: 1,
+  /** The seconds between two VFX pulses of a running hazard. */
+  hazardFxInterval: 0.6,
 });
 
 // --------------------------------------------------------------------------
@@ -299,6 +411,16 @@ export const TUNING_TBD = Object.freeze(new Set([
   // --- POP -------------------------------------------------------------
   'residentsPerLevel1',
   'residentsPerUpgrade',
+  'maxRenderedCitizens',
+  'citizenWalkSpeed',
+  'citizenRunSpeed',
+  'citizenRunShare',
+  'citizenDwellSeconds',
+  'citizenCheerHappiness',
+  'citizenCheerSeconds',
+  'citizenCheerCooldown',
+  'citizenCityShare',
+  'citizenCrossfadeSeconds',
   'maxLevels',
   'happinessMin',
   'happinessMax',
@@ -325,6 +447,37 @@ export const TUNING_TBD = Object.freeze(new Set([
   'cameraDistance',
   'cameraMinDistance',
   'cameraMaxDistance',
+  'cameraShakeAmplitude',
+  'cameraShakeDecay',
+  'cameraShakeFrequency',
+  'cameraShakeMaxAmplitude',
+  'cameraLookAhead',
+  'cameraLookAheadRate',
+  // --- CORE ------------------------------------------------------------
+  'dayStartFraction',
+  'skyRepaintStep',
+  'fixedStep',
+  'maxCatchUpSteps',
+  // --- HAZ --------------------------------------------------------------
+  'hazardPhaseGapSeconds',
+  'hazardMitigationDamageReduction',
+  'hazardMitigationResolveScale',
+  'hazardEarlyResolveMitigation',
+  'hazardEarlyResolveHoldSeconds',
+  'hazardEscalationStep',
+  'hazardCrisisPanicPerSecond',
+  'hazardCrisisPanicPerPhase',
+  'hazardCrisisPanicRelief',
+  'hazardCrisisCheckpointRelief',
+  'hazardCrisisFailurePanic',
+  'hazardMoraleLossPerDps',
+  'hazardLoyaltyLossPerDps',
+  'hazardRepairCostPerDps',
+  'hazardBuildingHealth',
+  'hazardCityCoverageWeight',
+  'hazardMitigationSamples',
+  'hazardDamageEventInterval',
+  'hazardFxInterval',
 ]));
 
 /**

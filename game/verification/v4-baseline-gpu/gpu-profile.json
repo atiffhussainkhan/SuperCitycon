@@ -1,0 +1,72 @@
+{
+  "tool": "profile-gpu",
+  "url": "http://127.0.0.1:4190/",
+  "measuredAt": "2026-11-09T09:26:35.626Z",
+  "machine": {
+    "platform": "darwin",
+    "arch": "x64",
+    "node": "v22.14.0",
+    "cpu": null
+  },
+  "hardware": {
+    "kind": "hardware",
+    "verified": true,
+    "reason": "The actual WebGL context names a physical GPU and the browser reports GPU device metadata.",
+    "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5500M, Unspecified Version)",
+    "vendor": "Google Inc. (AMD)"
+  },
+  "bootMs": 2156,
+  "scene": {
+    "scene": "boot"
+  },
+  "frames": {
+    "counted": 300,
+    "meanMs": 16.662,
+    "medianMs": 16.7,
+    "p95Ms": 18.4,
+    "p99Ms": 18.7,
+    "minMs": 14.6,
+    "maxMs": 18.8,
+    "fpsMean": 60,
+    "fpsP95Worst": 54.3,
+    "negativeSamples": 0
+  },
+  "counters": {
+    "drawCalls": 63,
+    "triangles": 1699158,
+    "geometries": 33,
+    "textures": 30,
+    "programs": 7
+  },
+  "rendererPerformance": {
+    "fps": 60,
+    "frameMs": 16.3,
+    "drawCalls": 63,
+    "triangles": 1699158,
+    "points": 0,
+    "lines": 0,
+    "geometries": 33,
+    "textures": 30,
+    "programs": 7,
+    "peakDrawCalls": 63,
+    "peakTriangles": 1699158,
+    "samples": 12,
+    "quality": "high"
+  },
+  "memory": {
+    "usedJSHeapMB": 109.51,
+    "totalJSHeapMB": 152.49,
+    "jsHeapLimitMB": 4192
+  },
+  "state": {
+    "buildings": 0,
+    "citizens": 0,
+    "treasury": 25000,
+    "day": 1,
+    "elapsed": 12.8
+  },
+  "fx": null,
+  "consoleErrors": [],
+  "pageErrors": [],
+  "failedRequests": []
+}

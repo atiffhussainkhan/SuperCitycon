@@ -17,11 +17,15 @@
  *   - an FPS / draw-call monitor and an adaptive-quality driver
  *     (render/performance.js);
  *   - `pickCell()` for grid picking, and a ResizeObserver-backed `resize()`.
+ *   - a pooled procedural effect service (`render/fx.js`), exposed as
+ *     `service.fx`: `spawn(kind, opts)`, `update(dt)`, `clear()`,
+ *     `stats()`, `setReducedMotion(on)` and `dispose()`.
  */
 
 import * as THREE from 'three';
-import { CELL, GRID, WORLD, TUNING, worldToCellInt, inBounds } from '../core/config.js';
+import { CELL, GRID, WORLD, TUNING, PALETTE, worldToCellInt, inBounds } from '../core/config.js';
 import { createSky, setTimeOfDay as setSkyTimeOfDay } from './sky.js';
+import { createEffects } from './fx.js';
 import {
   createPerformanceMonitor, createAdaptiveQuality, setShadowsEnabled as applyShadows,
 } from './performance.js';
@@ -39,6 +43,8 @@ import { disposeMaterials } from './materials.js';
  * @property {THREE.Raycaster} raycaster
  * @property {THREE.Plane} groundPlane
  * @property {THREE.DirectionalLight} sun
+ * @property {object} fx — the effect service: spawn(kind, opts), update(dt),
+ *   clear(), stats(), setReducedMotion(on), dispose()
  * @property {(o:THREE.Object3D)=>void} add
  * @property {(o:THREE.Object3D)=>void} remove
  * @property {()=>void} clearWorld
@@ -99,6 +105,28 @@ export function createRenderer(container) {
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
+  /**
+   * The render counters must describe the WHOLE FRAME, not the last draw.
+   *
+   * Three.js resets `renderer.info` inside `render()`, but it does the reset
+   * AFTER the shadow-map pass and BEFORE the main scene pass. With the
+   * default `autoReset` the counter therefore describes the main scene pass
+   * ONLY: the shadow pass is drawn and never counted.
+   *
+   * With the post chain on, a frame is TWO renders — the scene into the
+   * render target and then the fullscreen retro pass — so the counter would
+   * report the retro pass alone: 1 draw call, 1 triangle, for a scene with
+   * hundreds of objects. That number is not just wrong, it is DANGEROUS: the
+   * adaptive quality driver reads it to decide whether the GPU is keeping up,
+   * and the HUD's performance read-out shows it to the player.
+   *
+   * With `autoReset` off the counters accumulate across every pass in the
+   * frame, and `update()` resets them once at the top of the frame. The
+   * reported number is then the real total cost of the frame — measured on
+   * the boot scene: 34 calls for the main pass and 29 more for the shadow
+   * pass, 63 in all.
+   */
+  renderer.info.autoReset = false;
   container.appendChild(renderer.domElement);
 
   const clock = new THREE.Clock();
@@ -131,6 +159,11 @@ export function createRenderer(container) {
 
   // The retro sky: a palette gradient dome plus chunky voxel clouds.
   const sky = createSky(scene);
+
+  // The effect service: pooled procedural particles (render/fx.js). It lives
+  // in its own group inside the scene, so clearing the world never touches
+  // it and vice versa.
+  const fx = createEffects({ scene, renderer, config: { PALETTE } });
 
   // Camera rig — orbit around a focus point on the ground plane.
   const focus = new THREE.Vector3(0, 0, 0);
@@ -214,6 +247,7 @@ export function createRenderer(container) {
     sun,
     focus,
     sky,
+    fx,
     monitor,
     adaptive,
 
@@ -346,14 +380,25 @@ export function createRenderer(container) {
     /** Frame-time / draw-call snapshot for the HUD or the settings panel. */
     getPerformance() { return monitor.snapshot(); },
     update(dt) {
+      // One reset per FRAME (see `renderer.info.autoReset` above): the
+      // counters then accumulate across every pass the frame made — the
+      // scene pass AND the post pass — instead of describing only the last
+      // one. The reset happens at the TOP so that after this method returns
+      // the counters describe the frame that was just drawn.
+      renderer.info.reset();
+      fx.update(dt);
       sky.update(dt, camera);
-      monitor.update(dt);
-      adaptive.update(dt);
       if (postfx && postfx.enabled) {
         postfx.render(dt);
       } else {
         renderer.render(scene, camera);
       }
+      // The monitor and the adaptive driver read the counters AFTER the
+      // draw, so they see the frame that was actually rendered rather than
+      // the previous one. The adaptive driver's changes therefore take
+      // effect on the next frame.
+      monitor.update(dt);
+      adaptive.update(dt);
     },
     setViewport(w, h) {
       camera.aspect = w / h;
@@ -364,6 +409,7 @@ export function createRenderer(container) {
       resizeObserver?.disconnect?.();
       window.removeEventListener('resize', onWindowResize);
       postfx?.dispose?.();
+      fx.dispose();
       sky.dispose?.();
       disposeMaterials();
       adaptive.dispose?.();

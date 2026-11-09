@@ -21,6 +21,8 @@
  */
 
 import { TOOLS, SPEED, PALETTE_NAMES } from '../core/config.js';
+import { SCHEMA } from '../core/settings.js';
+import { ACTIONS, MODIFIER_ACTIONS, keyLabel } from '../core/input-map.js';
 
 /** The neutral placeholder shown when a number has no owner yet. */
 export const PLACEHOLDER = '—';
@@ -580,4 +582,282 @@ export function formatTickerEvent(event) {
   const label = event.label ?? event.type ?? 'event';
   const detail = event.detail ? ` ${event.detail}` : '';
   return `${label}${detail}`;
+}
+
+// ===========================================================================
+// V5 — settings, controls, credits, performance
+//
+// Everything below is DATA-DRIVEN: the settings rows come from
+// `core/settings.js`'s SCHEMA and the key rows come from
+// `core/input-map.js`. Nothing here hard-codes a setting or a key, so a new
+// setting or a rebinding shows up without a UI change.
+// ===========================================================================
+
+/** The order the settings sections are presented in. */
+export const SETTING_SECTIONS = Object.freeze([
+  { id: 'audio', label: 'Audio' },
+  { id: 'display', label: 'Display' },
+  { id: 'accessibility', label: 'Accessibility' },
+  { id: 'input', label: 'Controls' },
+]);
+
+/** "panUp" -> "Pan up" (camel case is split into words first). */
+function words(name) {
+  return String(name).replace(/([a-z0-9])([A-Z])/g, '$1 $2');
+}
+
+/**
+ * The settings model: one row per entry of the settings SCHEMA.
+ *
+ * The SCHEMA is the single source of truth — a setting that is added to
+ * `core/settings.js` appears here without a UI change.
+ *
+ * @param {{schema?:object, values?:object}} opts
+ * @returns {{groups:Array<{id:string,label:string,rows:Array}>, rows:Array}}
+ */
+export function buildSettingsModel({ schema = SCHEMA, values = {} } = {}) {
+  const source = (schema && typeof schema === 'object') ? schema : SCHEMA;
+  const groups = [];
+
+  for (const section of SETTING_SECTIONS) {
+    const rows = [];
+    for (const [key, def] of Object.entries(source)) {
+      if (!def || def.section !== section.id) continue;
+      const value = Object.prototype.hasOwnProperty.call(values, key) ? values[key] : def.default;
+      rows.push({
+        key,
+        label: def.label ?? key,
+        type: def.type,
+        value,
+        default: def.default,
+        min: Number.isFinite(def.min) ? def.min : null,
+        max: Number.isFinite(def.max) ? def.max : null,
+        step: Number.isFinite(def.step) ? def.step : null,
+        // The bindings are edited in the controls panel, not as a value row.
+        editable: def.type !== 'bindings',
+      });
+    }
+    if (rows.length) groups.push({ id: section.id, label: section.label, rows });
+  }
+
+  return { groups, rows: groups.flatMap((g) => g.rows) };
+}
+
+/**
+ * The controls model: one row per bindable ACTION of the input map.
+ *
+ * The key text is produced by `keyLabel()` from `core/input-map.js`, so the
+ * list can never drift from the code that reads the keys.
+ *
+ * @param {{inputMap?:object, actions?:ReadonlyArray<string>}} opts
+ * @returns {{rows:Array}}
+ */
+export function buildControlsModel({ inputMap, actions = ACTIONS } = {}) {
+  const list = Array.isArray(actions) ? actions : ACTIONS;
+  const rows = list.map((action) => {
+    const codes = inputMap && typeof inputMap.get === 'function'
+      ? (inputMap.get(action) ?? [])
+      : [];
+    const modifier = inputMap && typeof inputMap.modifierFor === 'function'
+      ? inputMap.modifierFor(action)
+      : (MODIFIER_ACTIONS[action] ?? null);
+    const keys = codes.map((code) => keyLabel(code));
+    const [group, name] = String(action).split('.');
+    return {
+      action,
+      group: words(group ?? ''),
+      label: titleCase(words(name ?? action)),
+      modifier,
+      codes: codes.slice(),
+      keys,
+      // The text shown on screen: "Ctrl + S", "W / ↑", "—".
+      keyText: modifier
+        ? `${String(modifier).toUpperCase()} + ${keys.join(' / ')}`
+        : keys.join(' / '),
+      bound: keys.length > 0,
+    };
+  });
+  return { rows };
+}
+
+/** The friendly description of every bindable action, for the help panel. */
+export const ACTION_HINTS = Object.freeze({
+  'camera.panUp': 'Pan the camera north',
+  'camera.panDown': 'Pan the camera south',
+  'camera.panLeft': 'Pan the camera west',
+  'camera.panRight': 'Pan the camera east',
+  'camera.rotateLeft': 'Rotate the camera left',
+  'camera.rotateRight': 'Rotate the camera right',
+  'camera.zoomIn': 'Zoom in',
+  'camera.zoomOut': 'Zoom out',
+  'camera.reset': 'Reset the camera',
+  'game.pause': 'Pause / resume',
+  'game.save': 'Save the city',
+  'game.help': 'This help',
+  'game.shop': 'Building shop',
+  'game.government': 'Government overview',
+  'game.building': 'Selected building',
+  'game.saves': 'Save / load',
+  'game.time': 'Time control',
+  'game.menu': 'Main menu',
+  'game.cancel': 'Close / cancel',
+});
+
+/**
+ * The help model — the key list GENERATED from the input map.
+ *
+ * The old help panel was a hand-written snapshot that had already drifted
+ * from the code (it was missing `T` for the time control). Every key hint
+ * below is produced from `core/input-map.js`, so it cannot drift again.
+ *
+ * @param {{inputMap?:object, toolKeys?:object, actions?:ReadonlyArray<string>}} opts
+ * @returns {{rows:Array<{keys:string,text:string}>}}
+ */
+export function buildHelpModel({ inputMap, toolKeys = TOOL_KEYS, actions = ACTIONS } = {}) {
+  const rows = [];
+
+  // The tools are numbered 1..7 by the HUD's own scheme (not bindable).
+  for (const tool of TOOL_ORDER) {
+    const digit = toolKeys?.[tool];
+    if (!digit) continue;
+    rows.push({ keys: digit, text: `Select the ${(TOOL_LABELS[tool] ?? tool).toLowerCase()} tool` });
+  }
+
+  const controls = buildControlsModel({ inputMap, actions });
+  for (const row of controls.rows) {
+    const hint = ACTION_HINTS[row.action];
+    if (!hint) continue;
+    rows.push({ keys: row.keyText, text: hint });
+  }
+
+  // The gestures and the HUD-only scheme that are not key bindings.
+  rows.push({ keys: 'Wheel', text: 'Zoom' });
+  rows.push({ keys: 'Left-drag', text: 'Pan the camera' });
+  rows.push({ keys: 'Right-drag', text: 'Rotate + tilt the camera' });
+  rows.push({ keys: 'Shift + 1..4', text: 'Simulation speed' });
+
+  return { rows };
+}
+
+/**
+ * The performance readout model.
+ *
+ * Every number comes from the renderer's own performance monitor; when the
+ * renderer does not publish one, the model reports "not available" instead
+ * of a fabricated zero.
+ *
+ * @param {{perf?:object|null}} opts
+ */
+export function buildPerformanceModel({ perf = null } = {}) {
+  if (!perf || typeof perf !== 'object') {
+    return { available: false, fps: null, frameMs: null, drawCalls: null, triangles: null };
+  }
+  const num = (v) => (Number.isFinite(Number(v)) ? Number(v) : null);
+  return {
+    available: true,
+    fps: num(perf.fps),
+    frameMs: num(perf.frameMs),
+    drawCalls: num(perf.drawCalls),
+    triangles: num(perf.triangles),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Credits — the REAL asset packs and their REAL licences
+// ---------------------------------------------------------------------------
+
+/**
+ * The 3D asset packs that ship with the game, with the licence of each.
+ *
+ * These names are NOT invented: they are the packs in
+ * `src/data/manifest.json`, and every licence file listed here exists in
+ * `public/assets/LICENSES/` (the UI test asserts both).
+ *
+ * The 2D interface art is deliberately ABSENT from this list: its licence
+ * clearance is unresolved, so the cleared build strips it and the HUD draws
+ * itself. See `CREDIT_NOTES`.
+ */
+export const CREDIT_PACKS = Object.freeze([
+  Object.freeze({
+    id: 'characters',
+    display: 'KayKit Adventurers + Character Animations',
+    author: 'Kay Lousberg (KayKit)',
+    licence: 'CC0-1.0',
+    licenceFiles: Object.freeze([
+      'assets/LICENSES/kaykit-adventurers-LICENSE.txt',
+      'assets/LICENSES/kaykit-character-animations-LICENSE.txt',
+    ]),
+  }),
+  Object.freeze({
+    id: 'citizens',
+    display: 'Quaternius Ultimate Animated Character',
+    author: 'Quaternius',
+    licence: 'CC0-1.0',
+    licenceFiles: Object.freeze(['assets/LICENSES/citizens-CC0-1.0.txt']),
+  }),
+  Object.freeze({
+    id: 'citybits',
+    display: 'KayKit City Builder Bits',
+    author: 'Kay Lousberg (KayKit)',
+    licence: 'CC0-1.0',
+    licenceFiles: Object.freeze(['assets/LICENSES/kaykit-city-builder-LICENSE.txt']),
+  }),
+  Object.freeze({
+    id: 'creatures',
+    display: 'Quaternius Ultimate Animated Animals',
+    author: 'Quaternius',
+    licence: 'CC0-1.0',
+    licenceFiles: Object.freeze(['assets/LICENSES/creatures-CC0-1.0.txt']),
+  }),
+  Object.freeze({
+    id: 'nature',
+    display: 'Avramania Nature & Terrain',
+    author: 'Avramania',
+    licence: 'CC0-1.0',
+    licenceFiles: Object.freeze(['assets/LICENSES/avramania-nature-terrain-CC0.txt']),
+  }),
+  Object.freeze({
+    id: 'props',
+    display: 'Holokat Game Assets',
+    author: 'Holokat / OpenGameArt',
+    licence: 'MIT',
+    licenceFiles: Object.freeze(['assets/LICENSES/holokat-game-assets-MIT.txt']),
+  }),
+  Object.freeze({
+    id: 'undead',
+    display: 'KayKit Character Pack: Skeletons',
+    author: 'Kay Lousberg (KayKit)',
+    licence: 'CC0-1.0',
+    licenceFiles: Object.freeze(['assets/LICENSES/undead-CC0-1.0.txt']),
+  }),
+]);
+
+/**
+ * The honesty notes shown under the credits.
+ *
+ * They say what actually ships — and what does NOT.
+ */
+export const CREDIT_NOTES = Object.freeze([
+  'The 3D models ship from the packs listed above. Each pack\'s licence text ships beside it under assets/LICENSES/.',
+  'The 2D interface art does NOT ship: its licence clearance is unresolved, so the cleared build strips it and the HUD draws itself.',
+  'Only the Avramania Nature & Terrain pack has a recorded retrieval (2026-10-06, CC0 verified on the source page) — see assets/PROVENANCE.md.',
+  'SuperCitycon is a fan project; the original game is by Binogure Studio.',
+]);
+
+/**
+ * The credits model.
+ * @param {{packs?:ReadonlyArray<object>}} opts
+ */
+export function buildCreditsModel({ packs = CREDIT_PACKS } = {}) {
+  const list = Array.isArray(packs) ? packs : CREDIT_PACKS;
+  return {
+    packs: list.map((p) => ({
+      id: p.id,
+      display: p.display,
+      author: p.author,
+      licence: p.licence,
+      licenceFiles: Array.isArray(p.licenceFiles) ? p.licenceFiles.slice() : [],
+    })),
+    notes: CREDIT_NOTES.slice(),
+  };
 }

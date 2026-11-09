@@ -21,7 +21,8 @@
  * API. `damp()` and friends are pure and are unit-tested in Node.
  */
 
-import { TUNING } from '../core/config.js';
+import { TUNING, GRID, CELL, WORLD } from '../core/config.js';
+import { EVENTS } from '../core/events.js';
 
 /**
  * Frame-rate-independent exponential damping.
@@ -97,7 +98,80 @@ export const RIG_RATES = Object.freeze({
   edgeBand: 24,
   /** Edge-scroll speed, world units / second. */
   edgeSpeed: 26,
+  /**
+   * Look-ahead: how far AHEAD of the pan direction the view leads, in world
+   * units. The player sees where they are going instead of where they were.
+   *
+   * TBD: the publisher never published a look-ahead distance, so these are
+   * design values. Proposed TUNING additions: `cameraLookAhead` and
+   * `cameraLookAheadRate`.
+   */
+  /** TBD: the look-ahead distance, in world units. */
+  lookAhead: 14,
+  /** TBD: how fast the look-ahead offset catches up (e-folds / second). */
+  lookAheadRate: 4.5,
 });
+
+/**
+ * The camera shake.
+ *
+ * TBD: the publisher never published a shake amplitude or a decay rate, so
+ * these are design values (the same class of number as `core/config.js`'s
+ * TUNING table). They are marked here and proposed as TUNING additions in
+ * the UI final report:
+ *
+ *   - `cameraShakeAmplitude` — the impulse of one shake, in world units.
+ *   - `cameraShakeDecay`     — how fast a shake dies, in e-folds / second.
+ *   - `cameraShakeFrequency` — how fast the shake oscillates, in rad/s.
+ */
+export const SHAKE = Object.freeze({
+  /** TBD: the impulse of one shake, in world units. */
+  amplitude: 0.9,
+  /** TBD: how fast a shake dies, in e-folds per second. */
+  decay: 4.2,
+  /** TBD: how fast the shake oscillates, in radians per second. */
+  frequency: 34,
+  /** TBD: the ceiling of a stacked shake, in world units. */
+  maxAmplitude: 2,
+  /** TBD: the impulse of each event that shakes the camera, as a multiple. */
+  byEvent: Object.freeze({
+    [EVENTS.BUILDING_PLACED]: 0.5,
+    [EVENTS.BUILDING_REMOVED]: 0.9,
+    [EVENTS.BUILDING_UPGRADED]: 0.7,
+    [EVENTS.HAZARD_DAMAGE]: 1.1,
+    [EVENTS.STAGE_ADVANCED]: 1.3,
+  }),
+});
+
+/**
+ * The rectangle the focus point is clamped to: the playfield itself.
+ *
+ * The grid is 64 x 64 cells of 4 world units, so the world is 256 x 256
+ * units centred on the origin — the focus can never leave it.
+ */
+export const WORLD_BOUNDS = Object.freeze({
+  minX: WORLD.originX,
+  maxX: WORLD.originX + GRID.size * CELL,
+  minZ: WORLD.originZ,
+  maxZ: WORLD.originZ + GRID.size * CELL,
+});
+
+/**
+ * Clamp a point into the world rectangle.
+ *
+ * @param {number} x
+ * @param {number} z
+ * @param {{minX:number,maxX:number,minZ:number,maxZ:number}} [bounds]
+ * @returns {{x:number,z:number}}
+ */
+export function clampToWorld(x, z, bounds = WORLD_BOUNDS) {
+  const nx = Number.isFinite(Number(x)) ? Number(x) : 0;
+  const nz = Number.isFinite(Number(z)) ? Number(z) : 0;
+  return {
+    x: Math.min(bounds.maxX, Math.max(bounds.minX, nx)),
+    z: Math.min(bounds.maxZ, Math.max(bounds.minZ, nz)),
+  };
+}
 
 const KEY_PAN = {
   KeyW: 'north', ArrowUp: 'north',
@@ -105,6 +179,14 @@ const KEY_PAN = {
   KeyA: 'west', ArrowLeft: 'west',
   KeyD: 'east', ArrowRight: 'east',
 };
+
+/** Which camera action moves the focus in which direction. */
+const PAN_ACTIONS = Object.freeze({
+  'camera.panUp': 'north',
+  'camera.panDown': 'south',
+  'camera.panLeft': 'west',
+  'camera.panRight': 'east',
+});
 
 /**
  * Create the camera rig.
@@ -117,6 +199,7 @@ const KEY_PAN = {
 export function createCameraRig(ctx, options = {}) {
   const renderer = ctx?.renderer;
   const state = ctx?.state;
+  const inputMap = ctx?.inputMap ?? null;
   const listen = options.listen !== false;
 
   const cfg = ctx?.config ?? {};
@@ -142,13 +225,53 @@ export function createCameraRig(ctx, options = {}) {
   let dragging = null;
   let disposed = false;
 
+  // --- the look-ahead offset (the view leads the pan direction) ----------
+  const lead = { x: 0, z: 0 };
+
+  // --- the shake ----------------------------------------------------------
+  let shakeAmplitude = 0;
+  let shakePhase = 0;
+  let shakeOffsetX = 0;
+  let shakeOffsetZ = 0;
+
   const DEG = 180 / Math.PI;
 
   // ---- helpers ------------------------------------------------------------
 
+  /**
+   * The pan direction a key code is bound to, read from the input map.
+   *
+   * It is read on every key event, so a REBIND takes effect immediately —
+   * the map is the single source of truth.
+   */
+  function panDirection(code) {
+    if (!inputMap || typeof inputMap.get !== 'function' || !code) return null;
+    for (const [action, dir] of Object.entries(PAN_ACTIONS)) {
+      const codes = inputMap.get(action) ?? [];
+      if (codes.includes(code)) return dir;
+    }
+    return null;
+  }
+
+  /** True when the player asked for a shake-free camera. */
+  function shakeReduced() {
+    try {
+      return !!ctx?.settings?.get?.('accessibility.reducedShake');
+    } catch {
+      return false;
+    }
+  }
+
+  /** Add a shake impulse — unless the player asked for no shake at all. */
+  function addShake(amount) {
+    if (shakeReduced()) return;
+    const n = Number(amount);
+    if (!Number.isFinite(n) || n <= 0) return;
+    shakeAmplitude = Math.min(SHAKE.maxAmplitude, shakeAmplitude + n * SHAKE.amplitude);
+  }
+
   /** The renderer reports pitch in radians; the rig works in degrees. */
-  function rendererPitchDeg() {
-    if (!renderer || typeof renderer.getPitch !== 'function') return current.pitch;
+  function rendererPitchDeg() {    if (!renderer || typeof renderer.getPitch !== 'function') return current.pitch;
     const rad = Number(renderer.getPitch());
     return Number.isFinite(rad) ? rad * DEG : current.pitch;
   }
@@ -189,20 +312,22 @@ export function createCameraRig(ctx, options = {}) {
     if (!Number.isFinite(fx) || !Number.isFinite(fz)) return;
     if (!Number.isFinite(pushed.x) || !Number.isFinite(pushed.z)) return;
     if (Math.abs(fx - pushed.x) > 1e-6 || Math.abs(fz - pushed.z) > 1e-6) {
-      target.x = fx;
-      target.z = fz;
-      current.x = fx;
-      current.z = fz;
+      const c = clampToWorld(fx, fz);
+      target.x = c.x;
+      target.z = c.z;
+      current.x = c.x;
+      current.z = c.z;
     }
   }
 
   // ---- the public rig ----------------------------------------------------
 
-  /** Move the focus point. */
+  /** Move the focus point (clamped to the world rectangle). */
   function focus(x, z) {
     if (!Number.isFinite(x) || !Number.isFinite(z)) return current;
-    target.x = x;
-    target.z = z;
+    const c = clampToWorld(x, z);
+    target.x = c.x;
+    target.z = c.z;
     return current;
   }
 
@@ -250,26 +375,43 @@ export function createCameraRig(ctx, options = {}) {
     applyToRenderer();
   }
 
-  /** Apply the smoothed values to the renderer. */
+  /**
+   * Apply the smoothed values to the renderer.
+   *
+   * The focus that is pushed carries the LOOK-AHEAD offset and the SHAKE
+   * offset: both are presentation, not the focus itself, so the target and
+   * the state mirror stay honest.
+   */
   function applyToRenderer() {
     if (!renderer) return;
-    if (typeof renderer.focusOn === 'function') renderer.focusOn(current.x, current.z);
+    const ox = lead.x + shakeOffsetX;
+    const oz = lead.z + shakeOffsetZ;
+    if (typeof renderer.focusOn === 'function') renderer.focusOn(current.x + ox, current.z + oz);
     if (typeof renderer.setDistance === 'function') renderer.setDistance(current.distance);
     if (typeof renderer.setYaw === 'function') renderer.setYaw(current.yaw);
     if (typeof renderer.setPitch === 'function') renderer.setPitch(current.pitch);
-    pushed.x = current.x;
-    pushed.z = current.z;
+    pushed.x = current.x + ox;
+    pushed.z = current.z + oz;
     pushed.distance = current.distance;
     pushed.yaw = current.yaw;
     pushed.pitch = current.pitch;
   }
 
-  /** Pan the focus in camera-relative space (used by WASD and edge-scroll). */
+  /**
+   * Pan the focus in camera-relative space (used by WASD and edge-scroll).
+   *
+   * The focus is clamped to the world rectangle, and the world-space
+   * movement is returned so the caller can work out the look-ahead.
+   */
   function panRelative(dx, dz) {
     const sin = Math.sin(current.yaw);
     const cos = Math.cos(current.yaw);
-    target.x += dx * cos - dz * sin;
-    target.z += dx * sin + dz * cos;
+    const wx = dx * cos - dz * sin;
+    const wz = dx * sin + dz * cos;
+    const c = clampToWorld(target.x + wx, target.z + wz);
+    target.x = c.x;
+    target.z = c.z;
+    return { x: wx, z: wz };
   }
 
   // ---- per-frame ---------------------------------------------------------
@@ -283,6 +425,10 @@ export function createCameraRig(ctx, options = {}) {
 
     adoptExternalFocus();
 
+    // The world-space movement of this frame (used for the look-ahead).
+    let movedX = 0;
+    let movedZ = 0;
+
     // --- keyboard pan (WASD / arrows) ------------------------------------
     let px = 0;
     let pz = 0;
@@ -293,7 +439,9 @@ export function createCameraRig(ctx, options = {}) {
     if (px || pz) {
       const speed = keys.has('shift') ? RIG_RATES.panFast : RIG_RATES.panSpeed;
       const len = Math.hypot(px, pz) || 1;
-      panRelative((px / len) * speed * d, (pz / len) * speed * d);
+      const moved = panRelative((px / len) * speed * d, (pz / len) * speed * d);
+      movedX += moved.x;
+      movedZ += moved.z;
     }
 
     // --- edge scroll ------------------------------------------------------
@@ -308,9 +456,30 @@ export function createCameraRig(ctx, options = {}) {
       else if (y > height - band) ez += 1;
       if (ex || ez) {
         const len = Math.hypot(ex, ez) || 1;
-        panRelative((ex / len) * RIG_RATES.edgeSpeed * d, (ez / len) * RIG_RATES.edgeSpeed * d);
+        const moved = panRelative((ex / len) * RIG_RATES.edgeSpeed * d, (ez / len) * RIG_RATES.edgeSpeed * d);
+        movedX += moved.x;
+        movedZ += moved.z;
       }
     }
+
+    // --- the look-ahead ----------------------------------------------------
+    // The view leads the pan direction: the player sees where they are
+    // going, not where they were. The offset decays when the pan stops.
+    const movedLen = Math.hypot(movedX, movedZ);
+    const leadX = movedLen > 1e-6 ? (movedX / movedLen) * RIG_RATES.lookAhead : 0;
+    const leadZ = movedLen > 1e-6 ? (movedZ / movedLen) * RIG_RATES.lookAhead : 0;
+    lead.x = damp(lead.x, leadX, RIG_RATES.lookAheadRate, d);
+    lead.z = damp(lead.z, leadZ, RIG_RATES.lookAheadRate, d);
+
+    // --- the shake ---------------------------------------------------------
+    // The decay is exponential, so it is frame-rate independent: the same
+    // shake lasts the same wall-clock time at 30 Hz and at 144 Hz.
+    if (shakeReduced()) shakeAmplitude = 0;
+    shakePhase += SHAKE.frequency * d;
+    shakeAmplitude *= Math.exp(-SHAKE.decay * d);
+    if (shakeAmplitude < 1e-4) shakeAmplitude = 0;
+    shakeOffsetX = Math.sin(shakePhase) * shakeAmplitude;
+    shakeOffsetZ = Math.cos(shakePhase * 0.83) * shakeAmplitude * 0.7;
 
     // --- smooth everything (frame-rate independent) -----------------------
     current.x = damp(current.x, target.x, RIG_RATES.focus, d);
@@ -394,10 +563,32 @@ export function createCameraRig(ctx, options = {}) {
     e.preventDefault?.();
   }
 
-  /** The rig owns its own key handling for the camera keys only. */
+  /**
+   * The camera's own key handling.
+   *
+   * The bindings come from `core/input-map.js` when the game published one,
+   * so the camera and the on-screen hints can never disagree. Without an
+   * input map the rig falls back to the historical WASD / arrows / Q / E /
+   * R scheme.
+   */
   function onKeyDown(e) {
     if (!e || disposed) return;
     if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName || '')) return;
+    // While the menu is open the menu owns the keyboard.
+    if (ctx?.ui?.menu?.isOpen?.()) return;
+
+    if (inputMap && typeof inputMap.matches === 'function') {
+      if (inputMap.matches('camera.rotateLeft', e)) { rotate(-RIG_RATES.dragYaw * 6); return; }
+      if (inputMap.matches('camera.rotateRight', e)) { rotate(RIG_RATES.dragYaw * 6); return; }
+      if (inputMap.matches('camera.reset', e)) { reset(); return; }
+      if (inputMap.matches('camera.zoomIn', e)) { zoomTo(current.distance * 0.82); return; }
+      if (inputMap.matches('camera.zoomOut', e)) { zoomTo(current.distance * 1.22); return; }
+      const dir = panDirection(e.code);
+      if (dir) { keys.add(dir); e.preventDefault?.(); }
+      if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.add('shift');
+      return;
+    }
+
     if (e.code === 'KeyQ') { rotate(-RIG_RATES.dragYaw * 6); return; }
     if (e.code === 'KeyE') { rotate(RIG_RATES.dragYaw * 6); return; }
     // R resets the camera. (H was the label on the reset button for a while,
@@ -411,10 +602,9 @@ export function createCameraRig(ctx, options = {}) {
   function onKeyUp(e) {
     if (!e || disposed) return;
     if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') keys.delete('shift');
-    const dir = KEY_PAN[e.code];
+    const dir = panDirection(e.code) ?? KEY_PAN[e.code];
     if (dir) keys.delete(dir);
   }
-
   function onBlur() {
     keys.clear();
     dragging = null;
@@ -432,6 +622,25 @@ export function createCameraRig(ctx, options = {}) {
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup', onKeyUp);
     window.addEventListener('blur', onBlur);
+  }
+
+  // --- the shake triggers --------------------------------------------------
+  //
+  // The renderer has no shake of its own, so the rig owns it. The events
+  // that shake the camera are the ones that describe something happening in
+  // the city — the rig never invents a shake of its own.
+  const busUnsubscribes = [];
+  const bus = ctx?.bus;
+  if (bus && typeof bus.on === 'function') {
+    for (const [evt, amount] of Object.entries(SHAKE.byEvent)) {
+      let un = null;
+      try {
+        un = bus.on(evt, () => addShake(amount));
+      } catch {
+        un = null;
+      }
+      if (typeof un === 'function') busUnsubscribes.push(un);
+    }
   }
 
   // Seed the smoothed values from the renderer so the first frame does not
@@ -473,6 +682,8 @@ export function createCameraRig(ctx, options = {}) {
     dispose() {
       disposed = true;
       keys.clear();
+      for (const un of busUnsubscribes) { try { un(); } catch { /* ignore */ } }
+      busUnsubscribes.length = 0;
       if (canvas && typeof canvas.removeEventListener === 'function') {
         canvas.removeEventListener('pointerdown', onPointerDown);
         canvas.removeEventListener('pointermove', onPointerMove);

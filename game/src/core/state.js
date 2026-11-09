@@ -42,6 +42,12 @@ export function createState(seed = DEFAULT_SEED) {
       score: 0,
       /** True once the vertical slice has booted. */
       ready: false,
+      /**
+       * The progression record: the checkpoints the city has reached, the
+       * collectibles that were found and the achievements that were
+       * unlocked. It lives in `meta` so it travels with the save.
+       */
+      progress: { checkpoints: [], collectibles: [], achievements: [] },
     },
 
     // ---- WLD ----------------------------------------------------------

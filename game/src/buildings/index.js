@@ -393,15 +393,23 @@ export function createBuildings(ctx) {
      * on a cell clears the scenery on that cell: the 3D object leaves the
      * scene and the record leaves `state.world.scenery`.
      *
+     * @param {number} rot
+     * @param {{prebuilt?:boolean}} [opts]
+     *   `prebuilt: true` places a building that already existed before the
+     *   player arrived — the starting city of a loaded level. A pre-built
+     *   building costs nothing and occupies no construction slot, because the
+     *   player did not order it and did not pay for it. The flag is carried
+     *   on the BUILDING_PLACED payload so the economy can tell the two apart.
      * @returns {{ok:boolean, reason:string|null, id:number|null}}
      */
-    place(typeId, cx, cz, rot = 0) {
+    place(typeId, cx, cz, rot = 0, opts = {}) {
       const def = getDefinition(typeId);
       if (!def) return { ok: false, reason: 'unknown-building', id: null };
 
-      const cost = deriveCost(def, 1);
+      const prebuilt = opts?.prebuilt === true;
+      const cost = prebuilt ? 0 : deriveCost(def, 1);
       const economy = ctx.domains?.economy;
-      if (economy && typeof economy.canAfford === 'function') {
+      if (!prebuilt && economy && typeof economy.canAfford === 'function') {
         try {
           if (!economy.canAfford(cost)) {
             return { ok: false, reason: 'insufficient-funds', id: null };
@@ -445,6 +453,7 @@ export function createBuildings(ctx) {
         rot: result.instance.rot,
         level: result.instance.level,
         cost,
+        prebuilt,
       });
       return { ok: true, reason: null, id: result.instance.id };
     },

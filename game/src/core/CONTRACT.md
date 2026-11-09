@@ -47,15 +47,17 @@ file. The integrator owns `src/main.js`, `src/core/config.js`,
 
    | Domain | Pure rule modules |
    |---|---|
-   | CORE | `core/config.js`, `core/events.js`, `core/state.js`, `core/modes.js`, `core/save.js`, `core/stage.js` |
+   | CORE | `core/config.js`, `core/events.js`, `core/state.js`, `core/modes.js`, `core/save.js`, `core/stage.js`, `core/log.js`, `core/settings.js`, `core/input-map.js`, `core/progress.js` |
    | BLD  | `buildings/catalogue.js`, `buildings/properties.js`, `buildings/placement.js` |
    | ECO  | `economy/logic.js` |
    | MOB  | `mobility/network.js`, `mobility/traffic.js` |
-   | POP  | `population/happiness.js` |
+   | POP  | `population/happiness.js`, `population/animation.js`, `population/pool.js` |
    | SRV  | `services/coverage.js`, `services/services.js` |
    | STD  | `studio/voxels.js` |
    | UX   | `ui/panels.js`, `ui/toasts.js`, `ui/camera.js` |
    | WLD  | `world/heightfield.js` |
+   | CTN  | `content/levels.js`, `content/validate.js` |
+   | HAZ  | `hazards/logic.js` |
 
    The **view** modules — these may import `three`: `render/*`,
    `world/terrain.js`, `world/water.js`, `population/citizens.js`,

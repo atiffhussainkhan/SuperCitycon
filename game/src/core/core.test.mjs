@@ -39,7 +39,9 @@ import {
   importSave,
   exportSave,
   buildRecord,
+  SAVE_VERSION,
   SAVE_KEY_PREFIX,
+  migrateRecord,
 } from './save.js';
 import {
   MODE_REGISTRY,
@@ -343,7 +345,7 @@ test('save: an exported file can be imported again', () => {
   resetLive();
   // The export writes the same record the storage slots use.
   const record = JSON.parse(JSON.stringify(buildRecord(liveState, { name: 'Round Trip' })));
-  assert.equal(record.version, 1);
+  assert.equal(record.version, SAVE_VERSION);
   assert.equal(record.name, 'Round Trip');
 
   const imported = importSave(JSON.stringify(record));
@@ -363,7 +365,7 @@ test('save: a slot survives a save / load round trip', () => {
   assert.ok(globalThis.localStorage.getItem(`${SAVE_KEY_PREFIX}1`), 'the slot was written');
 
   const record = JSON.parse(globalThis.localStorage.getItem(`${SAVE_KEY_PREFIX}1`));
-  assert.equal(record.version, 1);
+  assert.equal(record.version, SAVE_VERSION);
   assert.equal(record.name, 'Testville');
   assert.equal(record.stage, 'First Foundations');
   assert.ok(typeof record.savedAt === 'string' && record.savedAt.length > 0);
@@ -699,4 +701,66 @@ test('a typed array survives snapshot -> restore without any repair', () => {
     'the type map must come back as a Uint8Array');
   assert.equal(revived.world.heightmap[1], 1.25, 'and with the right values');
   assert.equal(revived.world.types[2], 3);
+});
+
+/* ------------------------------------------------- save: version migration */
+
+test('save: an older save is MIGRATED, not refused', () => {
+  resetLive();
+  // A v1 record: the shape the V4 build wrote.
+  const v1 = {
+    version: 1,
+    savedAt: '2026-01-01T00:00:00.000Z',
+    name: 'Old Town',
+    stage: 'First Foundations',
+    data: JSON.parse(JSON.stringify(snapshot(liveState))),
+  };
+  assert.ok(v1.data.meta, 'the v1 record carries a meta subtree');
+
+  const result = migrateRecord(v1);
+  assert.equal(result.ok, true, 'a v1 save must migrate');
+  assert.equal(result.migrated, true);
+  assert.equal(result.from, 1);
+  assert.equal(result.to, SAVE_VERSION);
+  assert.equal(result.record.version, SAVE_VERSION, 'the migrated record carries the current version');
+  assert.deepEqual(
+    result.record.data.meta.progress,
+    { checkpoints: [], collectibles: [], achievements: [] },
+    'the migration adds the v5 progression record',
+  );
+  assert.equal(result.record.data.meta.seed, v1.data.meta.seed, 'the city itself is untouched');
+  assert.equal(v1.version, 1, 'the migration does not mutate its input');
+});
+
+test('save: a save from a newer build is refused, not guessed at', () => {
+  const result = migrateRecord({ version: SAVE_VERSION + 1, data: { meta: { seed: 1 } } });
+  assert.equal(result.ok, false);
+  assert.equal(result.record, null);
+  assert.match(result.error, /format v/);
+});
+
+test('save: a current save is not migrated', () => {
+  const result = migrateRecord({ version: SAVE_VERSION, data: { meta: { seed: 1 } } });
+  assert.equal(result.ok, true);
+  assert.equal(result.migrated, false);
+  assert.equal(result.record.version, SAVE_VERSION);
+});
+
+test('save: a v1 save in a storage slot still loads', () => {
+  resetLive();
+  const state = resetLive();
+  state.meta.day = 5;
+  const v1 = {
+    version: 1,
+    savedAt: '2026-01-01T00:00:00.000Z',
+    name: 'Old Town',
+    stage: 'First Foundations',
+    data: JSON.parse(JSON.stringify(snapshot(state))),
+  };
+  globalThis.localStorage.setItem(`${SAVE_KEY_PREFIX}9`, JSON.stringify(v1));
+
+  const loaded = loadFromStorage('9');
+  assert.ok(loaded, 'a v1 slot must still load in the v5 build');
+  assert.equal(loaded.meta.day, 5, 'the city is restored exactly');
+  assert.deepEqual(loaded.meta.progress, { checkpoints: [], collectibles: [], achievements: [] });
 });

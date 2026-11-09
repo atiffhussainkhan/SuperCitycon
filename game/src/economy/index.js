@@ -619,6 +619,16 @@ export function createEconomy(ctx) {
     if (id !== null && eco.charged.has(id)) return;
     if (id !== null) eco.charged.add(id);
 
+    // A PRE-BUILT building (the starting city of a loaded level) already
+    // existed before the player arrived. It was never ordered and never
+    // paid for, so it must not be charged and must not occupy a construction
+    // slot (FR-ECO-120/121 governs the player's OWN constructions).
+    if (payload.prebuilt === true) {
+      eco.constructions?.delete?.(id);
+      refreshSlots();
+      return;
+    }
+
     const def = defOf(payload.type);
     const cost = Number.isFinite(payload.cost)
       ? Math.round(payload.cost)

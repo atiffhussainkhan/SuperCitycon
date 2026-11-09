@@ -34,7 +34,8 @@ import {
   deriveShopTabs, buildTopBarModel, buildSpeedModel, buildDemandModel, PLACEHOLDER, TOOL_ORDER,
 } from './panels.js';
 import { createToastQueue } from './toasts.js';
-import { damp, dampAngle, clampPitch, clampDistance, createCameraRig } from './camera.js';
+import { damp, dampAngle, clampPitch, clampDistance, createCameraRig, clampToWorld, WORLD_BOUNDS } from './camera.js';
+import { createInputMap } from '../core/input-map.js';
 import { HUD_STYLES } from './styles.js';
 
 // ===========================================================================
@@ -857,4 +858,132 @@ test('the demand bars degrade to a placeholder without the economy domain', () =
     assert.equal(bar.text, PLACEHOLDER);
     assert.equal(bar.assumed, true);
   }
+});
+
+// ===========================================================================
+// 10. The camera: world bounds, look-ahead and the shake
+// ===========================================================================
+
+/** A renderer stand-in that records what the rig pushes into it. */
+function makeRenderer() {
+  const pushed = [];
+  return {
+    pushed,
+    focus: { x: 0, z: 0 },
+    focusOn(x, z) { this.focus.x = x; this.focus.z = z; pushed.push({ x, z }); },
+    setDistance() { },
+    setYaw() { },
+    setPitch() { },
+    getDistance() { return 60; },
+    getYaw() { return 0; },
+    getPitch() { return 0.9; },
+  };
+}
+
+test('the camera clamps the focus to the world rectangle', () => {
+  const ctx = makeCtx();
+  const rig = createCameraRig(ctx, { listen: false });
+
+  rig.focus(9999, -9999);
+  assert.equal(rig.target.x, WORLD_BOUNDS.maxX, 'the focus cannot leave the world');
+  assert.equal(rig.target.z, WORLD_BOUNDS.minZ);
+
+  rig.focus(-9999, 9999);
+  assert.equal(rig.target.x, WORLD_BOUNDS.minX);
+  assert.equal(rig.target.z, WORLD_BOUNDS.maxZ);
+
+  // The pure helper agrees.
+  const c = clampToWorld(1000, -1000);
+  assert.equal(c.x, WORLD_BOUNDS.maxX);
+  assert.equal(c.z, WORLD_BOUNDS.minZ);
+
+  rig.dispose();
+});
+
+test('the camera leads the pan direction (look-ahead)', () => {
+  const ctx = makeCtx();
+  const renderer = makeRenderer();
+  const rig = createCameraRig({ ...ctx, renderer }, { listen: true });
+
+  // Pan east for a moment.
+  globalThis.window.dispatchEvent({ type: 'keydown', code: 'KeyD', target: globalThis.window, preventDefault() { } });
+  for (let i = 0; i < 10; i += 1) rig.update(0.05);
+  globalThis.window.dispatchEvent({ type: 'keyup', code: 'KeyD', target: globalThis.window, preventDefault() { } });
+
+  const last = renderer.pushed[renderer.pushed.length - 1];
+  assert.ok(rig.target.x > 0, 'the camera actually panned east');
+  assert.ok(last.x > rig.target.x,
+    `the view leads the pan direction (pushed ${last.x} vs target ${rig.target.x})`);
+
+  rig.dispose();
+});
+
+test('the camera shake decays and the reduced-shake setting silences it', () => {
+  const ctx = makeCtx();
+  const renderer = makeRenderer();
+  const rig = createCameraRig({ ...ctx, renderer }, { listen: false });
+
+  emit(EVENTS.BUILDING_PLACED, { x: 1, z: 1, type: 'res.house' });
+  rig.update(0.016);
+  const shaken = renderer.pushed[renderer.pushed.length - 1];
+  assert.notEqual(shaken.x, rig.target.x, 'the shake moved the camera');
+
+  // The shake decays: with no further events it settles back.
+  for (let i = 0; i < 200; i += 1) rig.update(0.05);
+  const settled = renderer.pushed[renderer.pushed.length - 1];
+  assert.ok(Math.abs(settled.x - rig.target.x) < 0.01, 'the shake died away');
+  rig.dispose();
+
+  // With the accessibility setting on, there is no shake at all.
+  const renderer2 = makeRenderer();
+  const rig2 = createCameraRig({
+    ...ctx,
+    renderer: renderer2,
+    settings: { get: (key) => (key === 'accessibility.reducedShake' ? true : undefined) },
+  }, { listen: false });
+  emit(EVENTS.BUILDING_PLACED, { x: 1, z: 1, type: 'res.house' });
+  rig2.update(0.016);
+  const still = renderer2.pushed[renderer2.pushed.length - 1];
+  assert.equal(still.x, rig2.target.x, 'the reduced-shake setting silences the camera');
+  rig2.dispose();
+});
+
+// ===========================================================================
+// 11. The generated help panel and the performance read-out
+// ===========================================================================
+
+test('the help panel is generated from the input map', () => {
+  const ctx = makeCtx();
+  ctx.inputMap = createInputMap();
+  const hud = createHUD(ctx, {});
+  hud.openPanel('help');
+
+  const text = hud.el.querySelectorAll('[data-sc-panel]')[0].textContent;
+  assert.match(text, /Pan the camera north/, 'the camera actions are listed');
+  assert.match(text, /Time control/, 'the time control is listed (the old list missed it)');
+  assert.match(text, /Save the city/);
+  // The key hints come from the map, so they carry the map's labels.
+  assert.match(text, /CTRL \+ S/);
+
+  hud.dispose();
+});
+
+test('the performance read-out is toggleable and shows the renderer\'s numbers', () => {
+  const ctx = makeCtx();
+  ctx.renderer = { getPerformance: () => ({ fps: 60, frameMs: 16.7, drawCalls: 120, triangles: 5000 }) };
+  const hud = createHUD(ctx, {});
+
+  const perf = hud.el.querySelectorAll('[data-sc-perf]')[0];
+  assert.equal(perf.hidden, true, 'the read-out starts hidden');
+
+  hud.togglePerformance(true);
+  hud.update(0.016);
+  assert.equal(perf.hidden, false);
+  assert.match(perf.textContent, /60 FPS/);
+  assert.match(perf.textContent, /120 CALLS/);
+  assert.match(perf.textContent, /5000 TRIS/);
+
+  hud.togglePerformance(false);
+  assert.equal(perf.hidden, true, 'the read-out can be switched off again');
+  hud.dispose();
 });
