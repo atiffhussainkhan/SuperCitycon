@@ -34,6 +34,8 @@ import { EVENTS } from '../core/events.js';
 import { createHUD } from './hud.js';
 import { createCameraRig } from './camera.js';
 import { createToastQueue } from './toasts.js';
+import { createMenu } from './menu.js';
+import { createSettingsPanel } from './settings-panel.js';
 import { ensureStyles, HUD_STYLES } from './styles.js';
 import { liveStateProxy } from '../core/state.js';
 
@@ -77,7 +79,29 @@ export function createUI(ctx) {
   ensureStyles(typeof document !== 'undefined' ? document : null);
 
   const toasts = createToastQueue({ ttl: 4.5 });
+
+  // The settings panel owns the SCHEMA-driven rows and the live effects
+  // (audio mixer, renderer, stylesheet). It is created BEFORE the camera
+  // rig on purpose: its key-capture listener has to be the first one on the
+  // window, so a rebind press never reaches the camera's own key handler.
+  const settingsPanel = createSettingsPanel(ctx, {
+    logger: ctx?.logger,
+    onToast: (message, kind) => showToast(message, kind),
+  });
+  // The stored settings are applied straight away: a player who asked for
+  // a bigger text or a high contrast gets them at the first frame, not
+  // after they visit the settings panel.
+  settingsPanel.applyUiEffects();
+
   const camera = createCameraRig(ctx, { listen: true });
+
+  // The main menu and the pause overlay.
+  const menu = createMenu(ctx, {
+    logger: ctx?.logger,
+    settingsPanel,
+    onToast: (message, kind) => showToast(message, kind),
+    onPause: (paused) => setPaused(paused),
+  });
 
   let hud = null;
   let mounted = false;
@@ -205,10 +229,26 @@ export function createUI(ctx) {
    * `state.ui.speed` is the UX subtree this domain owns. Both
    * `EVENTS.SPEED_CHANGED` and `EVENTS.PAUSE_CHANGED` are emitted so CORE
    * can take over the write if it prefers.
+   *
+   * V5: when CORE's mode registry is reachable the write goes through
+   * `ctx.core.modes.setSpeed()`, so CORE keeps ONE authority over the clock
+   * (it remembers `meta.speedBeforePause` and restores it on resume).
    */
   function setSpeed(name) {
     const meta = state?.meta;
     if (!meta) return null;
+    const modes = ctx?.core?.modes;
+    if (modes && typeof modes.setSpeed === 'function') {
+      try {
+        modes.setSpeed(name);
+        if (state?.ui) state.ui.speed = meta.speed;
+        return { speed: meta.speed, paused: meta.paused, path: 'core' };
+      } catch (err) {
+        ctx?.logger?.warn?.('CORE could not set the speed; the UI writes it directly', {
+          error: String(err?.message ?? err),
+        });
+      }
+    }
     if (name === 'paused') {
       meta.paused = true;
     } else {
@@ -218,7 +258,48 @@ export function createUI(ctx) {
     if (state?.ui) state.ui.speed = meta.speed;
     bus?.emit?.(EVENTS.SPEED_CHANGED, { speed: meta.speed, paused: meta.paused });
     bus?.emit?.(EVENTS.PAUSE_CHANGED, { paused: meta.paused });
-    return { speed: meta.speed, paused: meta.paused };
+    return { speed: meta.speed, paused: meta.paused, path: 'direct' };
+  }
+
+  /**
+   * Pause or resume the simulation.
+   *
+   * CORE owns the pause semantics whenever its mode registry is reachable:
+   * `setSpeed('paused')` remembers the speed in `meta.speedBeforePause` and
+   * `setPaused(false)` restores it. The direct `state.meta.paused` toggle is
+   * only the fallback for a build without CORE.
+   *
+   * @param {boolean} paused
+   * @returns {{paused:boolean, path:'core'|'direct'}}
+   */
+  function setPaused(paused) {
+    const next = !!paused;
+    const meta = state?.meta;
+    const modes = ctx?.core?.modes;
+    if (modes && typeof modes.setPaused === 'function') {
+      try {
+        if (next) {
+          // Remember the speed the way CORE does it.
+          if (typeof modes.setSpeed === 'function') modes.setSpeed('paused');
+          else modes.setPaused(true);
+        } else {
+          modes.setPaused(false);
+        }
+        if (state?.ui && meta) state.ui.speed = meta.speed;
+        return { paused: !!(meta && meta.paused), path: 'core' };
+      } catch (err) {
+        ctx?.logger?.warn?.('CORE could not pause the session; the UI writes the flag directly', {
+          error: String(err?.message ?? err),
+        });
+      }
+    }
+    if (meta) {
+      meta.paused = next;
+      if (state?.ui) state.ui.speed = meta.speed;
+    }
+    bus?.emit?.(EVENTS.SPEED_CHANGED, { speed: meta?.speed, paused: next });
+    bus?.emit?.(EVENTS.PAUSE_CHANGED, { paused: next });
+    return { paused: next, path: 'direct' };
   }
 
   // -------------------------------------------------------------------------
@@ -299,12 +380,19 @@ export function createUI(ctx) {
     hud = createHUD(ctx, {
       toasts,
       camera,
+      settingsPanel,
       onTool: (tool) => setTool(tool),
       onSelection: (sel) => setSelection(sel),
       onSpeed: (name) => setSpeed(name),
       onSave: () => saveGame(),
       onOpenPanel: (id) => { panelId = id; if (state?.ui) state.ui.panel = id; },
       onClosePanel: () => { panelId = null; if (state?.ui) state.ui.panel = null; },
+      // The main menu and the pause overlay. The key event that opened the
+      // menu is handed over, so it cannot also act on it.
+      onMenu: (e) => menu.open('main', { event: e ?? null }),
+      onPause: (e) => menu.open('pause', { event: e ?? null }),
+      isOverlayOpen: () => menu.isOpen(),
+      isCapturing: () => settingsPanel.isCapturing(),
     });
     return hud;
   }
@@ -313,6 +401,10 @@ export function createUI(ctx) {
     /** Prepare the HUD. Safe to call before `mount()`. */
     async init() {
       if (!hud) buildHud();
+
+      // The audio service is created after the domains, so the stored
+      // volumes are pushed into the mixer once it exists.
+      settingsPanel.applyUiEffects();
 
       // The building cost function lives in the buildings domain; it is
       // optional, so the import is guarded and the shop simply shows "—".
@@ -363,6 +455,8 @@ export function createUI(ctx) {
       if (!hud) buildHud();
       if (!el) return false;
       hud.mount(el);
+      // The menu overlay lives beside the HUD in the same container.
+      menu.mount(el);
       mounted = true;
       return true;
     },
@@ -370,6 +464,7 @@ export function createUI(ctx) {
     /** Remove the HUD from the DOM. */
     unmount() {
       hud?.unmount();
+      menu.unmount();
       mounted = false;
       return true;
     },
@@ -392,6 +487,27 @@ export function createUI(ctx) {
     /** Set the simulation speed or pause. */
     setSpeed,
 
+    /** Pause or resume the simulation (CORE owns it when it is reachable). */
+    setPaused,
+
+    /**
+     * The main menu and the pause overlay.
+     *
+     * `openMenu()` opens the full-screen menu; `openPauseMenu()` opens the
+     * pause overlay (which pauses the session through CORE).
+     */
+    menu,
+    openMenu() { return menu.open('main'); },
+    openPauseMenu() { return menu.open('pause'); },
+    closeMenu() { return menu.close(); },
+
+    /** The settings, accessibility and controls panel service. */
+    settingsPanel,
+
+    /** Show or hide the performance read-out. */
+    togglePerformance(force) { return hud?.togglePerformance?.(force) ?? false; },
+    performanceVisible() { return hud?.performanceVisible?.() ?? false; },
+
     /** Save / load helpers (the Ctrl+S binding uses them). */
     saveGame,
     loadGame,
@@ -410,6 +526,8 @@ export function createUI(ctx) {
       for (const un of unsubscribes) { try { un(); } catch { /* ignore */ } }
       unsubscribes.length = 0;
       hud?.dispose();
+      menu.dispose();
+      settingsPanel.dispose();
       camera.dispose();
       toasts.clear();
       mounted = false;

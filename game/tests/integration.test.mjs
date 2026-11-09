@@ -150,6 +150,8 @@ describe('purity: rules modules must not import three', () => {
     'mobility/network.js',
     'mobility/traffic.js',
     'population/happiness.js',
+    'population/animation.js',
+    'population/pool.js',
     'services/coverage.js',
     'services/services.js',
     'studio/voxels.js',
@@ -157,6 +159,14 @@ describe('purity: rules modules must not import three', () => {
     'ui/toasts.js',
     'ui/camera.js',
     'world/heightfield.js',
+    // --- V5 -------------------------------------------------------------
+    'core/log.js',
+    'core/settings.js',
+    'core/input-map.js',
+    'core/progress.js',
+    'content/levels.js',
+    'content/validate.js',
+    'hazards/logic.js',
   ];
   for (const rel of PURE) {
     test(`${rel} does not import three`, () => {
@@ -242,14 +252,19 @@ describe('no placeholder or generated art', () => {
     const offenders = [];
     for (const f of files) {
       const src = readFileSync(f, 'utf8');
-      // Allowed: the 3D model bundle, the 2D UI bundle, and the 2D manifest
-      // that the UI domain loads at runtime. Both the absolute and the
-      // relative form are allowed; anything else is an outside reference.
-      const m = src.match(/['"](?:\/)?assets\/(?!models\/|ui\/|ui-assets\.json)[^'"]+['"]/g);
+      // Allowed: the 3D model bundle, the 2D UI bundle, the 2D manifest
+      // that the UI domain loads at runtime, and the LICENCE TEXTS — the
+      // build ships `assets/LICENSES/` alongside the art (it is in the
+      // build's runtime directory set), and the credits panel links to
+      // them. Licence texts are documentation, not art, so they are not
+      // the thing this gate is protecting against.
+      // Both the absolute and the relative form are allowed; anything else
+      // is an outside reference.
+      const m = src.match(/['"](?:\/)?assets\/(?!models\/|ui\/|LICENSES\/|ui-assets\.json)[^'"]+['"]/g);
       if (m) offenders.push(`${relative(SRC, f)}: ${m.join(', ')}`);
     }
     assert.deepEqual(offenders, [],
-      'asset references must stay inside assets/models/, assets/ui/ or assets/ui-assets.json');
+      'asset references must stay inside assets/models/, assets/ui/, assets/LICENSES/ or assets/ui-assets.json');
   });
 });
 
@@ -373,6 +388,106 @@ describe('the placement gate (integrator wiring, main.js)', () => {
     assert.equal(ctx.domains.buildings.place, first, 'the gate was not wrapped twice');
     ctx.domains.buildings.place('res.house', 1, 1, 0);
     assert.equal(buildings.placed.length, 1, 'the placement was not duplicated');
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe('the visual-feedback bridge (integrator wiring, main.js)', () => {
+  /**
+   * A context with just enough of the world for the bridge: an FX service
+   * that records what it was asked to spawn, and a WORLD domain that answers
+   * `heightAt`. The event bus is the real module-level one from core/events.
+   */
+  function fxCtx(heightAt) {
+    const fx = {
+      spawned: [],
+      spawn(kind, opts) { this.spawned.push({ kind, opts }); return true; },
+    };
+    return {
+      ctx: {
+        renderer: { fx },
+        domains: { wld: { heightAt: (cx, cz) => heightAt(cx, cz) } },
+        content: { checkpointStatus: () => [] },
+      },
+      fx,
+    };
+  }
+
+  test('an effect is placed on the TERRAIN, not at world y = 0', async () => {
+    const { installFxFeedback } = await import('../src/main.js');
+    const { EVENTS, emit, clearAll } = await import('../src/core/events.js');
+    // The cell sits on a plateau 9 units above the base plane.
+    const { ctx, fx } = fxCtx(() => 9);
+    clearAll();
+    assert.equal(installFxFeedback(ctx), true, 'the bridge installed');
+    emit(EVENTS.BUILDING_PLACED, { x: 56, z: 32 });
+    assert.equal(fx.spawned.length, 1, 'one effect was spawned');
+    const y = fx.spawned[0].opts.position.y;
+    assert.ok(y > 5, `the effect is ON the ground, not underground (y=${y})`);
+    assert.ok(y < 11, `the effect is not floating in the sky (y=${y})`);
+    clearAll();
+  });
+
+  test('the bridge does NOT also draw the hazards — the hazard domain owns those', async () => {
+    const { installFxFeedback } = await import('../src/main.js');
+    const { EVENTS, emit, clearAll } = await import('../src/core/events.js');
+    const { ctx, fx } = fxCtx(() => 9);
+    clearAll();
+    installFxFeedback(ctx);
+    // The hazard domain pulses its own effect, on the ground its cell sits
+    // on. If the bridge answered these events too, every phase would draw
+    // the effect TWICE — and the bridge's copy used to be underground.
+    emit(EVENTS.HAZARD_STARTED, { type: 'wildfire', x: 56, z: 32 });
+    emit(EVENTS.HAZARD_PHASE, { type: 'wildfire', x: 56, z: 32 });
+    emit(EVENTS.HAZARD_DAMAGE, { id: 'hz-fire', amount: 1, x: 56, z: 32 });
+    assert.equal(fx.spawned.length, 0, 'the bridge leaves the hazard visuals to the hazard domain');
+    clearAll();
+  });
+
+  test('an effect on flat ground still lands on that ground', async () => {
+    const { installFxFeedback } = await import('../src/main.js');
+    const { EVENTS, emit, clearAll } = await import('../src/core/events.js');
+    const { ctx, fx } = fxCtx(() => 0);
+    clearAll();
+    installFxFeedback(ctx);
+    emit(EVENTS.BUILDING_PLACED, { x: 10, z: 10 });
+    assert.equal(fx.spawned.length, 1);
+    const { y } = fx.spawned[0].opts.position;
+    assert.ok(Math.abs(y - 0.2) < 1e-9, `flat ground: y=${y} (the 0.2 lift only)`);
+    clearAll();
+  });
+
+  test('a world without a heightmap never breaks the bridge', async () => {
+    const { installFxFeedback } = await import('../src/main.js');
+    const { EVENTS, emit, clearAll } = await import('../src/core/events.js');
+    const { ctx, fx } = fxCtx(() => NaN);
+    clearAll();
+    installFxFeedback(ctx);
+    emit(EVENTS.BUILDING_PLACED, { x: 10, z: 10 });
+    assert.equal(fx.spawned.length, 1, 'the effect was still spawned');
+    assert.ok(Number.isFinite(fx.spawned[0].opts.position.y), 'the position is a finite number');
+    clearAll();
+  });
+
+  test('the effect is placed at the cell it happened in', async () => {
+    const { installFxFeedback } = await import('../src/main.js');
+    const { EVENTS, emit, clearAll } = await import('../src/core/events.js');
+    const { cellCenter } = await import('../src/main.js');
+    const { ctx, fx } = fxCtx(() => 3);
+    clearAll();
+    installFxFeedback(ctx);
+    emit(EVENTS.CHECKPOINT_REACHED, { id: 'cp-1' });
+    clearAll();
+    // The achievement effect has no cell of its own; it uses the city centre.
+    clearAll();
+    const { ctx: ctx2, fx: fx2 } = fxCtx(() => 3);
+    installFxFeedback(ctx2);
+    emit(EVENTS.ACHIEVEMENT_UNLOCKED, {});
+    const expected = cellCenter(32, 32, 3.2);
+    const got = fx2.spawned[0].opts.position;
+    assert.ok(Math.abs(got.x - expected.x) < 1e-6, `x=${got.x} vs ${expected.x}`);
+    assert.ok(Math.abs(got.z - expected.z) < 1e-6, `z=${got.z} vs ${expected.z}`);
+    clearAll();
   });
 });
 

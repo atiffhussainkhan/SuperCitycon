@@ -6,7 +6,7 @@
  *
  * Public surface (binding — see core/CONTRACT.md §7):
  *   init, update, tick, generate(seed), heightAt(cx,cz), setHeight(cx,cz,h),
- *   typeAt(cx,cz), waterLevel(), isWater(cx,cz), buildMesh(), scatter(seed),
+ *   typeAt(cx,cz), waterLevel(), isWater(cx,cz), buildMesh(), restoreView(), scatter(seed),
  *   placeNature(cx,cz,modelKey), terraform(cx,cz,delta), dispose
  *   + onClick(cell, button) and onHover(cell).
  */
@@ -37,7 +37,9 @@ import {
   refreshTerrainMesh,
   terrainMeshStats,
 } from './terrain.js';
-import { clearScenery, clearSceneryAt, placeNature as placeNatureModel, scatterNature } from './scatter.js';
+import {
+  clearScenery, clearSceneryAt, placeNature as placeNatureModel, restoreScenery, scatterNature,
+} from './scatter.js';
 
 export { generateHeightmap, terrainTypeAt } from './heightfield.js';
 
@@ -68,6 +70,7 @@ export function createWorld(ctx) {
 
   let waterMesh = null;
   let elapsed = 0;
+  let viewRevision = 0;
   /** Signature of the last scenery reconciliation (roads + buildings). */
   let lastCitySignature = '';
 
@@ -104,16 +107,28 @@ export function createWorld(ctx) {
     return clearSceneryAt(ctx, doomed.map((r) => ({ x: r.cx, z: r.cz })));
   }
 
+  function disposeWater(mesh) {
+    mesh?.parent?.remove(mesh);
+    mesh?.geometry?.dispose?.();
+    mesh?.material?.dispose?.();
+  }
+
   /** Drop every mesh this domain owns (regeneration must not leak them). */
-  function disposeMeshes() {
-    if (waterMesh) {
-      if (waterMesh.parent) waterMesh.parent.remove(waterMesh);
-      waterMesh.geometry?.dispose?.();
-      waterMesh.material?.dispose?.();
-      waterMesh = null;
-    }
+  function disposeMeshes(options) {
+    disposeWater(waterMesh);
+    waterMesh = null;
     disposeTerrainMesh(ctx);
-    clearScenery(ctx);
+    clearScenery(ctx, options);
+  }
+
+  async function refreshWater(level, isCurrent) {
+    const mesh = await buildWaterMesh(ctx, level);
+    if (!isCurrent()) {
+      disposeWater(mesh);
+      return false;
+    }
+    waterMesh = mesh;
+    return true;
   }
 
   /** Recompute the derived per-cell data of one cell after a terrain edit. */
@@ -158,6 +173,9 @@ export function createWorld(ctx) {
      * first await, so a caller that does not await still sees valid data.
      */
     async generate(seed = state.meta.seed ?? 0) {
+      const revision = ++viewRevision;
+      const world = state.world;
+      const isCurrent = () => revision === viewRevision && state.world === world;
       disposeMeshes();
 
       const s = size();
@@ -174,8 +192,9 @@ export function createWorld(ctx) {
       state.world.sceneryCount = 0;
 
       buildTerrainMesh(ctx, hf);
-      waterMesh = await buildWaterMesh(ctx, level);
+      if (!await refreshWater(level, isCurrent)) return null;
       await service.scatter(seed);
+      if (!isCurrent()) return null;
 
       ctx.bus?.emit?.(EVENTS.TERRAIN_CHANGED, { reason: 'generated', seed });
       return { seed, waterLevel: level, cells: s * s };
@@ -247,18 +266,33 @@ export function createWorld(ctx) {
       return buildTerrainMesh(ctx, state.world.heightmap);
     },
 
+    /** Rebuild only the view after a save replaces the world state. */
+    async restoreView() {
+      const revision = ++viewRevision;
+      const world = state.world;
+      const isCurrent = () => revision === viewRevision && state.world === world;
+      disposeMeshes({ preserveState: true });
+      if (!world?.heightmap) return false;
+      buildTerrainMesh(ctx, world.heightmap);
+      if (!await refreshWater(world.waterLevel, isCurrent)) return false;
+      return restoreScenery(ctx, isCurrent);
+    },
+
     /** Re-scatter the nature models. */
     async scatter(seed = state.world.seed ?? 0) {
-      const hf = state.world.heightmap;
+      const world = state.world;
+      const hf = world.heightmap;
       if (!hf) return [];
+      const revision = viewRevision;
+      const isCurrent = () => revision === viewRevision && state.world === world;
       clearScenery(ctx);
-      const plan = await scatterNature(ctx, hf, seed);
-      return plan;
+      return scatterNature(ctx, hf, seed, { isCurrent });
     },
 
     /** Place one specific library model on a cell. */
     async placeNature(cx, cz, modelKey) {
-      return placeNatureModel(ctx, cx, cz, modelKey);
+      const revision = viewRevision;
+      return placeNatureModel(ctx, cx, cz, modelKey, () => revision === viewRevision);
     },
 
     /**
@@ -301,6 +335,7 @@ export function createWorld(ctx) {
 
     /** Release every resource this domain owns. */
     dispose() {
+      viewRevision += 1;
       disposeMeshes();
       m.ready = false;
     },

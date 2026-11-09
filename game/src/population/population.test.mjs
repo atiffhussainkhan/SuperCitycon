@@ -562,3 +562,55 @@ test('the domain survives the state tree being replaced (the load path)', async 
   assert.equal(fresh.population.housingCapacity, TUNING.residentsPerLevel1, 'the capacity is live too');
   pop.dispose();
 });
+
+// ---------------------------------------------------------------------------
+// The morale hook the HAZ domain uses
+// ---------------------------------------------------------------------------
+
+test('applyMorale takes happiness and loyalty off the live values', async () => {
+  const ctx = makeCtx(11);
+  const pop = createPopulation(ctx);
+  await pop.init();
+
+  const live = ctx.state; // POP resolves through ctx.state, not the module-level live tree
+  live.population.happiness = 80;
+  live.population.loyalty = 60;
+
+  const changed = pop.applyMorale({ happiness: 10, loyalty: 5 });
+  assert.equal(changed, true);
+  assert.equal(live.population.happiness, 70);
+  assert.equal(live.population.loyalty, 55);
+  pop.dispose();
+});
+
+test('applyMorale never drives happiness below the floor', async () => {
+  const ctx = makeCtx(12);
+  const pop = createPopulation(ctx);
+  await pop.init();
+
+  const live = ctx.state; // POP resolves through ctx.state, not the module-level live tree
+  live.population.happiness = 5;
+  pop.applyMorale({ happiness: 1000 });
+  assert.equal(live.population.happiness, TUNING.happinessMin ?? 0);
+  pop.dispose();
+});
+
+test('applyMorale ignores a loss that is not a positive number', async () => {
+  const ctx = makeCtx(13);
+  const pop = createPopulation(ctx);
+  await pop.init();
+
+  const live = ctx.state; // POP resolves through ctx.state, not the module-level live tree
+  live.population.happiness = 70;
+  live.population.loyalty = 60;
+
+  assert.equal(pop.applyMorale({}), false);
+  assert.equal(pop.applyMorale({ happiness: 0 }), false);
+  assert.equal(pop.applyMorale({ happiness: -5 }), false);
+  assert.equal(pop.applyMorale({ happiness: NaN }), false);
+  assert.equal(pop.applyMorale(null), false);
+
+  assert.equal(live.population.happiness, 70);
+  assert.equal(live.population.loyalty, 60);
+  pop.dispose();
+});

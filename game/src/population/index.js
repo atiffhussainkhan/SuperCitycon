@@ -324,6 +324,42 @@ export function createPopulation(ctx) {
     return next;
   }
 
+  /**
+   * Take a morale hit.
+   *
+   * The HAZ domain owns the hazard damage pipeline, but POP owns the morale
+   * numbers — and POP recomputes happiness and loyalty from its own needs
+   * model every tick, so a hazard cannot write `state.population.happiness`
+   * itself without the change being overwritten on the next tick.
+   *
+   * This is the hook that makes the loss stick: it lowers the CURRENT values
+   * and announces them, and the needs model then rebuilds from that lower
+   * baseline rather than from the pre-hazard one.
+   *
+   * @param {{happiness?:number, loyalty?:number}} loss how much to take
+   * @returns {boolean} true when something actually changed
+   */
+  function applyMorale(loss) {
+    const dh = Number(loss?.happiness);
+    const dl = Number(loss?.loyalty);
+    const tookHappiness = Number.isFinite(dh) && dh > 0;
+    const tookLoyalty = Number.isFinite(dl) && dl > 0;
+    if (!tookHappiness && !tookLoyalty) return false;
+
+    let changed = false;
+    if (tookHappiness) {
+      const before = state.population.happiness;
+      setHappiness(before - dh);
+      changed = changed || before !== state.population.happiness;
+    }
+    if (tookLoyalty) {
+      const before = state.population.loyalty;
+      setLoyalty(before - dl);
+      changed = changed || before !== state.population.loyalty;
+    }
+    return changed;
+  }
+
   /** Announce a population change. */
   function announcePopulation() {
     const total = state.population.total;
@@ -451,15 +487,16 @@ export function createPopulation(ctx) {
 
   /** Keep the rendered sample in step with the population. */
   function syncRenderedCitizens() {
+    const authored = citizens.count(true);
     const target = Math.min(
-      MAX_RENDERED_CITIZENS,
+      MAX_RENDERED_CITIZENS - authored,
       Math.max(0, Math.ceil(state.population.total / 25)),
     );
     let guard = MAX_RENDERED_CITIZENS + 1;
-    while (citizens.count() > target && guard-- > 0) citizens.despawn();
+    while (citizens.count(false) > target && guard-- > 0) citizens.despawn();
     guard = MAX_RENDERED_CITIZENS + 1;
     const from = residentialCell();
-    while (citizens.count() < target && guard-- > 0) {
+    while (citizens.count(false) < target && guard-- > 0) {
       const to = servicedCell() ?? from;
       if (!from && !to) break;
       citizens.spawn({ from: from ?? to, to: to ?? from });
@@ -602,6 +639,17 @@ export function createPopulation(ctx) {
       return citizens.spawn({ from: from ?? to, to: to ?? from });
     },
 
+    /** Place the named library character at the level's authored cell. */
+    spawnAuthoredCitizen(character, x, z) {
+      if (!citizens.availableCharacters().includes(character)) return null;
+      if (citizens.count() >= MAX_RENDERED_CITIZENS) citizens.despawn();
+      return citizens.spawn({ from: { x, z }, character });
+    },
+
+    clearAuthoredCitizens() {
+      while (citizens.despawn(true)) { /* return authored rigs to the pool */ }
+    },
+
     /** Remove one rendered citizen. */
     despawnCitizen() {
       return citizens.despawn();
@@ -616,6 +664,13 @@ export function createPopulation(ctx) {
     availableCharacters() {
       return citizens.availableCharacters();
     },
+
+    /**
+     * Take a morale hit — the hook the HAZ domain uses.
+     * @param {{happiness?:number, loyalty?:number}} loss
+     * @returns {boolean} true when something actually changed
+     */
+    applyMorale,
 
     /** Tear the domain down. */
     dispose() {

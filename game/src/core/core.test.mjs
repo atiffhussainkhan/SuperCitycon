@@ -15,7 +15,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { createState, restore, setState, snapshot, state as liveState } from './state.js';
-import { TUNING, TUNING_TBD, tuningIsTbd, tuningTbd } from './config.js';
+import { DAY_LENGTH, TUNING, TUNING_TBD, tuningIsTbd, tuningTbd } from './config.js';
 import { EVENTS, on, clearAll } from './events.js';
 import {
   STAGES,
@@ -39,7 +39,9 @@ import {
   importSave,
   exportSave,
   buildRecord,
+  SAVE_VERSION,
   SAVE_KEY_PREFIX,
+  migrateRecord,
 } from './save.js';
 import {
   MODE_REGISTRY,
@@ -48,8 +50,11 @@ import {
   availableModes,
   setSpeed,
   setPaused,
+  timeOfDay,
+  seekTimeOfDay,
   advanceDay,
   advanceClock,
+  createFixedStepRunner,
   dayIndex,
   currentSpeedName,
   clearParkedCities,
@@ -343,7 +348,7 @@ test('save: an exported file can be imported again', () => {
   resetLive();
   // The export writes the same record the storage slots use.
   const record = JSON.parse(JSON.stringify(buildRecord(liveState, { name: 'Round Trip' })));
-  assert.equal(record.version, 1);
+  assert.equal(record.version, SAVE_VERSION);
   assert.equal(record.name, 'Round Trip');
 
   const imported = importSave(JSON.stringify(record));
@@ -363,7 +368,7 @@ test('save: a slot survives a save / load round trip', () => {
   assert.ok(globalThis.localStorage.getItem(`${SAVE_KEY_PREFIX}1`), 'the slot was written');
 
   const record = JSON.parse(globalThis.localStorage.getItem(`${SAVE_KEY_PREFIX}1`));
-  assert.equal(record.version, 1);
+  assert.equal(record.version, SAVE_VERSION);
   assert.equal(record.name, 'Testville');
   assert.equal(record.stage, 'First Foundations');
   assert.ok(typeof record.savedAt === 'string' && record.savedAt.length > 0);
@@ -570,6 +575,90 @@ test('modes: the clock advances the day on a day boundary', () => {
   assert.equal(liveState.meta.elapsed, 61);
 });
 
+test('modes: fixed steps agree across frame partitions and drop excess backlog', () => {
+  function tickSizes(frames) {
+    const sizes = [];
+    const run = createFixedStepRunner((dt) => sizes.push(dt));
+    for (const dt of frames) run(dt, 600);
+    return sizes;
+  }
+
+  const ticks = Array(60).fill(TUNING.fixedStep);
+  assert.deepEqual(tickSizes([1]), ticks);
+  assert.deepEqual(tickSizes(Array(100).fill(0.01)), ticks);
+  assert.deepEqual(tickSizes(ticks), ticks);
+
+  const run = createFixedStepRunner(() => {});
+  assert.equal(run(1, 2), 2);
+  assert.equal(run(TUNING.fixedStep / 2, 2), 0);
+  assert.equal(run(TUNING.fixedStep / 2, 2), 1);
+});
+
+test('modes: a complete day of fixed ticks rolls the calendar on the last tick', () => {
+  const state = resetLive();
+  const run = createFixedStepRunner((dt) => advanceClock(state, dt));
+  for (let second = 0; second < DAY_LENGTH - 1; second += 1) run(1, 600);
+  run(1 - TUNING.fixedStep, 600);
+  assert.equal(state.meta.day, 1);
+
+  run(TUNING.fixedStep, 600);
+  assert.equal(state.meta.tick, Math.round(DAY_LENGTH / TUNING.fixedStep));
+  assert.equal(state.meta.day, 2);
+  assert.equal(state.meta.elapsed, DAY_LENGTH);
+  assert.equal(state.meta.dayProgress, 0);
+
+  for (let second = 0; second < DAY_LENGTH; second += 1) run(1, 600);
+  assert.equal(state.meta.day, 3);
+  assert.equal(state.meta.dayProgress, 0);
+  assert.equal(timeOfDay(state), TUNING.dayStartFraction);
+});
+
+test('modes: a save without day progress resumes from its recorded time of day', () => {
+  const state = resetLive();
+  state.meta.day = 7;
+  state.meta.elapsed = DAY_LENGTH * 1.25;
+  assert.equal(timeOfDay(state), 0.5);
+
+  advanceClock(state, DAY_LENGTH * 0.75);
+  assert.equal(state.meta.day, 8);
+  assert.equal(timeOfDay(state), TUNING.dayStartFraction);
+});
+
+test('modes: selecting Night on day one preserves the date until the next dawn', () => {
+  const state = resetLive();
+  const dayEvents = [];
+  const off = on(EVENTS.DAY_CHANGED, (event) => dayEvents.push(event));
+
+  try {
+    assert.equal(seekTimeOfDay(0, state), true);
+    assert.equal(state.meta.elapsed, DAY_LENGTH * 0.75);
+    assert.equal(state.meta.dayProgress, DAY_LENGTH * 0.75);
+    assert.equal(state.meta.day, 1);
+    assert.equal(state.meta.tick, 0);
+    assert.equal(timeOfDay(state), 0);
+    assert.deepEqual(dayEvents, []);
+
+    advanceClock(state, DAY_LENGTH * 0.25);
+    assert.equal(state.meta.elapsed, DAY_LENGTH);
+    assert.equal(state.meta.dayProgress, 0);
+    assert.deepEqual(dayEvents, [{ day: 2, year: 0 }]);
+  } finally {
+    off();
+  }
+});
+
+test('modes: a preset keeps the saved calendar and elapsed periods', () => {
+  const state = resetLive();
+  Object.assign(state.meta, { day: 366, year: 1, elapsed: 4 * DAY_LENGTH + 51, tick: 17, paused: true });
+  const before = { ...state.meta };
+
+  assert.equal(seekTimeOfDay(Infinity, state), false);
+  assert.deepEqual(state.meta, before);
+
+  assert.equal(seekTimeOfDay(1 + TUNING.dayStartFraction, state), true);
+  assert.deepEqual(state.meta, { ...before, elapsed: 4 * DAY_LENGTH, dayProgress: 0 });
+});
+
 test('modes: choosing a speed resumes, and a no-op emits nothing', () => {
   resetLive();
   setSpeed('fast');
@@ -699,4 +788,66 @@ test('a typed array survives snapshot -> restore without any repair', () => {
     'the type map must come back as a Uint8Array');
   assert.equal(revived.world.heightmap[1], 1.25, 'and with the right values');
   assert.equal(revived.world.types[2], 3);
+});
+
+/* ------------------------------------------------- save: version migration */
+
+test('save: an older save is MIGRATED, not refused', () => {
+  resetLive();
+  // A v1 record: the shape the V4 build wrote.
+  const v1 = {
+    version: 1,
+    savedAt: '2026-01-01T00:00:00.000Z',
+    name: 'Old Town',
+    stage: 'First Foundations',
+    data: JSON.parse(JSON.stringify(snapshot(liveState))),
+  };
+  assert.ok(v1.data.meta, 'the v1 record carries a meta subtree');
+
+  const result = migrateRecord(v1);
+  assert.equal(result.ok, true, 'a v1 save must migrate');
+  assert.equal(result.migrated, true);
+  assert.equal(result.from, 1);
+  assert.equal(result.to, SAVE_VERSION);
+  assert.equal(result.record.version, SAVE_VERSION, 'the migrated record carries the current version');
+  assert.deepEqual(
+    result.record.data.meta.progress,
+    { checkpoints: [], collectibles: [], achievements: [] },
+    'the migration adds the v5 progression record',
+  );
+  assert.equal(result.record.data.meta.seed, v1.data.meta.seed, 'the city itself is untouched');
+  assert.equal(v1.version, 1, 'the migration does not mutate its input');
+});
+
+test('save: a save from a newer build is refused, not guessed at', () => {
+  const result = migrateRecord({ version: SAVE_VERSION + 1, data: { meta: { seed: 1 } } });
+  assert.equal(result.ok, false);
+  assert.equal(result.record, null);
+  assert.match(result.error, /format v/);
+});
+
+test('save: a current save is not migrated', () => {
+  const result = migrateRecord({ version: SAVE_VERSION, data: { meta: { seed: 1 } } });
+  assert.equal(result.ok, true);
+  assert.equal(result.migrated, false);
+  assert.equal(result.record.version, SAVE_VERSION);
+});
+
+test('save: a v1 save in a storage slot still loads', () => {
+  resetLive();
+  const state = resetLive();
+  state.meta.day = 5;
+  const v1 = {
+    version: 1,
+    savedAt: '2026-01-01T00:00:00.000Z',
+    name: 'Old Town',
+    stage: 'First Foundations',
+    data: JSON.parse(JSON.stringify(snapshot(state))),
+  };
+  globalThis.localStorage.setItem(`${SAVE_KEY_PREFIX}9`, JSON.stringify(v1));
+
+  const loaded = loadFromStorage('9');
+  assert.ok(loaded, 'a v1 slot must still load in the v5 build');
+  assert.equal(loaded.meta.day, 5, 'the city is restored exactly');
+  assert.deepEqual(loaded.meta.progress, { checkpoints: [], collectibles: [], achievements: [] });
 });

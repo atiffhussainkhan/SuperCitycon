@@ -1,7 +1,7 @@
 {
   "name": "supercitycon",
   "private": true,
-  "version": "1.0.0",
+  "version": "5.0.0",
   "type": "module",
   "description": "SuperCitycon — retro 16-bit voxel city builder. All art sourced from the user's asset library (CC0-1.0 / MIT packs only).",
   "scripts": {
@@ -15,7 +15,7 @@
     "verify:production": "node tools/verify-production.mjs"
   },
   "devDependencies": {
-    "vite": "^5.4.10"
+    "vite": "^7.3.7"
   },
   "dependencies": {
     "three": "^0.169.0"

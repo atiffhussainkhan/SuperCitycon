@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import { cp, mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { execSync } from 'node:child_process';
 import { resolve } from 'node:path';
 
 /**
@@ -34,6 +35,52 @@ const RUNTIME_FILES = ['ui-assets.json'];
  * with zero 2D images.
  */
 const SHIP_CLEARED = process.env.SC_SHIP_CLEARED === '1';
+
+/**
+ * The build identity injected into the bundle.
+ *
+ * `core/log.js` reads these from `import.meta.env`, so every log line and
+ * every diagnostics snapshot names the exact build it came from: the version,
+ * the source revision, the engine version and the build time.
+ *
+ * A missing git revision (a tarball export, a shallow clone) must not fail
+ * the build, so it falls back to `unknown` rather than throwing.
+ *
+ * @returns {{version:string, revision:string, engine:string, builtAt:string}}
+ */
+function buildIdentity() {
+  let version = '0.0.0';
+  try {
+    version = JSON.parse(readFileSync(resolve(process.cwd(), 'package.json'), 'utf8')).version ?? version;
+  } catch {
+    /* keep the fallback */
+  }
+  let revision = 'unknown';
+  try {
+    revision = execSync('git rev-parse --short HEAD', {
+      cwd: process.cwd(),
+      stdio: ['ignore', 'pipe', 'ignore'],
+      encoding: 'utf8',
+    }).trim() || 'unknown';
+  } catch {
+    /* no git, or no repository — the build still works */
+  }
+  let engine = 'three.js';
+  try {
+    const pkg = JSON.parse(readFileSync(resolve(process.cwd(), 'package.json'), 'utf8'));
+    const range = String(pkg.dependencies?.three ?? '');
+    const exact = /^([\d.]+)$/.exec(range.replace(/^[\^~]/, ''));
+    engine = `three.js ${exact ? exact[1] : range.replace(/^[\^~]/, '')}`;
+  } catch {
+    /* keep the fallback */
+  }
+  return {
+    version,
+    revision,
+    engine,
+    builtAt: new Date().toISOString(),
+  };
+}
 
 /**
  * Copy the runtime asset set into `dist/` after the bundle is written.
@@ -268,21 +315,31 @@ async function reportDist() {
   console.log(`[dist] by extension: ${parts.join(', ')}`);
 }
 
-export default defineConfig(({ command }) => ({
-  // The dev server serves the whole `public/` tree (that is where the asset
-  // curator works). The build serves only the runtime set — see below.
-  publicDir: command === 'serve' ? 'public' : false,
-  base: './',
-  server: { port: 5173, strictPort: false },
-  build: {
-    target: 'es2020',
-    outDir: 'dist',
-    // Never inline anything: the .glb models and the .png icons must stay
-    // separate files that a browser can fetch, range-request and cache.
-    assetsInlineLimit: 0,
-    chunkSizeWarningLimit: 2000,
-    reportCompressedSize: false,
-  },
-  assetsInclude: ['**/*.glb', '**/*.gltf', '**/*.bin', '**/*.png'],
-  plugins: [runtimeAssets()],
-}));
+export default defineConfig(({ command }) => {
+  const identity = buildIdentity();
+  return {
+    // The dev server serves the whole `public/` tree (that is where the asset
+    // curator works). The build serves only the runtime set — see below.
+    publicDir: command === 'serve' ? 'public' : false,
+    base: './',
+    server: { port: 5173, strictPort: false },
+    // The build identity every log line carries.
+    define: {
+      'import.meta.env.VITE_BUILD_VERSION': JSON.stringify(identity.version),
+      'import.meta.env.VITE_BUILD_REVISION': JSON.stringify(identity.revision),
+      'import.meta.env.VITE_ENGINE_VERSION': JSON.stringify(identity.engine),
+      'import.meta.env.VITE_BUILD_TIME': JSON.stringify(identity.builtAt),
+    },
+    build: {
+      target: 'es2020',
+      outDir: 'dist',
+      // Never inline anything: the .glb models and the .png icons must stay
+      // separate files that a browser can fetch, range-request and cache.
+      assetsInlineLimit: 0,
+      chunkSizeWarningLimit: 2000,
+      reportCompressedSize: false,
+    },
+    assetsInclude: ['**/*.glb', '**/*.gltf', '**/*.bin', '**/*.png'],
+    plugins: [runtimeAssets()],
+  };
+});

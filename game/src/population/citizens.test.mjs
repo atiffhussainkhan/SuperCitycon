@@ -11,8 +11,11 @@
  *      mixer animates bones the skin never reads, so the skin does NOT move.
  *   2. `SkeletonUtils.clone()` rebuilds the skeleton against the clone's own
  *      bones - the skin DOES deform.
- *   3. every character the module uses really exists in the manifest and
- *      really has a walk clip and an idle clip.
+ *   3. every character the module uses really exists in the manifest, really
+ *      has a walk clip and an idle clip, and can really play the five
+ *      animation states (idle, walk, run, cheer, flee).
+ *   4. the manager wires the machine, the terrain height and the pool the way
+ *      the V5 upgrade asks for.
  */
 
 import test from 'node:test';
@@ -20,7 +23,15 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 import * as THREE from 'three';
-import { CHARACTER_KEYS, skinBindingReport } from './citizens.js';
+import {
+  CHARACTER_KEYS,
+  CITY_CHARACTER_KEYS,
+  CLASSIC_CHARACTER_KEYS,
+  MAX_RENDERED_CITIZENS,
+  createCitizens,
+  skinBindingReport,
+} from './citizens.js';
+import { STATE_CLIP_CANDIDATES, createAnimationMachine } from './animation.js';
 
 /** The manifest, read from disk (Node needs an import attribute for JSON). */
 const manifest = JSON.parse(
@@ -89,7 +100,10 @@ function skinnedPosition(root, skin, index = 0) {
 // ---------------------------------------------------------------------------
 
 test('every character the citizens use really exists in the manifest', () => {
-  assert.equal(CHARACTER_KEYS.length, 6, 'the six rigged characters');
+  assert.equal(CHARACTER_KEYS.length, 20, 'the twenty rigged characters');
+  assert.equal(CITY_CHARACTER_KEYS.length, 14, 'the city crowd');
+  assert.equal(CLASSIC_CHARACTER_KEYS.length, 6, 'the adventurers');
+  assert.equal(CHARACTER_KEYS.length, CITY_CHARACTER_KEYS.length + CLASSIC_CHARACTER_KEYS.length);
   for (const key of CHARACTER_KEYS) {
     assert.ok(manifest.characters[key], `"${key}" is in the manifest`);
     const rec = manifest.characters[key];
@@ -105,6 +119,33 @@ test('every character really has a walk clip and an idle clip', () => {
     const walk = clips.find((c) => /walk/i.test(c));
     assert.ok(walk, `"${key}" has a walk clip (${walk})`);
   }
+});
+
+test('the city crowd has the clips a modern city needs', () => {
+  for (const key of CITY_CHARACTER_KEYS) {
+    const clips = manifest.characters[key].animations;
+    assert.ok(clips.includes('Idle'), `"${key}" has an Idle clip`);
+    assert.ok(clips.includes('Walk'), `"${key}" has a Walk clip`);
+    assert.ok(clips.includes('Run'), `"${key}" has a Run clip`);
+    assert.ok(clips.includes('Victory'), `"${key}" has a Victory clip to cheer with`);
+  }
+});
+
+test('every character of the roster can play all five animation states', () => {
+  for (const key of CHARACTER_KEYS) {
+    const machine = createAnimationMachine({ clips: manifest.characters[key].animations });
+    for (const state of Object.keys(STATE_CLIP_CANDIDATES)) {
+      const clip = machine.clipFor(state);
+      assert.ok(clip, `"${key}" can play "${state}" (${clip ?? 'no clip'})`);
+      assert.equal(machine.resolveState(state), state, `"${key}" never falls back to idle`);
+    }
+  }
+});
+
+test('a character without a walk clip falls back to idle', () => {
+  const machine = createAnimationMachine({ clips: ['Idle', 'Defeat'] });
+  assert.equal(machine.clipFor('walk'), null);
+  assert.equal(machine.resolveState('walk'), 'idle');
 });
 
 // ---------------------------------------------------------------------------
@@ -231,4 +272,264 @@ test('several clones animate independently', async (t) => {
       'animating one clone does not move the other',
     );
   }
+});
+
+// ---------------------------------------------------------------------------
+// 3. The manager: the machine, the terrain and the pool
+// ---------------------------------------------------------------------------
+
+/** A tiny event bus for the tests. */
+function fakeBus() {
+  const listeners = new Map();
+  return {
+    on(evt, fn) {
+      if (!listeners.has(evt)) listeners.set(evt, new Set());
+      listeners.get(evt).add(fn);
+      return () => listeners.get(evt)?.delete(fn);
+    },
+    emit(evt, payload) {
+      for (const fn of [...(listeners.get(evt) ?? [])]) fn(payload);
+    },
+  };
+}
+
+/**
+ * A context with the real Knight model behind the fake asset service.
+ */
+async function makeCtx() {
+  const gltf = await loadKnight();
+  const actors = new THREE.Group();
+  const bus = fakeBus();
+  const ctx = {
+    renderer: { actors },
+    assets: {
+      loadCharacter: async () => ({ model: gltf.scene, clips: gltf.animations }),
+    },
+    rng: () => 0.5,
+    bus,
+    state: { population: { happiness: 60 } },
+    domains: { wld: { heightAt: () => 3.5 } },
+  };
+  return { ctx, bus, actors, gltf };
+}
+
+/** The actions of a mixer that are really playing. */
+function runningActions(mixer) {
+  const actions = mixer?._actions ?? [];
+  return actions.filter((a) => a.isRunning());
+}
+
+test('a walking citizen plays the walk state and stands on the terrain', async (t) => {
+  const { ctx, gltf } = await makeCtx();
+  if (!gltf) {
+    t.skip('Knight.glb is not available in this checkout');
+    return;
+  }
+  const citizens = createCitizens(ctx);
+  await citizens.preload();
+
+  const citizen = citizens.spawn({ from: { x: 10, z: 10 }, to: { x: 20, z: 20 } });
+  assert.ok(citizen, 'the citizen is spawned');
+  assert.equal(citizens.count(), 1);
+
+  citizens.update(0.1);
+  assert.equal(citizen.state, 'walk', 'a moving citizen walks');
+  assert.equal(citizen.model.position.y, 3.5, 'the citizen stands on the terrain');
+});
+
+test('the terrain is re-sampled while the citizen walks', async (t) => {
+  const { ctx, gltf } = await makeCtx();
+  if (!gltf) {
+    t.skip('Knight.glb is not available in this checkout');
+    return;
+  }
+  let height = 1;
+  ctx.domains.wld.heightAt = () => height;
+
+  const citizens = createCitizens(ctx);
+  await citizens.preload();
+  const citizen = citizens.spawn({ from: { x: 10, z: 10 }, to: { x: 20, z: 20 } });
+  citizens.update(0.1);
+  assert.equal(citizen.model.position.y, 1);
+
+  height = 7.5;
+  citizens.update(0.1);
+  assert.equal(citizen.model.position.y, 7.5, 'the citizen follows the ground');
+});
+
+test('without a world domain the citizen keeps the old behaviour', async (t) => {
+  const { ctx, gltf } = await makeCtx();
+  if (!gltf) {
+    t.skip('Knight.glb is not available in this checkout');
+    return;
+  }
+  delete ctx.domains;
+
+  const citizens = createCitizens(ctx);
+  await citizens.preload();
+  const citizen = citizens.spawn({ from: { x: 10, z: 10 }, to: { x: 20, z: 20 } });
+  citizens.update(0.1);
+  assert.equal(citizen.model.position.y, 0, 'no terrain, no height');
+  assert.equal(citizen.state, 'walk');
+});
+
+test('only ONE action plays at a time, and the old one is stopped', async (t) => {
+  const { ctx, bus, gltf } = await makeCtx();
+  if (!gltf) {
+    t.skip('Knight.glb is not available in this checkout');
+    return;
+  }
+  const citizens = createCitizens(ctx);
+  await citizens.preload();
+  const citizen = citizens.spawn({ from: { x: 10, z: 10 }, to: { x: 20, z: 20 } });
+
+  citizens.update(0.1);
+  citizens.update(0.1);
+  citizens.update(0.1);
+  assert.equal(runningActions(citizen.rig.mixer).length, 1, 'the walk clip plays alone');
+
+  // A hazard starts: the citizen panics and the clips crossfade.
+  bus.emit('hazard:started', { id: 'h1', type: 'fire', x: 10, z: 10, radius: 4 });
+  citizens.update(0.1);
+  assert.equal(citizen.state, 'flee', 'the citizen panics');
+
+  citizens.update(0.1);
+  citizens.update(0.1);
+  citizens.update(0.1);
+  assert.equal(runningActions(citizen.rig.mixer).length, 1, 'the old action is stopped');
+});
+
+test('a hazard makes the citizen flee and its end calms it down', async (t) => {
+  const { ctx, bus, gltf } = await makeCtx();
+  if (!gltf) {
+    t.skip('Knight.glb is not available in this checkout');
+    return;
+  }
+  const citizens = createCitizens(ctx);
+  await citizens.preload();
+  const citizen = citizens.spawn({ from: { x: 10, z: 10 }, to: { x: 20, z: 20 } });
+  citizens.update(0.1);
+  assert.equal(citizen.state, 'walk');
+
+  bus.emit('hazard:started', { id: 'h1', type: 'fire', x: 10, z: 10, radius: 4 });
+  citizens.update(0.1);
+  assert.equal(citizen.state, 'flee');
+
+  bus.emit('hazard:resolved', { id: 'h1', outcome: 'contained' });
+  citizens.update(0.1);
+  assert.equal(citizen.state, 'walk', 'the citizen calms down');
+});
+
+test('without a bus nothing ever panics', async (t) => {
+  const { ctx, gltf } = await makeCtx();
+  if (!gltf) {
+    t.skip('Knight.glb is not available in this checkout');
+    return;
+  }
+  delete ctx.bus;
+
+  const citizens = createCitizens(ctx);
+  await citizens.preload();
+  const citizen = citizens.spawn({ from: { x: 10, z: 10 }, to: { x: 20, z: 20 } });
+  for (let i = 0; i < 10; i += 1) citizens.update(0.1);
+  assert.equal(citizen.state, 'walk', 'no bus, no panic');
+});
+
+test('a happy city cheers the citizens that stand still', async (t) => {
+  const { ctx, gltf } = await makeCtx();
+  if (!gltf) {
+    t.skip('Knight.glb is not available in this checkout');
+    return;
+  }
+  ctx.state.population.happiness = 90;
+
+  const citizens = createCitizens(ctx);
+  await citizens.preload();
+  const citizen = citizens.spawn({ from: { x: 10, z: 10 }, to: { x: 14, z: 10 } });
+
+  let state = citizen.state;
+  for (let i = 0; i < 400 && state !== 'cheer'; i += 1) {
+    citizens.update(0.1);
+    state = citizen.state;
+  }
+  assert.equal(state, 'cheer', 'a happy citizen celebrates');
+});
+
+test('a despawned citizen goes back to the pool and is reused', async (t) => {
+  const { ctx, actors, gltf } = await makeCtx();
+  if (!gltf) {
+    t.skip('Knight.glb is not available in this checkout');
+    return;
+  }
+  const citizens = createCitizens(ctx);
+  await citizens.preload();
+
+  const citizen = citizens.spawn({ from: { x: 10, z: 10 }, to: { x: 20, z: 20 } });
+  const model = citizen.model;
+  citizens.update(0.1);
+  assert.equal(actors.children.length, 1, 'the citizen is in the scene');
+
+  assert.equal(citizens.despawn(), true);
+  assert.equal(citizens.count(), 0);
+  assert.equal(actors.children.length, 0, 'the citizen left the scene');
+  const stats = citizens.poolStats();
+  assert.equal(stats.free, 1, 'the rig waits in the pool');
+  assert.equal(stats.live, 0);
+  assert.equal(stats.hits, 0);
+  assert.equal(stats.misses, 1, 'one rig was built');
+
+  const again = citizens.spawn({ from: { x: 30, z: 30 }, to: { x: 40, z: 40 } });
+  assert.equal(again.model, model, 'the very same rig is reused');
+  assert.equal(citizens.poolStats().hits, 1, 'the reuse is a hit');
+  assert.equal(actors.children.length, 1, 'the citizen is back in the scene');
+});
+
+test('authored characters use their named rig and survive crowd retirement', async () => {
+  const { ctx } = await makeCtx();
+  const citizens = createCitizens(ctx);
+  await citizens.preload();
+  citizens.spawn();
+  const cell = { x: 30, z: 34 };
+  const mage = citizens.spawn({ character: 'Mage', from: cell });
+  assert.equal(mage.key, 'Mage');
+  assert.deepEqual(mage.origin, cell);
+  assert.equal(citizens.despawn(), true);
+  assert.equal(citizens.count(false), 0);
+  assert.equal(citizens.count(true), 1);
+  assert.equal(citizens.despawn(true), true);
+  const knight = citizens.spawn({ character: 'Knight', from: cell });
+  assert.equal(knight.key, 'Knight');
+  citizens.dispose();
+});
+
+test('the number of rendered citizens is capped', async (t) => {
+  const { ctx, gltf } = await makeCtx();
+  if (!gltf) {
+    t.skip('Knight.glb is not available in this checkout');
+    return;
+  }
+  const citizens = createCitizens(ctx);
+  await citizens.preload();
+  for (let i = 0; i < MAX_RENDERED_CITIZENS + 5; i += 1) {
+    citizens.spawn({ from: { x: 1, z: 1 }, to: { x: 2, z: 2 } });
+  }
+  assert.equal(citizens.count(), MAX_RENDERED_CITIZENS);
+  assert.equal(citizens.spawn({ from: { x: 1, z: 1 }, to: { x: 2, z: 2 } }), null);
+});
+
+test('disposing the citizens tears everything down', async (t) => {
+  const { ctx, actors, gltf } = await makeCtx();
+  if (!gltf) {
+    t.skip('Knight.glb is not available in this checkout');
+    return;
+  }
+  const citizens = createCitizens(ctx);
+  await citizens.preload();
+  citizens.spawn({ from: { x: 10, z: 10 }, to: { x: 20, z: 20 } });
+  citizens.update(0.1);
+
+  citizens.dispose();
+  assert.equal(citizens.count(), 0);
+  assert.equal(actors.children.length, 0, 'nothing is left in the scene');
+  assert.equal(citizens.spawn({ from: { x: 1, z: 1 } }), null, 'a disposed manager spawns nothing');
 });

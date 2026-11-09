@@ -352,6 +352,48 @@ async function loadPrototype(ctx, key) {
   }
 }
 
+function groupByModel(records) {
+  const groups = new Map();
+  for (const rec of records) {
+    let group = groups.get(rec.model);
+    if (!group) {
+      group = [];
+      groups.set(rec.model, group);
+    }
+    group.push(rec);
+  }
+  return groups;
+}
+
+function scatterBatch(proto, count) {
+  if (!proto) return null;
+  try {
+    return makeInstanced(proto, count);
+  } catch {
+    return null;
+  }
+}
+
+function addScatterGroup(ctx, key, mesh, records, transform) {
+  if (mesh) {
+    mesh.setInstances(records.map(transform));
+    mesh.name = `scatter:${key}`;
+    mesh.userData.scatterGroup = key;
+    ctx?.renderer?.world?.add(mesh);
+  }
+  sceneryState(ctx).groups.set(key, { mesh, records, transform });
+}
+
+function addSingle(ctx, record, proto) {
+  const t = transformFor(ctx, record, proto);
+  const obj = proto.clone ? proto.clone(true) : proto;
+  obj.position.set(t.x, t.y, t.z);
+  obj.rotation.y = t.rotY;
+  obj.scale.setScalar(t.scale);
+  ctx?.renderer?.world?.add(obj);
+  sceneryState(ctx).singles.push({ record, obj });
+}
+
 /**
  * Scatter nature models over a heightmap.
  *
@@ -368,33 +410,17 @@ async function loadPrototype(ctx, key) {
  */
 export async function scatterNature(ctx, hf, seed = 0, opts = {}) {
   const plan = planScatter(hf, seed, opts);
-  const s = sceneryState(ctx);
   const records = [];
+  const world = ctx?.state?.world;
+  const isCurrent = opts.isCurrent ?? (() => ctx?.state?.world === world);
 
-  // --- group the plan by model key ---------------------------------------
-  const byModel = new Map();
-  for (const rec of plan) {
-    let g = byModel.get(rec.model);
-    if (!g) {
-      g = { key: rec.model, recs: [] };
-      byModel.set(rec.model, g);
-    }
-    g.recs.push(rec);
-  }
-
-  for (const g of byModel.values()) {
-    const proto = await loadPrototype(ctx, g.key);
-    let mesh = null;
-    if (proto) {
-      try {
-        mesh = makeInstanced(proto, g.recs.length);
-      } catch {
-        mesh = null;
-      }
-    }
+  for (const [key, group] of groupByModel(plan)) {
+    const proto = await loadPrototype(ctx, key);
+    if (!isCurrent()) return [];
+    const mesh = scatterBatch(proto, group.length);
     // The group's records ARE the state records, so a removal can find the
     // instance it has to drop.
-    const groupRecords = g.recs.map((rec) => {
+    const groupRecords = group.map((rec) => {
       const c = cellCenterWorld(ctx, rec.cx, rec.cz);
       return {
         model: rec.model,
@@ -407,31 +433,47 @@ export async function scatterNature(ctx, hf, seed = 0, opts = {}) {
         y: groundHeight(ctx, rec.cx, rec.cz),
         placed: Boolean(mesh),
         /** The instanced group this prop belongs to. */
-        group: g.key,
+        group: key,
         kind: 'instanced',
         /** The world transform of this instance (kept for re-batching). */
         transform: proto ? transformFor(ctx, rec, proto) : null,
       };
     });
-    if (mesh) {
-      // `setInstances` writes every part of a multi-mesh model and flags the
-      // instance matrices for upload. The old code touched
-      // `mesh.instanceMatrix` directly, which a multi-part group does not have.
-      mesh.setInstances(groupRecords.map((rec) => rec.transform));
-      mesh.name = `scatter:${g.key}`;
-      mesh.userData.scatterGroup = g.key;
-      ctx?.renderer?.world?.add(mesh);
-    }
-    s.groups.set(g.key, { key: g.key, mesh, records: groupRecords });
+    addScatterGroup(ctx, key, mesh, groupRecords, (rec) => rec.transform);
     for (const rec of groupRecords) records.push(rec);
   }
 
-  const world = ctx?.state?.world;
   if (world) {
     world.scenery = records;
     world.sceneryCount = records.length;
   }
   return plan;
+}
+
+/** Recreate the scene from saved records while keeping their identity and data. */
+export async function restoreScenery(ctx, isCurrent) {
+  const world = ctx.state.world;
+  if (!Array.isArray(world.scenery)) return false;
+  const records = world.scenery.filter((rec) => rec && isPlaceableNatureKey(rec.model, ctx.manifest));
+  const groups = groupByModel(records);
+  const prototypes = await Promise.all([...groups].map(async ([key, group]) => [key, group, await loadPrototype(ctx, key)]));
+  if (!isCurrent()) return false;
+
+  const retained = new Set(world.scenery);
+  for (const [key, group, proto] of prototypes) {
+    if (!proto) continue;
+    const batch = [];
+    for (const rec of group) {
+      if (!retained.has(rec)) continue;
+      if (rec.kind === 'single') addSingle(ctx, rec, proto);
+      else batch.push(rec);
+    }
+    if (batch.length) {
+      const mesh = scatterBatch(proto, batch.length);
+      addScatterGroup(ctx, key, mesh, batch, (rec) => transformFor(ctx, rec, proto));
+    }
+  }
+  return true;
 }
 
 /**
@@ -440,7 +482,7 @@ export async function scatterNature(ctx, hf, seed = 0, opts = {}) {
  *
  * @returns {Promise<{ok:boolean, reason:string, rec?:object}>}
  */
-export async function placeNature(ctx, cx, cz, modelKey) {
+export async function placeNature(ctx, cx, cz, modelKey, isCurrent = () => true) {
   const manifest = ctx?.manifest;
   if (!modelKey || typeof modelKey !== 'string') {
     return { ok: false, reason: 'no model key given' };
@@ -455,26 +497,19 @@ export async function placeNature(ctx, cx, cz, modelKey) {
   if (!Number.isInteger(cx) || !Number.isInteger(cz) || cx < 0 || cz < 0 || cx >= size || cz >= size) {
     return { ok: false, reason: 'cell out of bounds' };
   }
-  const hf = ctx?.state?.world?.heightmap;
+  const world = ctx?.state?.world;
+  const hf = world?.heightmap;
   if (hf) {
-    const level = ctx?.state?.world?.waterLevel ?? 0;
+    const level = world.waterLevel ?? 0;
     if (hf[cz * size + cx] < level) {
       return { ok: false, reason: 'cannot place on water' };
     }
   }
 
-  const rec = { model: modelKey, cx, cz, rot: 0, scale: 1 };
   const proto = await loadPrototype(ctx, modelKey);
   if (!proto) return { ok: false, reason: `model "${modelKey}" could not be loaded` };
+  if (!isCurrent() || ctx?.state?.world !== world) return { ok: false, reason: 'the world changed' };
 
-  const t = transformFor(ctx, rec, proto);
-  const obj = proto.clone ? proto.clone(true) : proto;
-  obj.position.set(t.x, t.y, t.z);
-  obj.rotation.y = rec.rot;
-  obj.scale.setScalar(t.scale);
-  ctx?.renderer?.world?.add(obj);
-
-  const s = sceneryState(ctx);
   const c = cellCenterWorld(ctx, cx, cz);
   const record = {
     model: modelKey,
@@ -489,9 +524,9 @@ export async function placeNature(ctx, cx, cz, modelKey) {
     group: null,
     kind: 'single',
   };
-  s.singles.push({ record, obj });
-  ctx?.state?.world?.scenery?.push(record);
-  if (ctx?.state?.world) ctx.state.world.sceneryCount = ctx.state.world.scenery.length;
+  addSingle(ctx, record, proto);
+  world?.scenery?.push(record);
+  if (world) world.sceneryCount = world.scenery.length;
   return { ok: true, reason: 'placed', rec: record };
 }
 
@@ -564,13 +599,13 @@ function rebuildGroup(g) {
   g.records.forEach((rec, i) => {
     // The prototype transform is baked into the matrix by transformFor(); the
     // group keeps the transform it was created with.
-    g.mesh.setInstance(i, rec.transform);
+    g.mesh.setInstance(i, g.transform(rec));
   });
   setInstanceCount(g.mesh, n);
 }
 
 /** Remove every scattered object from the scene (used on regeneration). */
-export function clearScenery(ctx) {
+export function clearScenery(ctx, { preserveState = false } = {}) {
   const s = scenery.get(ctx);
   if (!s) return;
   for (const g of s.groups.values()) {
@@ -582,7 +617,7 @@ export function clearScenery(ctx) {
   }
   s.singles.length = 0;
   const world = ctx?.state?.world;
-  if (world) {
+  if (world && !preserveState) {
     world.scenery = [];
     world.sceneryCount = 0;
   }

@@ -32,7 +32,108 @@ import { EVENTS, emit } from './events.js';
 import { currentStage } from './stage.js';
 
 /** Current save-file format version. */
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = 2;
+
+/**
+ * The migration chain.
+ *
+ * A save is a long-lived artefact: the player keeps it for months. Every
+ * time the format changes, the older files must still open, or the upgrade
+ * silently takes away everybody's city.
+ *
+ * Each entry migrates a record FROM the version named in the key TO the next
+ * version. `migrateRecord` walks the chain, so a v1 file opens in a v3 build
+ * as long as a 1 -> 2 and a 2 -> 3 migration exist.
+ *
+ * A migration is PURE: it takes a record and returns a NEW record. It never
+ * touches the live state and never mutates its input, so it can be tested in
+ * isolation and re-run safely.
+ *
+ * @type {Object<number, (record:object)=>object>}
+ */
+export const MIGRATIONS = Object.freeze({
+  /**
+   * v1 -> v2: the progression record.
+   *
+   * V5 added checkpoints, collectibles and achievements. A v1 save has no
+   * such record, so an empty one is added — the city itself is untouched.
+   */
+  1: (record) => {
+    const data = { ...(record.data ?? {}) };
+    const meta = { ...(data.meta ?? {}) };
+    if (!meta.progress || typeof meta.progress !== 'object') {
+      meta.progress = { checkpoints: [], collectibles: [], achievements: [] };
+    }
+    data.meta = meta;
+    return { ...record, version: 2, data };
+  },
+});
+
+/**
+ * Migrate a save record to the current format.
+ *
+ * The chain is walked one version at a time, so a file from several versions
+ * ago opens as long as every step between it and now exists. A file from a
+ * NEWER build cannot be migrated — this build does not know what a future
+ * format means — and is refused rather than guessed at.
+ *
+ * @param {object} record the stored record
+ * @returns {{ok:boolean, record:object|null, migrated:boolean, from:number, to:number, error:string|null}}
+ */
+export function migrateRecord(record) {
+  if (!record || typeof record !== 'object' || Array.isArray(record)) {
+    return { ok: false, record: null, migrated: false, from: 0, to: SAVE_VERSION, error: 'not a save record' };
+  }
+  const from = Number.isFinite(record.version) ? record.version : 0;
+  if (from > SAVE_VERSION) {
+    return {
+      ok: false,
+      record: null,
+      migrated: false,
+      from,
+      to: SAVE_VERSION,
+      error: `the save uses format v${from}, this build reads v${SAVE_VERSION}`,
+    };
+  }
+  if (from === SAVE_VERSION) {
+    return { ok: true, record, migrated: false, from, to: SAVE_VERSION, error: null };
+  }
+
+  let current = record;
+  let version = from;
+  while (version < SAVE_VERSION) {
+    const step = MIGRATIONS[version];
+    if (typeof step !== 'function') {
+      return {
+        ok: false,
+        record: null,
+        migrated: false,
+        from,
+        to: SAVE_VERSION,
+        error: `there is no migration from save format v${version}`,
+      };
+    }
+    try {
+      current = step(current);
+    } catch (err) {
+      return {
+        ok: false,
+        record: null,
+        migrated: false,
+        from,
+        to: SAVE_VERSION,
+        error: `the migration from v${version} failed: ${err?.message ?? err}`,
+      };
+    }
+    version += 1;
+    if (!current || typeof current !== 'object') {
+      return { ok: false, record: null, migrated: false, from, to: SAVE_VERSION, error: 'a migration produced an invalid record' };
+    }
+    current = { ...current, version };
+  }
+
+  return { ok: true, record: current, migrated: true, from, to: SAVE_VERSION, error: null };
+}
 
 /** localStorage key prefix: `supercitycon:save:<slot>`. */
 export const SAVE_KEY_PREFIX = 'supercitycon:save:';
@@ -294,7 +395,17 @@ export function loadFromStorage(slot = DEFAULT_SLOT) {
     return null;
   }
   if (!record || typeof record !== 'object') return null;
-  if (record.version !== SAVE_VERSION || !record.data || typeof record.data !== 'object') {
+  // An older save is MIGRATED, not refused: the city in it is the player's
+  // work and must survive an upgrade. A save from a newer build is refused,
+  // because this build cannot know what its format means.
+  const migration = migrateRecord(record);
+  if (!migration.ok || !migration.record) {
+    // eslint-disable-next-line no-console
+    console.warn('[save] slot', slot, 'has an unsupported format and was ignored:', migration.error);
+    return null;
+  }
+  record = migration.record;
+  if (!record.data || typeof record.data !== 'object') {
     // eslint-disable-next-line no-console
     console.warn('[save] slot', slot, 'has an unsupported format and was ignored');
     return null;
@@ -317,6 +428,7 @@ export function loadFromStorage(slot = DEFAULT_SLOT) {
     name: record.name ?? null,
     stage: record.stage ?? null,
     savedAt: record.savedAt ?? null,
+    migratedFrom: migration.migrated ? migration.from : null,
   });
   return restored;
 }
@@ -500,11 +612,16 @@ export function importSave(text) {
 
   // A record envelope …
   let data = parsed;
+  let migratedFrom = null;
   if (parsed.version !== undefined && parsed.data && typeof parsed.data === 'object') {
-    if (parsed.version !== SAVE_VERSION) {
-      throw new Error(`save: import failed — the file uses save format v${parsed.version}, this build reads v${SAVE_VERSION}`);
+    // An older file is migrated rather than refused — the city in it is the
+    // player's work. A newer file cannot be understood by this build.
+    const migration = migrateRecord(parsed);
+    if (!migration.ok || !migration.record) {
+      throw new Error(`save: import failed — ${migration.error ?? 'the file uses an unsupported save format'}`);
     }
-    data = parsed.data;
+    if (migration.migrated) migratedFrom = migration.from;
+    data = migration.record.data;
   }
   // … or a raw snapshot.
   if (!isSnapshot(data)) {
@@ -523,6 +640,7 @@ export function importSave(text) {
     name: parsed.name || defaultName(restored),
     stage: stageLabel(restored),
     savedAt: parsed.savedAt ?? null,
+    migratedFrom,
   });
   return restored;
 }
