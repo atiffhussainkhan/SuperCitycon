@@ -106,7 +106,7 @@ verified with evidence.
 | | |
 |---|---|
 | **The package** | `supercitycon-7.0.0-cleared.tar.gz` |
-| **Its SHA-256** | `d7ca1ff57c05007ad8040b80c716479e8c421a809b84a6d75fa7b4584d659e8d` |
+| **Its SHA-256** | written next to the package as `supercitycon-7.0.0-cleared.tar.gz.sha256` by the packaging step, and in `MANIFEST.sha256` for every file inside it. The value is NOT hard-coded here: the bundle embeds its build time by design, so the checksum identifies **this** package rather than any rebuild of it. The authoritative value for a given run is the one in the evidence directory. |
 | **The size** | 22,593,876 bytes (218 files, 72.7 MB uncompressed) |
 | **The file manifest** | `MANIFEST.sha256` — a SHA-256 for every file in the bundle |
 | **How it was built** | `node tools/package-game-release.mjs` |

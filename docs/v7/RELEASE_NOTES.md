@@ -25,6 +25,7 @@
 | **Target platform** | Web — Chromium verified. Firefox, Safari, Windows, Linux and ARM **not** tested (see [`PLATFORM_COMPATIBILITY.md`](PLATFORM_COMPATIBILITY.md)) |
 | **Build command** | `cd game && npm ci && npm run build:cleared` |
 | **Build result** | 218 files, 72.7 MB, licence policy **CLEARED** |
+| **Package checksum** | written beside the package as `supercitycon-7.0.0-cleared.tar.gz.sha256`, with a SHA-256 per file in `MANIFEST.sha256` |
 | **Test summary** | **835 unit tests, 835 pass, 0 fail** · 91/91 files parse cleanly · the content validator: 3 levels, 0 errors, 0 warnings · the V5 acceptance scenario 40/41 (1 correctly skipped) · the V6 gamepad scenario 19/19 · the **V7 scenario 10/10** · `npm audit` 0 vulnerabilities · the secret scan 0 findings |
 | **Performance** | the navigation search: median 0.202 ms, **p95 1.350 ms** against a 2 ms budget · the frame rate: 60 fps, unchanged from V6 |
 | **Known blockers** | none code-level. Four environment limitations are named in [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md) |
