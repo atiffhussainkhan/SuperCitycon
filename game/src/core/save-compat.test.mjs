@@ -101,14 +101,19 @@ function v5SaveRecord(overrides = {}) {
 // The product version and the save schema are DIFFERENT numbers
 // ---------------------------------------------------------------------------
 
-test('the product version is 6.0.0', () => {
+test('the product version is a real release version', () => {
   const pkg = JSON.parse(readFileSync(PACKAGE_JSON, 'utf8'));
-  assert.equal(pkg.version, '6.0.0', 'the shipped product version is 6.0.0');
+  // The exact version moves with every release, so this test does NOT pin
+  // it — that would make a compatibility suite fail on every version bump
+  // for no reason. What matters here is that the product version is a
+  // version at all, and that it is NOT the save schema version.
+  assert.match(String(pkg.version), /^\d+\.\d+\.\d+$/,
+    `the shipped product version is a semantic version (${pkg.version})`);
 });
 
 test('the save schema stays at version 2', () => {
   assert.equal(SAVE_VERSION, 2,
-    'V6 does NOT move the save schema; a V5 city opens without a migration');
+    'The product upgrade does NOT move the save schema; a V5 city opens without a migration');
 });
 
 test('the product version and the save schema are not the same thing', () => {
