@@ -106,12 +106,13 @@ verified with evidence.
 | | |
 |---|---|
 | **The package** | `supercitycon-7.0.0-cleared.tar.gz` |
-| **Its SHA-256** | `cc89df06583eba3c25d939d6e9489398687c20feb2a5b11098f501ff028bd192` |
+| **Its SHA-256** | `d7ca1ff57c05007ad8040b80c716479e8c421a809b84a6d75fa7b4584d659e8d` |
 | **The size** | 22,593,876 bytes (218 files, 72.7 MB uncompressed) |
 | **The file manifest** | `MANIFEST.sha256` — a SHA-256 for every file in the bundle |
 | **How it was built** | `node tools/package-game-release.mjs` |
 | **What the packager refuses** | any path matching the uncleared 2D art, any credential file, and any credential-shaped value in a text file. It exits 1 rather than shipping one. |
 | **Reproducible** | the packager builds the archive **twice** and compares the hashes. The same bundle always produces the same bytes: the file list is sorted, the ownership is normalised, the modification times are pinned and the gzip timestamp is dropped. The rebuild check is part of the packaging step, and the pipeline fails if the two differ. |
+| **A note on what "reproducible" means here** | the ARCHIVE is reproducible **given the same bundle**. The BUNDLE itself is not byte-identical across builds, by design: `vite.config.js` stamps the build time into the bundle's identity, so two builds of the same commit differ. The checksum identifies **this** package, which is what a release checksum is for. |
 | **Verified** | the package contains **0** paths matching `assets/ui`, `ui-assets.json` or `DO-NOT-PUBLISH.txt` |
 
 **The rollback** is one command: check out `v6/upgrade-Zehe03` (or `main`),
