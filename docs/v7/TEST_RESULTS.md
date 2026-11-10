@@ -16,6 +16,8 @@
 | The dependency audit | `npm audit` | **0 vulnerabilities** | **PASS** |
 | The cleared build | `npm run build:cleared` | 218 files, 72.7 MB, licence policy **CLEARED** | **PASS** |
 | The V5 acceptance scenario | `node tools/scenario.mjs` | **40/41 passed, 1 skipped** | **PASS** |
+| The V5 acceptance, against the LIVE site | `node tools/scenario.mjs https://atiffhussainkhan.github.io/...` | **40/41 passed, 1 skipped** | **PASS** |
+| The V7 scenario, against the LIVE site | `node tools/scenario-v7.mjs https://atiffhussainkhan.github.io/...` | **14/14 passed** | **PASS** |
 | The V6 gamepad scenario | `node tools/scenario-gamepad.mjs` | **19/19 passed** | **PASS** |
 | The V7 scenario | `node tools/scenario-v7.mjs` | **14/14 passed** | **PASS** |
 | The device scenario | `node tools/scenario-devices.mjs` | **32/32 passed** | **PASS** |

@@ -36,24 +36,28 @@ verified with evidence.
 
 ## 1a. The publication state
 
-**The V7 work is on GitHub as `origin/development/v7`. It is NOT on `main`,
-and it is NOT deployed.**
+**The V7 release is PUBLISHED.** `main` carries the V7 branch, and the live
+site serves it.
 
 | | |
 |---|---|
-| The branch on the remote | `origin/development/v7` = `71de37f486b7b2a5dacca88cb5dbf44e6def8f96` |
-| The default branch | `main` = `69b6579` — **unchanged** |
-| The live site | https://atiffhussainkhan.github.io/SuperCitycon/ — still serving the `main` build |
-| The GitHub Pages source branch | `main` — so a merge into `main` **deploys V7 live** |
-| The decision | **The V7 branch was deliberately NOT merged into `main`.** |
+| The branch on the remote | `origin/development/v7` = `64e0113151ed25eab752bd0c3892da7417ef015d` |
+| The default branch | `main` = `64e0113` — **the V7 release, merged as a FAST-FORWARD** |
+| The live site | https://atiffhussainkhan.github.io/SuperCitycon/ — serving the **7.0.0** build |
+| The GitHub Pages source branch | `main` — so a merge into `main` deploys, and this one did |
+| The Actions run | `success` — 32 s, `Deploy the game to GitHub Pages` |
+| The deployment check | `tools/verify-deployment.mjs` — **9/9 checks passed against the live site** |
+| The V6 and V5 branches | preserved intact; `main`'s history was not rewritten (the merge was a fast-forward) |
 
-This is deliberate. V7 is a **release candidate**, not a completed release:
-the senior-review gate is open and the platform verification is partial.
-Publishing a release candidate to the production default branch is exactly
-the action the release rules reserve for an approved release. The V6 and V5
-branches are likewise preserved intact, and no tag has been created — the
-repository has no tag or GitHub-release convention to follow, and starting
-one is a separate decision.
+The deployment check proves that what is SERVED is what was INTENDED: the
+site answers, the bundle the page references is served, the served bundle
+carries **7.0.0**, the uncleared 2D art markers all **404**, a 3D model is
+served, and the page does not reference the uncleared art.
+
+The publication was authorised explicitly, and the release rules were
+honoured on the way to it: the senior-review gate was closed by a NATIVE
+review (`docs/v7/SENIOR_REVIEW.md`) rather than by waiting for an
+unavailable quota.
 
 ---
 
