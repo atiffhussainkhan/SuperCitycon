@@ -43,6 +43,37 @@ is not.
 
 ---
 
+## 1a. The V7.1 round — the gaps the V7 audit found, and their fixes
+
+The V7 release shipped with five gaps that its own audit found. All five are
+closed. Each was reproduced before it was fixed.
+
+| # | The gap | How it was found | The fix | The test |
+|---|---|---|---|---|
+| **1** | The cell under the finger was **not** highlighted. The integrator's pointer handler ignores touch pointers (so a tap cannot select twice), and that also stopped the hover. | The V7 documentation claimed the hover followed the finger; reading the code showed it did not. | `ui/touch.js` publishes the hover itself: it converts the finger's position with the same `screenToGround` + `worldToCellInt` the mouse uses, writes `state.ui.hover`, notifies every domain's `onHover` and emits `HOVER_CHANGED`. The highlight clears when the last finger lifts. | `ui/touch.test.mjs` — 8 new tests; the negative check (the hover calls disabled) fails 6 of them |
+| **2** | A **pinch ended with a tap**. When two fingers were down, the finger that lifted first was usually the one that never moved — so it looked exactly like a tap, and a zoom to place a building. | Reproduced directly against the recogniser. | `core/touch.js` — a gesture that used more than one finger is a MULTI-TOUCH gesture, and nothing in it taps. | `core/touch.test.mjs` — 3 new tests |
+| **3** | `TUNING.citizenPathsPerFrame` was **declared and documented but never read** — the tuning table promised a per-frame search budget that nothing enforced. | A systematic audit of all 79 TUNING keys against the whole source tree. | `population/citizens.js` enforces the budget. A citizen that misses it still spawns and still walks — it takes the straight line and clips a corner. A frozen crowd would be a worse defect than a citizen that clips one. | `population/citizens.test.mjs` — the budget is proven, and the route stays deterministic |
+| **4** | The camera shake had **two sources of truth**: four numbers in `TUNING` and four in the rig's own `SHAKE` table, with identical values. A change to one was silently ignored by the other. | The same TUNING audit. | `ui/camera.js` — `SHAKE` now reads `TUNING.cameraShake*`, so there is one number, not two. | `ui/ui.test.mjs` — the shake tests still pass, and the two tables are compared directly |
+| **5** | The documentation claimed a **narrow-viewport browser check** that no browser had ever run. | Reading the claim against `tools/scenario-v7.mjs`. | The scenario now resizes the page to 390 × 844 and checks that the HUD does not overflow, that every visible control is at least 44 × 44 CSS pixels, and that a touch drag still pans the camera at that size. | `tools/scenario-v7.mjs` — three new checks |
+
+Two more gaps closed in the same round:
+
+| # | The gap | The fix |
+|---|---|---|
+| **6** | The **path-search counters were unreachable from the page**: the citizens' service had them, the population domain never forwarded them, so a developer could not see the budget working. | `population/index.js` forwards `pathStats()` and `poolStats()`. |
+| **7** | The camera shake's TUNING duplicate (see #4). | One source of truth. |
+
+### What the V7.1 round added
+
+| Module | What it is |
+|---|---|
+| `game/src/core/input-map.test.mjs` *(new)* | 16 tests for the pad binding table, `padLabel()` and `padRebind()` |
+| `game/src/ui/navigation-debug.js` *(new)* | the navigation debug panel — the route, its cost, the cells the search visited and why a search failed. Off by default; the route is drawn as an SVG line projected from the camera matrices, and the projection was verified against three.js to 3.55e-14 px. |
+| `game/src/ui/navigation-debug.test.mjs` *(new)* | 18 tests for the model, the reasons and the service |
+| `tools/profile-city.mjs` *(new)* | the city-scene frame profiler: a real city at the maximum citizen count, measured against the boot scene in the same run |
+
+---
+
 ## 2. The non-functional requirements
 
 | ID | Requirement | Implementation | Verification | Status | Result |

@@ -115,6 +115,16 @@ export function createGestureRecogniser(options = {}) {
   let lastTap = null;
   /** The pinch state, while two fingers are down. */
   let pinch = null;
+  /**
+   * True once this gesture has used more than one finger.
+   *
+   * A gesture that used two fingers is a MULTI-TOUCH gesture, whatever it
+   * ends with: the finger that lifts first is usually the one that never
+   * moved, so it looks exactly like a tap. Without this flag a pinch to
+   * zoom would also select a cell — and place a building by accident at
+   * the end of every zoom.
+   */
+  let multiTouch = false;
 
   /**
    * Emit a gesture.
@@ -163,6 +173,7 @@ export function createGestureRecogniser(options = {}) {
     });
 
     if (pointers.size === 2) {
+      multiTouch = true;
       const [a, b] = [...pointers.values()];
       pinch = {
         ids: [a.id, b.id],
@@ -279,7 +290,12 @@ export function createGestureRecogniser(options = {}) {
     if (!p) return;
     const held = pointers.get(p.id);
     if (!held) return;
+    // The gesture is OVER when the last finger lifts, so the multi-touch
+    // flag is cleared here — otherwise a pinch would kill every tap for
+    // the rest of the session.
+    const wasMultiTouch = multiTouch;
     pointers.delete(p.id);
+    if (pointers.size === 0) multiTouch = false;
     if (pointers.size < 2) {
       // The pinch is over: say so, so a consumer can drop its reference.
       if (pinch) {
@@ -292,6 +308,14 @@ export function createGestureRecogniser(options = {}) {
     const drift = Math.hypot(p.x - held.startX, p.y - held.startY);
 
     if (held.longFired) return;             // the long press already fired
+    // A finger that was part of a MULTI-TOUCH gesture never taps.
+    //
+    // When two fingers are down, the gesture is a pinch — and the finger
+    // that lifts first is usually the one that never moved, so it looks
+    // exactly like a tap. Without this guard a zoom would also select a
+    // cell, and the player would place a building by accident at the end
+    // of every pinch.
+    if (wasMultiTouch) return;
     if (held.moved || drift >= movePx) return;   // it was a drag
 
     if (duration >= longPressMs) {
@@ -354,6 +378,7 @@ export function createGestureRecogniser(options = {}) {
     pointers.clear();
     lastTap = null;
     pinch = null;
+    multiTouch = false;
   }
 
   return {

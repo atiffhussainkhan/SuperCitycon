@@ -10,6 +10,10 @@
  *   - the accessibility settings have REAL effects (the stylesheet, the
  *     renderer, the camera's shake switch);
  *   - a rebind is persisted through the settings store;
+ *   - a GAMEPAD button can be bound to an action, and the binding is stored
+ *     and applied to the live pad table;
+ *   - the pad capture is honest: it never binds a button the player did not
+ *     press, it leaves the menu's own buttons alone, and it can be cancelled;
  *   - the bindings can be reset to the defaults.
  */
 
@@ -17,7 +21,15 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { createSettings, SCHEMA } from '../core/settings.js';
-import { createInputMap, DEFAULT_BINDINGS, keyLabel } from '../core/input-map.js';
+import {
+  createInputMap,
+  DEFAULT_BINDINGS,
+  DEFAULT_PAD_BINDINGS,
+  PAD_ACTIONS,
+  keyLabel,
+  padLabel,
+} from '../core/input-map.js';
+import { PAD_BUTTONS } from '../core/gamepad.js';
 import { buildSettingsModel, buildControlsModel } from './panels.js';
 import { createSettingsPanel, applyUiEffects, formatSettingValue } from './settings-panel.js';
 
@@ -161,6 +173,62 @@ function installDom() {
 
 const { doc: fakeDocument, win: fakeWindow } = installDom();
 
+/**
+ * A fake gamepad, shaped like the browser's Gamepad.
+ *
+ * The buttons are read live by `readPad`, so a test can press and release
+ * one between two polls.
+ */
+function makePad() {
+  const buttons = [];
+  const fill = (index) => {
+    while (buttons.length <= index) buttons.push({ pressed: false, value: 0 });
+  };
+  return {
+    connected: true,
+    id: 'Test Pad (STANDARD GAMEPAD)',
+    index: 0,
+    axes: [],
+    buttons,
+    press(index) {
+      fill(index);
+      buttons[index] = { pressed: true, value: 1 };
+    },
+    release(index) {
+      fill(index);
+      buttons[index] = { pressed: false, value: 0 };
+    },
+  };
+}
+
+/**
+ * A `localStorage`-like object, so the stored settings can be tested.
+ */
+function makeStorage(initial = {}) {
+  const data = new Map(Object.entries(initial));
+  return {
+    getItem(key) { return data.has(key) ? data.get(key) : null; },
+    setItem(key, value) { data.set(key, String(value)); },
+    removeItem(key) { data.delete(key); },
+    data,
+  };
+}
+
+/**
+ * A panel with a fake pad behind it.
+ *
+ * The poll interval is pushed out of the way on purpose: the test drives the
+ * capture by hand with `pollPadButtons()`, so the capture never depends on
+ * the clock.
+ */
+function makePadPanel(ctx, pad, extraDeps = {}) {
+  return createSettingsPanel(ctx, {
+    getPads: () => [pad],
+    pollIntervalMs: 3600000,
+    ...extraDeps,
+  });
+}
+
 /** A context with a real settings store and a real input map. */
 function makeCtx(overrides = {}) {
   const settings = createSettings({ storage: null });
@@ -221,7 +289,8 @@ test('the panel renders one row per setting', () => {
   panel.render(container, 'settings');
 
   const rows = container.querySelectorAll('[data-sc-setting]');
-  const expected = Object.keys(SCHEMA).filter((k) => k !== 'input.bindings').length;
+  // The whole input section lives in the controls view, not here.
+  const expected = Object.keys(SCHEMA).filter((k) => SCHEMA[k].section !== 'input').length;
   assert.equal(rows.length, expected, 'every setting has a row');
 
   // The accessibility view carries only the accessibility rows.
@@ -402,3 +471,242 @@ test('the value formatting is honest about ratios and flags', () => {
   assert.equal(formatSettingValue('audio.muted', SCHEMA['audio.muted'], false), 'OFF');
   assert.equal(formatSettingValue('accessibility.textScale', SCHEMA['accessibility.textScale'], 1.25), '1.25');
 });
+
+// ===========================================================================
+// 4. The gamepad bindings: capturing a pad button
+// ===========================================================================
+
+test('the controls view lists the gamepad actions with readable button labels', (t) => {
+  const ctx = makeCtx();
+  const panel = createSettingsPanel(ctx, {});
+  t.after(() => panel.dispose());
+  const container = fakeDocument.createElement('div');
+  panel.render(container, 'controls');
+
+  const rows = container.querySelectorAll('[data-sc-pad-control]');
+  assert.equal(rows.length, PAD_ACTIONS.length, 'every pad action has a row');
+
+  const confirm = rows.find((r) => r.dataset.scPadControl === 'menu.confirm');
+  assert.ok(confirm, 'the confirm row exists');
+  assert.equal(confirm.querySelectorAll('.sc-setvalue')[0].textContent, 'A',
+    'the bound button is named');
+  assert.equal(padLabel(PAD_BUTTONS.DPAD_UP), 'D-pad up');
+
+  // The row reads like the keyboard rows: "Camera — Zoom In".
+  const zoom = rows.find((r) => r.dataset.scPadControl === 'camera.zoomIn');
+  assert.equal(zoom.querySelectorAll('.sc-setlabel')[0].textContent, 'Camera — Zoom In');
+});
+
+test('a pad button can be bound to an action, and the binding is stored', (t) => {
+  const ctx = makeCtx();
+  const pad = makePad();
+  const panel = makePadPanel(ctx, pad);
+  t.after(() => panel.dispose());
+  const container = fakeDocument.createElement('div');
+  panel.render(container, 'controls');
+
+  // Start the capture for "zoom out" and press the right bumper.
+  container.querySelectorAll('[data-sc-pad-bind="camera.zoomOut"]')[0].click();
+  assert.equal(panel.padCapturing(), 'camera.zoomOut', 'the capture is running');
+  assert.equal(panel.isCapturing(), true, 'the panel knows a capture is running');
+
+  pad.press(PAD_BUTTONS.RIGHT_BUMPER);
+  panel.pollPadButtons();
+
+  assert.equal(panel.padCapturing(), null, 'the capture is over');
+  assert.deepEqual(ctx.inputMap.padFor('camera.zoomOut'), [PAD_BUTTONS.RIGHT_BUMPER],
+    'the action is bound to the pressed button');
+  assert.deepEqual(ctx.settings.get('input.padBindings')['camera.zoomOut'], [PAD_BUTTONS.RIGHT_BUMPER],
+    'the binding was persisted through the settings store');
+  assert.deepEqual(ctx.inputMap.padFor('camera.zoomIn'), [],
+    'the button has one owner: the table is read first-match');
+
+  // The row tells the player what they bound.
+  const row = container.querySelectorAll('[data-sc-pad-control="camera.zoomOut"]')[0];
+  assert.equal(row.querySelectorAll('.sc-setvalue')[0].textContent, 'right bumper',
+    'the row shows the button by name');
+});
+
+test('the pad capture never binds a button that belongs to the menu', (t) => {
+  const ctx = makeCtx();
+  const pad = makePad();
+  const panel = makePadPanel(ctx, pad);
+  t.after(() => panel.dispose());
+  const container = fakeDocument.createElement('div');
+  panel.render(container, 'controls');
+
+  container.querySelectorAll('[data-sc-pad-bind="camera.zoomOut"]')[0].click();
+
+  // A is the menu's confirm button by default: the player is using the
+  // menu to reach this screen, so the capture must not take it.
+  pad.press(PAD_BUTTONS.A);
+  panel.pollPadButtons();
+  assert.equal(panel.padCapturing(), 'camera.zoomOut', 'the capture is still running');
+  assert.deepEqual(ctx.inputMap.padFor('camera.zoomOut'), DEFAULT_PAD_BINDINGS['camera.zoomOut'],
+    'nothing was bound');
+
+  // The d-pad belongs to the menu too: taking it would leave the player
+  // unable to move around the menu.
+  pad.release(PAD_BUTTONS.A);
+  pad.press(PAD_BUTTONS.DPAD_UP);
+  panel.pollPadButtons();
+  assert.equal(panel.padCapturing(), 'camera.zoomOut', 'the capture is still running');
+  assert.deepEqual(ctx.inputMap.padFor('camera.zoomOut'), DEFAULT_PAD_BINDINGS['camera.zoomOut'],
+    'the d-pad was not taken either');
+
+  // A button that is not the menu's still binds.
+  pad.release(PAD_BUTTONS.DPAD_UP);
+  pad.press(PAD_BUTTONS.RIGHT_BUMPER);
+  panel.pollPadButtons();
+  assert.deepEqual(ctx.inputMap.padFor('camera.zoomOut'), [PAD_BUTTONS.RIGHT_BUMPER]);
+});
+
+test('moving the menu\'s own button frees that button to be bound', (t) => {
+  const ctx = makeCtx();
+  const pad = makePad();
+  const panel = makePadPanel(ctx, pad);
+  t.after(() => panel.dispose());
+  const container = fakeDocument.createElement('div');
+  panel.render(container, 'controls');
+
+  // The player moves the menu's "up" to the Y button, so the d-pad is free.
+  ctx.inputMap.padRebind('menu.up', PAD_BUTTONS.Y);
+  panel.persistPadBindings();
+
+  container.querySelectorAll('[data-sc-pad-bind="camera.zoomOut"]')[0].click();
+  pad.press(PAD_BUTTONS.DPAD_UP);
+  panel.pollPadButtons();
+
+  assert.deepEqual(ctx.inputMap.padFor('camera.zoomOut'), [PAD_BUTTONS.DPAD_UP],
+    'the d-pad can be bound once the menu has moved off it');
+});
+
+test('the pad capture never binds a button the player did not press', (t) => {
+  const ctx = makeCtx();
+  const pad = makePad();
+  // The button is ALREADY held when the capture starts, so it is a hold and
+  // not a press.
+  pad.press(PAD_BUTTONS.Y);
+  const panel = makePadPanel(ctx, pad);
+  t.after(() => panel.dispose());
+  const container = fakeDocument.createElement('div');
+  panel.render(container, 'controls');
+
+  container.querySelectorAll('[data-sc-pad-bind="camera.zoomOut"]')[0].click();
+  panel.pollPadButtons();
+
+  assert.equal(panel.padCapturing(), 'camera.zoomOut', 'the capture is still running');
+  assert.deepEqual(ctx.inputMap.padFor('camera.zoomOut'), DEFAULT_PAD_BINDINGS['camera.zoomOut'],
+    'a held button is not a press');
+  assert.equal(ctx.settings.get('input.padBindings'), null, 'nothing was stored');
+});
+
+test('the pad capture can be cancelled with Escape, and binds nothing', (t) => {
+  const ctx = makeCtx();
+  const pad = makePad();
+  const panel = makePadPanel(ctx, pad);
+  t.after(() => panel.dispose());
+  const container = fakeDocument.createElement('div');
+  panel.render(container, 'controls');
+
+  container.querySelectorAll('[data-sc-pad-bind="camera.zoomOut"]')[0].click();
+  assert.equal(panel.isCapturing(), true);
+
+  fakeWindow.dispatchEvent({
+    type: 'keydown',
+    code: 'Escape',
+    key: 'Escape',
+    preventDefault() { },
+    stopImmediatePropagation() { },
+  });
+
+  assert.equal(panel.padCapturing(), null, 'the capture is over');
+  assert.equal(panel.isCapturing(), false);
+
+  // A press after the cancellation binds nothing.
+  pad.press(PAD_BUTTONS.RIGHT_BUMPER);
+  panel.pollPadButtons();
+  assert.deepEqual(ctx.inputMap.padFor('camera.zoomOut'), DEFAULT_PAD_BINDINGS['camera.zoomOut'],
+    'nothing was bound');
+  assert.equal(ctx.settings.get('input.padBindings'), null, 'nothing was stored');
+});
+
+test('a key capture and a pad capture cannot both run', (t) => {
+  const ctx = makeCtx();
+  const pad = makePad();
+  const panel = makePadPanel(ctx, pad);
+  t.after(() => panel.dispose());
+  const container = fakeDocument.createElement('div');
+  panel.render(container, 'controls');
+
+  container.querySelectorAll('[data-sc-pad-bind="camera.zoomOut"]')[0].click();
+  assert.equal(panel.padCapturing(), 'camera.zoomOut');
+
+  // Starting a key capture takes over from the pad capture.
+  container.querySelectorAll('[data-sc-rebind="camera.panUp"]')[0].click();
+  assert.equal(panel.padCapturing(), null, 'the pad capture stepped aside');
+  assert.equal(panel.capturing(), 'camera.panUp');
+});
+
+test('RESET ALL BINDINGS resets the gamepad table too', (t) => {
+  const ctx = makeCtx();
+  const panel = createSettingsPanel(ctx, {});
+  t.after(() => panel.dispose());
+  const container = fakeDocument.createElement('div');
+  panel.render(container, 'controls');
+
+  ctx.inputMap.padRebind('camera.zoomOut', PAD_BUTTONS.Y);
+  panel.persistPadBindings();
+  assert.deepEqual(ctx.inputMap.padFor('camera.zoomOut'), [PAD_BUTTONS.Y]);
+
+  container.querySelectorAll('[data-sc-reset-all]')[0].click();
+  assert.deepEqual(ctx.inputMap.padFor('camera.zoomOut'), DEFAULT_PAD_BINDINGS['camera.zoomOut'],
+    'the default button is back');
+  assert.deepEqual(ctx.settings.get('input.padBindings')['camera.zoomOut'],
+    DEFAULT_PAD_BINDINGS['camera.zoomOut'], 'and it was persisted');
+});
+
+test('a single gamepad action can be reset', (t) => {
+  const ctx = makeCtx();
+  const panel = createSettingsPanel(ctx, {});
+  t.after(() => panel.dispose());
+  const container = fakeDocument.createElement('div');
+  panel.render(container, 'controls');
+
+  ctx.inputMap.padRebind('camera.zoomOut', PAD_BUTTONS.Y);
+  panel.persistPadBindings();
+
+  container.querySelectorAll('[data-sc-pad-reset="camera.zoomOut"]')[0].click();
+  assert.deepEqual(ctx.inputMap.padFor('camera.zoomOut'), DEFAULT_PAD_BINDINGS['camera.zoomOut']);
+});
+
+test('a stored gamepad binding is applied to the live pad table', (t) => {
+  const storage = makeStorage();
+  const settings = createSettings({ storage });
+  settings.set('input.padBindings', { 'camera.reset': [PAD_BUTTONS.Y] });
+  const inputMap = createInputMap();
+  const ctx = makeCtx({ settings, inputMap });
+
+  const panel = createSettingsPanel(ctx, {});
+  t.after(() => panel.dispose());
+
+  assert.deepEqual(inputMap.padFor('camera.reset'), [PAD_BUTTONS.Y],
+    'the stored binding is live before the first frame is drawn');
+});
+
+test('a gamepad binding that is written is applied to the live pad table', (t) => {
+  const ctx = makeCtx();
+  const pad = makePad();
+  const panel = makePadPanel(ctx, pad);
+  t.after(() => panel.dispose());
+  const container = fakeDocument.createElement('div');
+  panel.render(container, 'controls');
+
+  container.querySelectorAll('[data-sc-pad-bind="camera.zoomOut"]')[0].click();
+  pad.press(PAD_BUTTONS.RIGHT_BUMPER);
+  panel.pollPadButtons();
+
+  // The table the gamepad service reads every frame carries the binding.
+  assert.deepEqual(ctx.inputMap.padAll()['camera.zoomOut'], [PAD_BUTTONS.RIGHT_BUMPER]);
+});
+

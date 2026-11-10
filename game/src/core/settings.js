@@ -25,6 +25,7 @@ export const SETTING_TYPES = Object.freeze({
   boolean: 'boolean',
   string: 'string',
   bindings: 'bindings',
+  padBindings: 'padBindings',
 });
 
 /**
@@ -55,6 +56,7 @@ export const SCHEMA = Object.freeze({
 
   // --- input ------------------------------------------------------------
   'input.bindings': { type: 'bindings', section: 'input', default: null, label: 'Key bindings' },
+  'input.padBindings': { type: 'padBindings', section: 'input', default: null, label: 'Gamepad bindings' },
 });
 
 /** The storage key the settings live under. */
@@ -92,6 +94,20 @@ export function validateSetting(key, value) {
     for (const [action, codes] of Object.entries(value)) {
       if (!Array.isArray(codes)) continue;
       out[action] = codes.filter((c) => typeof c === 'string' && c.length > 0);
+    }
+    return { ok: true, value: out };
+  }
+  if (def.type === 'padBindings') {
+    // A pad bindings record is an object of action -> array of BUTTON
+    // INDICES. The indices are the standard gamepad mapping, so a stored
+    // record works on any browser that reports a standard pad — the same
+    // promise the key bindings make with `KeyboardEvent.code`.
+    if (value === null || value === undefined) return { ok: true, value: null };
+    if (typeof value !== 'object' || Array.isArray(value)) return { ok: false, value: null };
+    const out = {};
+    for (const [action, indices] of Object.entries(value)) {
+      if (!Array.isArray(indices)) continue;
+      out[action] = indices.filter((i) => Number.isInteger(i) && i >= 0);
     }
     return { ok: true, value: out };
   }

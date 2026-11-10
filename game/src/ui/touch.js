@@ -22,6 +22,16 @@
  *   Only pointers whose type is `touch` or `pen` are fed to the recogniser.
  *   The mouse keeps its own path, unchanged.
  *
+ * THE FINGER SHOWS THE CELL
+ *   The integrator's mouse handler owns the hover for the MOUSE. A finger
+ *   never reaches it — V7 gave the touch path to this service, so that a
+ *   tap cannot select the same cell twice — and the phone was left with
+ *   no highlight at all. This service therefore publishes the hover for
+ *   the finger: the same state write, the same `onHover` call on every
+ *   domain and the same event the mouse path uses. When the last finger
+ *   lifts, the hover is cleared, so the highlight does not stay stuck on
+ *   the last cell the player touched.
+ *
  * THE BROWSER MUST NOT STEAL THE GESTURE
  *   The canvas carries `touch-action: none`, so a drag on the city pans the
  *   city instead of scrolling the page, and a double-tap does not zoom the
@@ -29,6 +39,7 @@
  */
 
 import { createGestureRecogniser, isTouchPointer } from '../core/touch.js';
+import { EVENTS, emit } from '../core/events.js';
 import { RIG_RATES } from './camera.js';
 import { worldToCellInt, inBounds } from '../core/config.js';
 
@@ -61,16 +72,43 @@ export function createTouchService(ctx, deps = {}) {
   /**
    * The cell under a screen point.
    *
+   * This is the SAME conversion the integrator's mouse handler uses
+   * (`cellFromEvent()` in `main.js`): the renderer turns the screen point
+   * into a point on the ground plane, and `worldToCellInt` turns that into
+   * a grid cell. A cell outside the grid is reported as `outOfBounds`, so
+   * the HUD can say "outside the city" exactly as it does for the mouse.
+   *
    * @param {number} x
    * @param {number} y
-   * @returns {{x:number,z:number}|null}
+   * @returns {{x:number,z:number,outOfBounds?:boolean}|null}
    */
   function cellAt(x, y) {
     const hit = renderer?.screenToGround?.(x, y);
     if (!hit) return null;
     const cell = worldToCellInt(hit.x, hit.z);
-    if (!inBounds(cell.x, cell.z)) return null;
+    if (!inBounds(cell.x, cell.z)) return { x: cell.x, z: cell.z, outOfBounds: true };
     return cell;
+  }
+
+  /**
+   * Publish the cell the finger is over.
+   *
+   * This is the TOUCH half of what the integrator's mouse handler does in
+   * `handleHover()`: the same state write, the same `onHover` call on every
+   * domain, and the same event. Without it a phone player gets no feedback
+   * about the cell they are about to select.
+   *
+   * The state write is guarded, so a half-built state tree cannot break the
+   * input; the domains and the bus are told either way.
+   *
+   * @param {{x:number,z:number,outOfBounds?:boolean}|null} cell the cell, or
+   *   null when the finger is over nothing.
+   */
+  function publishHover(cell) {
+    const ui = ctx?.state?.ui;
+    if (ui) ui.hover = cell;
+    for (const svc of Object.values(ctx?.domains ?? {})) svc?.onHover?.(cell);
+    emit(EVENTS.HOVER_CHANGED, cell);
   }
 
   /**
@@ -137,9 +175,11 @@ export function createTouchService(ctx, deps = {}) {
         return;
       }
       case 'tap': {
-        // A tap selects the cell, exactly as a click does.
+        // A tap selects the cell, exactly as a click does — and exactly
+        // ONCE. The integrator's pointer handler ignores touch pointers,
+        // so this is the only click a tap produces.
         const cell = cellAt(gesture.x, gesture.y);
-        if (!cell) return;
+        if (!cell || cell.outOfBounds) return;
         ctx?.dispatchWorldClick?.(cell, 0);
         return;
       }
@@ -177,11 +217,48 @@ export function createTouchService(ctx, deps = {}) {
   );
 
   /**
+   * The time a pointer event HAPPENED, rather than the time it was
+   * processed.
+   *
+   * This matters more than it looks. The browser timestamps an input event
+   * when it is GENERATED; the handler runs later, and on a busy main
+   * thread — a software renderer drawing hundreds of objects, say — that
+   * gap can be a whole second. Measuring the gap with the processing
+   * clock would turn every tap into a long press on a slow machine.
+   *
+   * `event.timeStamp` is the event's own timestamp, in the same time base
+   * as `performance.now()`. A browser that reports it in the epoch
+   * milliseconds instead is detected and ignored.
+   *
+   * @param {object} e the pointer event
+   * @returns {number} the event's time, in milliseconds
+   */
+  function eventTime(e) {
+    const stamp = Number(e?.timeStamp);
+    if (Number.isFinite(stamp) && stamp > 0 && stamp < 1e12) return stamp;
+    return now();
+  }
+
+  /**
    * A pointer event, in the shape the recogniser wants.
    * @param {object} e
    */
   function pointOf(e) {
-    return { id: e?.pointerId ?? 0, x: Number(e?.clientX ?? 0), y: Number(e?.clientY ?? 0), t: now() };
+    return { id: e?.pointerId ?? 0, x: Number(e?.clientX ?? 0), y: Number(e?.clientY ?? 0), t: eventTime(e) };
+  }
+
+  /**
+   * The cell under the finger that is STILL down.
+   *
+   * When one of two fingers lifts, the other one is still on the glass, so
+   * the highlight belongs to that one and not to the finger that left.
+   *
+   * @returns {{x:number,z:number,outOfBounds?:boolean}|null}
+   */
+  function cellUnderRemainingPointer() {
+    const [first] = recogniser.pointers();
+    if (!first) return null;
+    return cellAt(first.x, first.y);
   }
 
   const onPointerDown = (e) => {
@@ -190,6 +267,10 @@ export function createTouchService(ctx, deps = {}) {
     e.preventDefault?.();
     try { element?.setPointerCapture?.(e.pointerId); } catch { /* not capturable */ }
     recogniser.down(pointOf(e));
+    // The finger is ON a cell the moment it lands, so the cell is shown
+    // right away: a tap that never moves still tells the player what they
+    // are about to select.
+    publishHover(cellAt(e.clientX, e.clientY));
   };
 
   const onPointerMove = (e) => {
@@ -197,6 +278,9 @@ export function createTouchService(ctx, deps = {}) {
     if (recogniser.pointerCount() === 0) return;
     e.preventDefault?.();
     recogniser.move(pointOf(e));
+    // The hover follows the finger. It is published AFTER the gesture, so
+    // the cell is read from the city as the gesture left it.
+    publishHover(cellAt(e.clientX, e.clientY));
   };
 
   const onPointerUp = (e) => {
@@ -205,11 +289,19 @@ export function createTouchService(ctx, deps = {}) {
     e.preventDefault?.();
     recogniser.up(pointOf(e));
     try { element?.releasePointerCapture?.(e.pointerId); } catch { /* not captured */ }
+    // The finger that lifted is gone. If it was the last one, the highlight
+    // goes away with it; if another finger is still down, the highlight
+    // moves to that one instead of staying on the cell that was left.
+    publishHover(recogniser.pointerCount() === 0 ? null : cellUnderRemainingPointer());
   };
 
   const onPointerCancel = (e) => {
     if (!isTouchPointer(e)) return;
     recogniser.cancel(pointOf(e));
+    // A cancelled finger (a call came in, the browser took the gesture
+    // away) leaves no highlight behind either — unless another finger is
+    // still down, which then owns the highlight.
+    publishHover(recogniser.pointerCount() === 0 ? null : cellUnderRemainingPointer());
   };
 
   return {

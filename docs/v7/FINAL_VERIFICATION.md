@@ -80,8 +80,8 @@ one is a separate decision.
 
 | Check | Command | Result |
 |---|---|---|
-| The unit suite | `cd game && npm test` | **835 tests, 835 pass, 0 fail, 0 skipped** (9 suites) |
-| The syntax check | `npm run check` | **91/91 source files parse cleanly** |
+| The unit suite | `cd game && npm test` | **898 tests, 898 pass, 0 fail, 0 skipped** (9 suites) |
+| The syntax check | `npm run check` | **94/94 source files parse cleanly** |
 | The content validator | `node tools/validate-content.mjs` | 3 levels — **0 errors, 0 warnings**, 3 notes; the reachability proof: **3/3, 5/5 and 7/7** targets reachable |
 | The GPU tooling | `node --test ../tools/performance-gpu.test.mjs` | 5 tests, 5 pass |
 | The dependency audit | `npm audit` | **0 vulnerabilities** |
@@ -89,9 +89,10 @@ one is a separate decision.
 | The build identity | `grep 7.0.0 dist/assets/index-*.js` | the bundle carries **7.0.0** |
 | The V5 acceptance scenario | `node tools/scenario.mjs` | **40/41 passed, 1 skipped** |
 | The V6 gamepad scenario | `node tools/scenario-gamepad.mjs` | **19/19 passed** |
-| The V7 scenario | `node tools/scenario-v7.mjs` | **10/10 passed** |
+| The V7 scenario | `node tools/scenario-v7.mjs` | **13/13 passed** |
 | The production verification | `npm run verify:production -- --profile cleared` | **PRODUCTION BUILD VERIFIED** |
 | The navigation benchmark | `node tools/profile-navigation.mjs` | median 0.202 ms, p95 1.350 ms, budget 2 ms — **PASS** |
+| The city profile | `node tools/profile-city.mjs` | the city at 40 citizens holds 60 fps — **PASS** |
 | The secret scan | `node tools/secret-scan.mjs` | 274 files, **0 findings** |
 | The GPU profile | `node tools/profile-gpu.mjs` | mean 16.666 ms, p95 18.4 ms, 60 fps, 0 errors |
 

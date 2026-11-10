@@ -9,15 +9,15 @@
 
 | Check | Command | Result | Status |
 |---|---|---|---|
-| The unit suite | `npm test` | **835 tests, 835 pass, 0 fail, 0 skipped** (9 suites) | **PASS** |
-| The syntax check | `npm run check` | **91/91 source files parse cleanly** | **PASS** |
+| The unit suite | `npm test` | **898 tests, 898 pass, 0 fail, 0 skipped** (9 suites) | **PASS** |
+| The syntax check | `npm run check` | **94/94 source files parse cleanly** | **PASS** |
 | The content validator | `node tools/validate-content.mjs` | 3 levels — **0 errors, 0 warnings**, 3 notes | **PASS** |
 | The GPU tooling | `node --test ../tools/performance-gpu.test.mjs` | 5 tests, 5 pass | **PASS** |
 | The dependency audit | `npm audit` | **0 vulnerabilities** | **PASS** |
 | The cleared build | `npm run build:cleared` | 218 files, 72.7 MB, licence policy **CLEARED** | **PASS** |
 | The V5 acceptance scenario | `node tools/scenario.mjs` | **40/41 passed, 1 skipped** | **PASS** |
 | The V6 gamepad scenario | `node tools/scenario-gamepad.mjs` | **19/19 passed** | **PASS** |
-| The V7 scenario | `node tools/scenario-v7.mjs` | **10/10 passed** | **PASS** |
+| The V7 scenario | `node tools/scenario-v7.mjs` | **13/13 passed** | **PASS** |
 | The production verification | `npm run verify:production -- --profile cleared` | **PRODUCTION BUILD VERIFIED** | **PASS** |
 | The navigation benchmark | `node tools/profile-navigation.mjs` | p95 **1.350 ms** against a 2 ms budget | **PASS** |
 | The secret scan | `node tools/secret-scan.mjs` | 274 files, **0 findings** | **PASS** |
@@ -37,15 +37,15 @@
 
 ```
 $ cd game && npm test
-# tests 835
+# tests 898
 # suites 9
-# pass 835
+# pass 898
 # fail 0
 # cancelled 0
 # skipped 0
 ```
 
-**The V6 baseline was 770 tests.** V7 added **66**:
+**The V6 baseline was 770 tests.** V7 added **128**:
 
 | File | Added | What it proves |
 |---|---|---|
@@ -55,6 +55,14 @@ $ cd game && npm test
 | `src/content/content.test.mjs` | 4 | the reachability proof, the unreachable target, the determinism |
 | `src/population/citizens.test.mjs` | 3 | the citizens walking around a building and around the flood |
 | `src/ui/ui.test.mjs` | 2 | the held key under the menu |
+| **The V7.1 round** | | |
+| `src/core/input-map.test.mjs` | 16 | the pad binding table, `padLabel()`, `padRebind()` |
+| `src/ui/navigation-debug.test.mjs` | 18 | the debug panel's model, the reasons and the service |
+| `src/ui/touch.test.mjs` (+4) | 4 | the touch hover, the event-time rule, the tap-once rule |
+| `src/core/touch.test.mjs` (+4) | 4 | the multi-touch guard and the flag's scope |
+| `src/population/citizens.test.mjs` (+3) | 3 | the per-frame path-search budget |
+| `src/ui/settings-panel.test.mjs` (+11) | 11 | the gamepad rebinding capture |
+| `src/ui/navigation-debug.test.mjs` (the overlay) | — | the route model, the projection, the service |
 
 ## 3. The browser scenarios, in detail
 

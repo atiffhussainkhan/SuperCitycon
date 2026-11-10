@@ -95,6 +95,40 @@ too. The regression test **fails on the V6 baseline** and passes on V7.
   machine, where the parallel test suite cannot.
 - `tools/scenario-v7.mjs` — the V7 browser acceptance scenario.
 
+## 2a. The V7.1 audit round
+
+V7.0.0 shipped, and then V7 audited itself. The audit found **seven** gaps —
+two of them introduced by V7 itself — and this round closes all of them.
+
+| The gap | The fix |
+|---|---|
+| The cell under the finger was **not** highlighted (V7 had broken this when it made the pointer handler ignore touch pointers, so a tap could not select twice) | The touch service publishes the hover itself, with the same conversion the mouse uses, and clears it when the finger lifts. |
+| A **pinch ended with a tap** — the still finger looked exactly like a tap, so a zoom placed a building | A gesture that used more than one finger is a multi-touch gesture, and nothing in it taps. |
+| **A slow frame killed the tap** — the gesture was timed by when it was HANDLED, not when it happened | The gesture now uses the browser's own `event.timeStamp`. |
+| `TUNING.citizenPathsPerFrame` was declared and documented but **never read** | The per-frame path-search budget is enforced. A citizen that misses it still walks. |
+| The camera shake had **two** sources of truth | `TUNING` is now the only one. |
+| The path-search counters were **unreachable** from the page | The POP domain forwards `pathStats()` and `poolStats()`. |
+| The docs claimed a **narrow-viewport check** that no browser had run | The scenario now resizes to 390 × 844 and checks the overflow, the 44 × 44 touch targets and the touch drag — and it found two controls that were too small (the speed buttons at 40 px and the shop tabs at 34 px), which are now fixed. |
+
+And three things were **finished**:
+
+- **The gamepad can be rebound** (this closes V7-KI-09): a pad button can be
+  bound to an action, the binding persists in the new `input.padBindings`
+  setting and applies to the live pad table. The menu's own buttons are
+  reserved, so a capture cannot steal the player's menu.
+- **The navigation debug panel**: off by default, and it shows the route a
+  citizen took, its cost, the cells the search visited and why a search
+  failed.
+- **The city profiler** (`tools/profile-city.mjs`): the city at the maximum
+  citizen count **holds 60 fps** on a hardware GPU (16.663 ms against the
+  boot scene's 16.667 ms), and a path search costs **0.0361 ms**.
+
+The V7.1 totals: **898 unit tests** (was 835), **94/94 files parse cleanly**
+(was 91), and the V7 browser scenario is **13/13** (was 10/10). The V5 and V6
+acceptance scenarios still pass.
+
+---
+
 ## 3. What V7 did NOT change
 
 | | |

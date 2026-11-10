@@ -8,6 +8,19 @@
  *   key rows from `core/input-map.js`. Nothing is hard-coded here, so a new
  *   setting or a rebinding shows up without touching this file.
  *
+ * THE PAD IS REBINDABLE TOO
+ *   A gamepad button can be bound to an action, and the binding is stored
+ *   (`input.padBindings`) and pushed into the live pad table, so it takes
+ *   effect on the next frame. The panel reads the pad through the browser's
+ *   Gamepad API, but ONLY while a capture is running: a panel that polled
+ *   the pad forever would be a panel that never slept.
+ *
+ *   The capture is HONEST. It binds the button that went DOWN — an edge,
+ *   not a hold — so a button that was already held when the capture started
+ *   is not a press; the menu's own buttons (A, B and the d-pad by default)
+ *   are reserved, because the player is using the menu to reach this
+ *   screen; and Escape cancels a capture, so the player is never trapped.
+ *
  * THE EFFECTS ARE REAL
  *   A row does not just remember a number: it pushes that number into the
  *   audio mixer, into the renderer and into the stylesheet, so the change is
@@ -29,10 +42,78 @@
 import { SCHEMA } from '../core/settings.js';
 import { EVENTS } from '../core/events.js';
 import { createLogger } from '../core/log.js';
-import { buildSettingsModel, buildControlsModel } from './panels.js';
+import { buildSettingsModel, buildControlsModel, titleCase } from './panels.js';
+import { readPad, diffPad } from '../core/gamepad.js';
+import { PAD_ACTIONS, padLabel } from '../core/input-map.js';
 
 /** The audio buses the settings know about. */
 export const AUDIO_BUSES = Object.freeze(['master', 'music', 'sfx', 'ambience', 'ui']);
+
+/**
+ * The pad actions the MENU owns.
+ *
+ * A and B confirm and go back in the menu, and the d-pad moves the focus
+ * ring, so none of them may be captured: the player is using the menu to
+ * reach this very screen, and a capture that ate a navigation press would
+ * move the focus instead of binding. Taking the d-pad from the menu would
+ * also leave a pad player unable to move around the menu at all.
+ *
+ * The reservation is read from the LIVE pad table, so a player who has
+ * moved the menu's buttons elsewhere gets those buttons back: bind
+ * `menu.up` to another button first, and the d-pad is free to be bound.
+ */
+const MENU_PAD_ACTIONS = Object.freeze([
+  'menu.up',
+  'menu.down',
+  'menu.left',
+  'menu.right',
+  'menu.confirm',
+  'menu.back',
+]);
+
+/**
+ * How often the panel reads the pad while a capture is running, in
+ * milliseconds.
+ *
+ * TBD: 50 ms is a guess. It is about a frame and a half at 60 Hz, so a
+ * press is noticed before it feels laggy, without polling the pad a hundred
+ * times a second for nothing. The panel polls ONLY while a capture is
+ * running, and stops the moment the capture ends.
+ */
+const PAD_POLL_MS = 50;
+
+/**
+ * "zoomIn" -> "zoom In".
+ *
+ * The same camel-case split the keyboard rows use, so a pad row reads
+ * "Camera — Zoom In" and not "Camera — Zoomin".
+ *
+ * @param {string} name
+ * @returns {string}
+ */
+function padWords(name) {
+  return String(name).replace(/([a-z0-9])([A-Z])/g, '$1 $2');
+}
+
+/**
+ * Read the pads the browser can see.
+ *
+ * `navigator.getGamepads` does not exist in every browser and can throw in
+ * a page that is not secure, so the failure is a "no pad" rather than a
+ * crash.
+ *
+ * @returns {Array|null}
+ */
+function readBrowserPads() {
+  try {
+    const nav = typeof navigator !== 'undefined' ? navigator : null;
+    if (!nav || typeof nav.getGamepads !== 'function') return null;
+    const pads = nav.getGamepads();
+    return Array.isArray(pads) ? pads : Array.from(pads ?? []);
+  } catch {
+    return null;
+  }
+}
 
 /** The bus a setting key belongs to ('audio.music' -> 'music'). */
 function busOf(key) {
@@ -166,6 +247,29 @@ export function createSettingsPanel(ctx, deps = {}) {
   /** The action whose next key press is being captured for a rebind. */
   let capturing = null;
 
+  /** The action whose next PAD BUTTON press is being captured. */
+  let padCapturing = null;
+
+  /** The watchers that want to hear about pad button presses. */
+  const padWatchers = new Set();
+
+  /** The last pad snapshot, so a press can be told from a hold. */
+  let padPrevious = null;
+
+  /** The poll timer. It exists only while a capture is running. */
+  let padTimer = null;
+
+  /** The unsubscribe function of the running pad watch, if any. */
+  let padUnwatch = null;
+
+  /** The pad reader: the browser's pads, or a fake one in a test. */
+  const getPads = typeof deps.getPads === 'function' ? deps.getPads : readBrowserPads;
+
+  /** How often the pad is read while a capture is running, in ms. */
+  const pollIntervalMs = Number.isFinite(deps.pollIntervalMs) && deps.pollIntervalMs > 0
+    ? deps.pollIntervalMs
+    : PAD_POLL_MS;
+
   /**
    * The menu's focus registrar.
    *
@@ -287,13 +391,221 @@ export function createSettingsPanel(ctx, deps = {}) {
     return writeSetting('input.bindings', table);
   }
 
+  /**
+   * Persist the current GAMEPAD bindings.
+   *
+   * The pad table lives in the settings store (`input.padBindings`), so a
+   * rebound button survives a reload. The table is also applied to the LIVE
+   * input map here: the gamepad service reads that table every frame, so a
+   * stored override has to be in it before the next frame is drawn.
+   *
+   * @returns {boolean} true when the table was written
+   */
+  function persistPadBindings() {
+    if (!inputMap || typeof inputMap.padAll !== 'function') return false;
+    const table = inputMap.padAll();
+    inputMap.applyPadOverrides?.(table);
+    return writeSetting('input.padBindings', table);
+  }
+
+  /**
+   * Apply the stored gamepad overrides to the live pad table.
+   *
+   * The panel does this itself because the integrator's boot code wires up
+   * the KEY overrides only, and a rebound button that is not in the table
+   * before the first frame is a binding that does nothing until the player
+   * happens to visit the settings panel.
+   *
+   * @returns {boolean} true when an override was applied
+   */
+  function applyStoredPadBindings() {
+    if (!inputMap || typeof inputMap.applyPadOverrides !== 'function') return false;
+    const stored = settings?.get?.('input.padBindings') ?? null;
+    if (!stored || typeof stored !== 'object') return false;
+    return inputMap.applyPadOverrides(stored) === true;
+  }
+
+  // ---- pad capture (rebinding a gamepad button) --------------------------
+
+  /**
+   * The current pad snapshot, or a disconnected one.
+   *
+   * @returns {object} a snapshot from `readPad`
+   */
+  function padSnapshot() {
+    let pads = null;
+    try {
+      pads = typeof getPads === 'function' ? getPads() : null;
+    } catch {
+      return readPad(null);
+    }
+    if (!pads) return readPad(null);
+    const list = Array.isArray(pads) ? pads : Array.from(pads ?? []);
+    for (const pad of list) {
+      if (pad && pad.connected) return readPad(pad);
+    }
+    return readPad(null);
+  }
+
+  /**
+   * Read the pad once and tell the watchers about the buttons that went DOWN.
+   *
+   * The EDGE is what makes the capture honest: a button that was already
+   * held when the capture started is not a press, and a button that is still
+   * held is not a second press.
+   *
+   * @returns {number[]} the button indices that were pressed
+   */
+  function pollPadButtons() {
+    const next = padSnapshot();
+    const diff = diffPad(padPrevious, next);
+    padPrevious = next;
+    for (const index of diff.pressed) {
+      for (const fn of Array.from(padWatchers)) {
+        try { fn(index); } catch { /* a broken watcher must not break the panel */ }
+      }
+    }
+    return diff.pressed;
+  }
+
+  /** Start polling the pad. The timer lives only while a capture runs. */
+  function startPadWatch() {
+    if (padTimer !== null) return;
+    // The baseline is taken NOW: a button the player is already holding —
+    // the one that opened this screen — is not a press.
+    padPrevious = padSnapshot();
+    padTimer = setInterval(pollPadButtons, pollIntervalMs);
+  }
+
+  /** Stop polling the pad and forget the baseline. */
+  function stopPadWatch() {
+    if (padTimer !== null) {
+      clearInterval(padTimer);
+      padTimer = null;
+    }
+    padPrevious = null;
+  }
+
+  /**
+   * Watch the pad for button presses.
+   *
+   * The panel reads the pad ONLY while a watcher is registered, so a panel
+   * nobody is capturing with never touches the gamepad API.
+   *
+   * @param {Function} fn (buttonIndex) => void
+   * @returns {Function} an unsubscribe function
+   */
+  function watchPadButtons(fn) {
+    if (typeof fn !== 'function') return () => {};
+    padWatchers.add(fn);
+    startPadWatch();
+    return () => {
+      padWatchers.delete(fn);
+      if (!padWatchers.size) stopPadWatch();
+    };
+  }
+
+  /**
+   * The pad buttons the MENU uses, and may not be captured.
+   *
+   * @returns {Set<number>}
+   */
+  function reservedPadButtons() {
+    const reserved = new Set();
+    for (const action of MENU_PAD_ACTIONS) {
+      for (const index of inputMap?.padFor?.(action) ?? []) reserved.add(index);
+    }
+    return reserved;
+  }
+
+  /** The pad button the player pressed. */
+  function onCapturedPadButton(buttonIndex) {
+    if (!padCapturing) return;
+    if (reservedPadButtons().has(buttonIndex)) {
+      // The menu's own button: it belongs to the menu, and the capture
+      // keeps waiting rather than binding something the player did not
+      // choose.
+      deps.onToast?.(`${padLabel(buttonIndex)} belongs to the menu — press another button`, 'info');
+      return;
+    }
+    const action = padCapturing;
+    stopPadCapture();
+    const bound = inputMap?.padRebind?.(action, buttonIndex) === true;
+    if (bound) {
+      persistPadBindings();
+      bus?.emit?.(EVENTS.BINDINGS_CHANGED, {
+        action,
+        button: buttonIndex,
+        bindings: inputMap.all?.(),
+        padBindings: inputMap.padAll?.(),
+      });
+      deps.onToast?.(`Bound ${action} to ${padLabel(buttonIndex)}`, 'success');
+    }
+    deps.onChange?.('input.padBindings', inputMap?.padAll?.());
+    refresh();
+  }
+
+  /** End the capture machinery. Nothing is bound. */
+  function stopPadCapture() {
+    padCapturing = null;
+    if (padUnwatch) {
+      padUnwatch();
+      padUnwatch = null;
+    }
+  }
+
+  /**
+   * Start capturing the next pad button press for an action.
+   *
+   * @param {string} action
+   * @returns {boolean} true when the capture started
+   */
+  function startPadCapture(action) {
+    if (!inputMap || typeof inputMap.padFor !== 'function') return false;
+    if (!PAD_ACTIONS.includes(action)) return false;
+    stopPadCapture();
+    padCapturing = action;
+    padUnwatch = watchPadButtons(onCapturedPadButton);
+    deps.onToast?.('Press a pad button to bind it (Esc cancels)', 'info');
+    refresh();
+    return true;
+  }
+
+  /**
+   * Cancel a running pad capture. Nothing is bound.
+   *
+   * @returns {boolean} true when a capture was cancelled
+   */
+  function cancelPadCapture() {
+    if (!padCapturing) return false;
+    stopPadCapture();
+    deps.onToast?.('Pad binding cancelled', 'info');
+    refresh();
+    return true;
+  }
+
   // ---- key capture (rebinding) ------------------------------------------
 
   function onCapturedKey(e) {
+    const code = e?.code ?? e?.key ?? null;
+    // ESCAPE CANCELS A CAPTURE.
+    // The toast has always promised it ('Esc cancels'), and a capture that
+    // cannot be abandoned is a trap: the player is stuck until they press
+    // the exact key they meant to bind.
+    if (code === 'Escape' && (capturing !== null || padCapturing !== null)) {
+      try { e.preventDefault?.(); } catch { /* not a real event */ }
+      try { e.stopImmediatePropagation?.(); } catch { /* not a real event */ }
+      if (capturing !== null) {
+        capturing = null;
+        deps.onToast?.('Rebind cancelled', 'info');
+      }
+      if (padCapturing !== null) stopPadCapture();
+      refresh();
+      return;
+    }
     if (!capturing) return;
     const action = capturing;
     capturing = null;
-    const code = e?.code ?? e?.key ?? null;
     // The key must not also trigger a HUD shortcut.
     try { e.preventDefault?.(); } catch { /* not a real event */ }
     try { e.stopImmediatePropagation?.(); } catch { /* not a real event */ }
@@ -310,6 +622,19 @@ export function createSettingsPanel(ctx, deps = {}) {
   if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
     window.addEventListener('keydown', onCapturedKey);
   }
+
+  // ---- the stored gamepad overrides -------------------------------------
+
+  // The stored pad bindings are applied as soon as the panel exists: the
+  // gamepad service reads the pad table every frame, so a rebound button
+  // has to be in the table before the first frame is drawn.
+  applyStoredPadBindings();
+
+  // Any writer of the setting — this panel, or a boot path that loads it
+  // from storage — ends up in the same place: the live pad table.
+  const unsubscribeSettings = settings?.onChange?.((key) => {
+    if (key === 'input.padBindings') applyStoredPadBindings();
+  });
 
   // ---- rendering --------------------------------------------------------
 
@@ -411,6 +736,39 @@ export function createSettingsPanel(ctx, deps = {}) {
   }
 
   /**
+   * One GAMEPAD row: the action, the button it is bound to, and the button
+   * that starts a pad capture.
+   *
+   * The gamepad rows are their own section, because the pad's actions are
+   * not the keyboard's: the stick pans the camera, and there is no key that
+   * does that. A row for a key that does not exist would be a lie.
+   *
+   * @param {string} action
+   */
+  function renderPadRow(action) {
+    const wrap = make('div', 'sc-setrow');
+    wrap.dataset.scPadControl = action;
+    const [group, name] = String(action).split('.');
+    wrap.append(make('span', 'sc-setlabel', `${titleCase(padWords(group))} — ${titleCase(padWords(name ?? action))}`));
+
+    const buttons = inputMap.padFor(action) ?? [];
+    const text = buttons.map((index) => padLabel(index)).join(' / ');
+    // While the capture is running the read-out says so, so the player knows
+    // the row is waiting for a press and not broken.
+    const capturingThis = padCapturing === action;
+    wrap.append(make('span', 'sc-setvalue', capturingThis ? 'PRESS A BUTTON' : (text || '—')));
+
+    const bind = make('button', 'sc-setbtn', capturingThis ? 'CANCEL' : 'BIND');
+    bind.type = 'button';
+    bind.dataset.scPadBind = action;
+    const reset = make('button', 'sc-setbtn', 'RESET');
+    reset.type = 'button';
+    reset.dataset.scPadReset = action;
+    wrap.append(registerFocusable(bind), registerFocusable(reset));
+    return wrap;
+  }
+
+  /**
    * The controls view: every bindable action, its keys and the rebind
    * controls.
    * @param {Element} container
@@ -445,12 +803,19 @@ export function createSettingsPanel(ctx, deps = {}) {
       container.append(wrap);
     }
 
+    // The gamepad bindings: their own section, with their own capture.
+    if (typeof inputMap.padFor === 'function') {
+      container.append(make('div', 'sc-sethead', 'Gamepad bindings'));
+      for (const action of PAD_ACTIONS) container.append(renderPadRow(action));
+    }
+
     const resetAll = make('button', 'sc-setbtn sc-setbtn-wide', 'RESET ALL BINDINGS');
     resetAll.type = 'button';
     resetAll.dataset.scResetAll = '1';
     container.append(registerFocusable(resetAll));
     container.append(make('div', 'sc-note',
-      'Choose REBIND and press the key you want. The bindings are stored in this browser.'));
+      'Choose REBIND and press the key you want. Choose BIND under the gamepad bindings and press the pad button. '
+      + 'Escape cancels a capture. The bindings are stored in this browser.'));
     return model;
   }
 
@@ -488,8 +853,38 @@ export function createSettingsPanel(ctx, deps = {}) {
 
     const rebind = target.closest('[data-sc-rebind]');
     if (rebind) {
+      // One capture at a time: a key capture and a pad capture cannot both
+      // own the next press.
+      if (padCapturing !== null) stopPadCapture();
       capturing = rebind.dataset.scRebind;
       deps.onToast?.('Press a key to bind it (Esc cancels)', 'info');
+      return true;
+    }
+
+    const padBind = target.closest('[data-sc-pad-bind]');
+    if (padBind) {
+      const action = padBind.dataset.scPadBind;
+      // The same button starts and stops a capture: a player who starts a
+      // capture by mistake can undo it without reaching for the keyboard.
+      if (padCapturing === action) {
+        cancelPadCapture();
+        return true;
+      }
+      if (capturing !== null) capturing = null;
+      startPadCapture(action);
+      return true;
+    }
+
+    const padReset = target.closest('[data-sc-pad-reset]');
+    if (padReset) {
+      const action = padReset.dataset.scPadReset;
+      if (inputMap?.resetPadAction?.(action)) {
+        persistPadBindings();
+        bus?.emit?.(EVENTS.BINDINGS_CHANGED, {
+          action, bindings: inputMap.all?.(), padBindings: inputMap.padAll?.(),
+        });
+        deps.onChange?.('input.padBindings', inputMap.padAll?.());
+      }
       return true;
     }
 
@@ -506,10 +901,16 @@ export function createSettingsPanel(ctx, deps = {}) {
 
     const resetAll = target.closest('[data-sc-reset-all]');
     if (resetAll) {
+      // `resetAll` restores BOTH tables: the keyboard bindings and the
+      // gamepad bindings are one player's controls.
       inputMap?.resetAll?.();
       persistBindings();
-      bus?.emit?.(EVENTS.BINDINGS_CHANGED, { action: null, bindings: inputMap.all() });
+      persistPadBindings();
+      bus?.emit?.(EVENTS.BINDINGS_CHANGED, {
+        action: null, bindings: inputMap.all(), padBindings: inputMap.padAll?.(),
+      });
       deps.onChange?.('input.bindings', inputMap.all());
+      deps.onChange?.('input.padBindings', inputMap.padAll?.());
       return true;
     }
 
@@ -540,16 +941,55 @@ export function createSettingsPanel(ctx, deps = {}) {
     writeSetting,
     /** Persist the current bindings. */
     persistBindings,
+    /** Persist the current gamepad bindings. */
+    persistPadBindings,
+    /**
+     * Watch the pad for button presses.
+     *
+     * The panel reads the pad through the browser's Gamepad API, and ONLY
+     * while a watcher is registered — a panel that polled the pad forever
+     * would be a panel that never slept.
+     *
+     * @param {Function} fn (buttonIndex) => void
+     * @returns {Function} an unsubscribe function
+     */
+    watchPadButtons,
+    /**
+     * Read the pad once and report the buttons that went down.
+     *
+     * This is the same read the poll timer does; it is exposed so a host
+     * that drives its own loop — or a test — can step the capture by hand.
+     *
+     * @returns {number[]} the button indices that were pressed
+     */
+    pollPadButtons,
     /** Apply the current settings to the audio mixer, renderer and stylesheet. */
     applyUiEffects() { return applyUiEffects(ctx); },
-    /** True while a key press is being captured for a rebind. */
-    isCapturing() { return capturing !== null; },
+    /**
+     * True while a capture is running — a key capture or a pad capture.
+     *
+     * The gamepad service reads this: while a capture runs, the camera's
+     * analogue axes are released and the pad's own game actions are held
+     * back, so a stick that is being used to reach the screen cannot also
+     * move the city.
+     */
+    isCapturing() { return capturing !== null || padCapturing !== null; },
     /** The action being rebound, or null. */
     capturing() { return capturing; },
+    /** The action whose next pad button press is being captured, or null. */
+    padCapturing() { return padCapturing; },
     /** Cancel a pending capture. */
-    cancelCapture() { capturing = null; },
+    cancelCapture() {
+      capturing = null;
+      if (padCapturing !== null) {
+        stopPadCapture();
+        refresh();
+      }
+    },
     dispose() {
       capturing = null;
+      stopPadCapture();
+      unsubscribeSettings?.();
       if (typeof window !== 'undefined' && typeof window.removeEventListener === 'function') {
         window.removeEventListener('keydown', onCapturedKey);
       }

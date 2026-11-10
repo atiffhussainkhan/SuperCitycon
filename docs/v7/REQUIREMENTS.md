@@ -150,6 +150,25 @@ anything. Each carries a V7 test that fails on `ecc30fc` and passes on V7.
 
 ---
 
+## F2. The V7.1 requirements — the gaps the V7 audit found
+
+The V7 release shipped and then audited itself. The audit found seven gaps,
+two of which V7 had introduced. These are the requirements that close them.
+
+| id | Requirement | Acceptance criteria |
+|---|---|---|
+| **V7-FR-018** | The cell under the finger shall be **highlighted**, exactly as it is under the mouse, and the highlight shall clear when the finger lifts. | `ui/touch.test.mjs` — the hover follows the finger, the domains are notified, and the highlight clears. The negative check (the hover disabled) fails six of the tests. |
+| **V7-FR-019** | A **multi-touch gesture shall never tap**. | `core/touch.test.mjs` — a pinch produces no tap, and a tap after a pinch still taps. |
+| **V7-FR-020** | A gesture shall be timed by the **event's own timestamp**, not by the moment the event was handled. | `ui/touch.test.mjs` — an 80 ms tap handled a second later is still a tap. |
+| **V7-FR-021** | `TUNING.citizenPathsPerFrame` shall be **enforced**. A citizen that misses the budget shall still spawn and still walk. | `population/citizens.test.mjs` — the budget is proven, the deferral is counted, the route stays deterministic. |
+| **V7-FR-022** | A pad button shall be **rebindable**, and the binding shall persist and apply to the live pad table. The menu's own buttons shall be reserved. | `core/input-map.test.mjs` and `ui/settings-panel.test.mjs` — the binding, the persistence, the reservation and the reset. |
+| **V7-FR-023** | The pathfinder's results shall be **inspectable**: the route, its cost, the cells visited and the reason for a failure. | `ui/navigation-debug.test.mjs` — the model, every reason, and the service. |
+| **V7-FR-024** | Every visible HUD control shall be at least **44 × 44 CSS pixels**, and the HUD shall not overflow a **390 px** viewport. | `tools/scenario-v7.mjs` — the narrow-viewport checks. |
+| **V7-NFR-007** | The tuning table shall not contain a key that **nothing reads**. | The audit script: all 79 keys are read. |
+| **V7-NFR-008** | The camera shake shall have **one** source of truth. | `ui/camera.js` — `SHAKE` reads `TUNING`. |
+
+---
+
 ## G. V7 non-functional requirements
 
 | id | Requirement | Target |

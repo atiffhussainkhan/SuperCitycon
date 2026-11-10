@@ -32,7 +32,7 @@ import {
   skinBindingReport,
 } from './citizens.js';
 import { STATE_CLIP_CANDIDATES, createAnimationMachine } from './animation.js';
-import { worldToCellInt } from '../core/config.js';
+import { TUNING, makeRng, worldToCellInt } from '../core/config.js';
 
 /** The manifest, read from disk (Node needs an import attribute for JSON). */
 const manifest = JSON.parse(
@@ -649,4 +649,191 @@ test('a citizen still arrives when no route exists', async (t) => {
   const citizen = citizens.spawn({ from: { x: 5, z: 16 }, to: { x: 25, z: 16 } });
   assert.ok(citizen, 'the citizen is still spawned');
   assert.ok(citizen.path.length >= 2, 'and it still has a path to walk');
+});
+
+// ===========================================================================
+// V7: the path-search budget
+// ===========================================================================
+//
+// `TUNING.citizenPathsPerFrame` promises that a city full of citizens cannot
+// flood the frame with path searches. These tests are the proof that the
+// promise is kept: the budget is spent, the citizens that miss it still
+// walk, the next frame gets a fresh budget, and two identical runs walk
+// the same routes.
+
+/**
+ * A city context with a REAL character behind it and a SEEDED rng.
+ *
+ * The seeded rng is what makes the determinism test mean anything: an
+ * unseeded random would let two runs of the same world disagree.
+ */
+function makeBudgetCtx(gltf, { size = 32, buildings = [], seed = 1337 } = {}) {
+  const ctx = makeCityCtx({ size, buildings });
+  ctx.renderer = { actors: new THREE.Group() };
+  ctx.assets = { loadCharacter: async () => ({ model: gltf.scene, clips: gltf.animations }) };
+  ctx.rng = makeRng(seed);
+  ctx.bus = fakeBus();
+  ctx.domains = { wld: { heightAt: () => 0 } };
+  return ctx;
+}
+
+/**
+ * A wall across the city with ONE gap, at the far end.
+ *
+ * A route EXISTS, so the search succeeds and the citizen walks around the
+ * wall. The straight line does NOT exist, so a citizen that falls back to
+ * the straight line is visibly different from one that was routed.
+ */
+function wallBuildings(size = 32) {
+  const buildings = [];
+  for (let z = 0; z < size - 1; z += 1) buildings.push({ x: 15, z });
+  return buildings;
+}
+
+/** The cells of a path that the wall covers. */
+function wallCellsOnPath(path, buildings) {
+  const blocked = new Set(buildings.map((b) => `${b.x},${b.z}`));
+  return pathCells(path).filter((cell) => blocked.has(`${cell.x},${cell.z}`));
+}
+
+test('the path-search budget caps the searches one frame starts', async (t) => {
+  const { gltf } = await makeCtx();
+  if (!gltf) {
+    t.skip('Knight.glb is not available in this checkout');
+    return;
+  }
+  const buildings = wallBuildings();
+  const ctx = makeBudgetCtx(gltf, { buildings });
+  const citizens = createCitizens(ctx);
+  await citizens.preload();
+
+  const budget = TUNING.citizenPathsPerFrame;
+  const spawned = [];
+  for (let i = 0; i < budget + 3; i += 1) {
+    spawned.push(citizens.spawn({ from: { x: 5, z: 8 + i }, to: { x: 25, z: 8 + i } }));
+  }
+  assert.equal(spawned.length, budget + 3, 'every citizen is spawned');
+
+  const stats = citizens.pathStats();
+  assert.equal(stats.budget, budget, 'the budget is the TUNING value');
+  assert.equal(stats.started, budget, 'no more searches started than the budget allows');
+  assert.equal(stats.deferred, 3, 'the searches over the budget were deferred');
+
+  // The ROUTED citizens walked AROUND the wall...
+  for (const citizen of spawned.slice(0, budget)) {
+    assert.deepEqual(
+      wallCellsOnPath(citizen.path, buildings),
+      [],
+      'the routed citizen walked around the wall',
+    );
+  }
+  // ...and the DEFERRED ones took the old straight line through it.
+  for (const citizen of spawned.slice(budget)) {
+    assert.ok(
+      wallCellsOnPath(citizen.path, buildings).length > 0,
+      'the deferred citizen walked the straight line through the wall',
+    );
+  }
+});
+
+test('a citizen that misses the budget still spawns and still walks', async (t) => {
+  const { gltf } = await makeCtx();
+  if (!gltf) {
+    t.skip('Knight.glb is not available in this checkout');
+    return;
+  }
+  const ctx = makeBudgetCtx(gltf, { buildings: wallBuildings() });
+  const citizens = createCitizens(ctx);
+  await citizens.preload();
+
+  const budget = TUNING.citizenPathsPerFrame;
+  for (let i = 0; i < budget; i += 1) {
+    citizens.spawn({ from: { x: 5, z: 8 + i }, to: { x: 25, z: 8 + i } });
+  }
+  assert.equal(citizens.pathStats().deferred, 0, 'the budget of the frame is still open');
+
+  const deferred = citizens.spawn({ from: { x: 5, z: 20 }, to: { x: 25, z: 20 } });
+  assert.ok(deferred, 'the deferred citizen is still spawned');
+  assert.ok(deferred.path.length >= 2, 'and it still has a path of at least two points');
+  assert.equal(citizens.pathStats().deferred, 1, 'the search was deferred');
+
+  // It WALKS: the model moves along the path it was given.
+  const before = deferred.model.position.x;
+  citizens.update(0.1);
+  assert.ok(deferred.model.position.x > before, 'the deferred citizen walks');
+});
+
+test('the budget is fresh again in the next frame', async (t) => {
+  const { gltf } = await makeCtx();
+  if (!gltf) {
+    t.skip('Knight.glb is not available in this checkout');
+    return;
+  }
+  const ctx = makeBudgetCtx(gltf, { buildings: wallBuildings() });
+  const citizens = createCitizens(ctx);
+  await citizens.preload();
+
+  const budget = TUNING.citizenPathsPerFrame;
+  for (let i = 0; i < budget; i += 1) {
+    citizens.spawn({ from: { x: 5, z: 8 + i }, to: { x: 25, z: 8 + i } });
+  }
+  assert.equal(citizens.pathStats().started, budget, 'the frame spent its budget');
+
+  citizens.update(0.016);   // one frame passes
+
+  const after = citizens.pathStats();
+  assert.equal(after.started, 0, 'the next frame starts with a full budget');
+  assert.equal(after.lastStarted, budget, 'the frame that ended is archived');
+
+  for (let i = 0; i < budget; i += 1) {
+    citizens.spawn({ from: { x: 5, z: 8 + i }, to: { x: 25, z: 8 + i } });
+  }
+  assert.equal(citizens.pathStats().started, budget, 'the budget is fresh again');
+});
+
+test('two identical runs walk the same routes', async (t) => {
+  const { gltf } = await makeCtx();
+  if (!gltf) {
+    t.skip('Knight.glb is not available in this checkout');
+    return;
+  }
+  const buildings = wallBuildings();
+
+  async function run() {
+    const ctx = makeBudgetCtx(gltf, { buildings, seed: 20240513 });
+    const citizens = createCitizens(ctx);
+    await citizens.preload();
+    const paths = [];
+    for (let i = 0; i < 6; i += 1) {
+      const citizen = citizens.spawn({ from: { x: 5, z: 8 + i }, to: { x: 25, z: 8 + i } });
+      paths.push(citizen.path);
+    }
+    citizens.dispose();
+    return paths;
+  }
+
+  const first = await run();
+  const second = await run();
+  assert.deepEqual(second, first, 'the same world and the same seed give the same routes');
+});
+
+test('the service reports the path-search numbers', async (t) => {
+  const { gltf } = await makeCtx();
+  if (!gltf) {
+    t.skip('Knight.glb is not available in this checkout');
+    return;
+  }
+  const ctx = makeBudgetCtx(gltf, { buildings: wallBuildings() });
+  const citizens = createCitizens(ctx);
+  await citizens.preload();
+
+  const fresh = citizens.pathStats();
+  assert.equal(fresh.budget, TUNING.citizenPathsPerFrame, 'the budget is the TUNING value');
+  assert.equal(fresh.started, 0);
+  assert.equal(fresh.deferred, 0);
+  assert.equal(fresh.lastStarted, 0);
+  assert.equal(fresh.lastDeferred, 0);
+
+  citizens.spawn({ from: { x: 5, z: 8 }, to: { x: 25, z: 8 } });
+  assert.equal(citizens.pathStats().started, 1, 'one search was started');
 });

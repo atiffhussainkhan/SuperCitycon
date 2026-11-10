@@ -22,6 +22,11 @@
  * controls and one place rebinds them. The rules that interpret a pad —
  * dead zones, button edges, axis resolution — are in `core/gamepad.js`.
  *
+ * The capture SCREEN lives in the settings panel (UX), but the rules about
+ * what a pad button may be bound to live here: `padRebind` owns the rule
+ * that a button belongs to ONE action, and `padLabel` names a button so the
+ * screen can tell the player what they just pressed.
+ *
  * Pure: this module imports nothing but the pad constants, and touches no DOM.
  */
 
@@ -240,6 +245,39 @@ export function createInputMap({ bindings = null, padBindings = null } = {}) {
       table[action] = DEFAULT_BINDINGS[action].slice();
       return true;
     },
+    /**
+     * Bind a pad BUTTON to an action.
+     *
+     * A pad button is a SINGLE resource, unlike a key: the table is read
+     * first-match, so the same button on two actions would leave the second
+     * one unreachable and the player's new binding would silently do
+     * nothing. The button is therefore taken from whichever action had it,
+     * and that action is left unbound rather than shadowed.
+     *
+     * The action's previous buttons are NOT kept as secondaries: one
+     * button per action keeps the pad table readable, and the analogue
+     * stick does the panning the keyboard does with four keys.
+     *
+     * @param {string} action
+     * @param {number} buttonIndex
+     * @returns {boolean} true when the binding was accepted
+     */
+    padRebind(action, buttonIndex) {
+      if (!(action in DEFAULT_PAD_BINDINGS)) return false;
+      if (!Number.isInteger(buttonIndex) || buttonIndex < 0) return false;
+      for (const [other, indices] of Object.entries(padTable)) {
+        if (other === action || !indices.includes(buttonIndex)) continue;
+        padTable[other] = indices.filter((i) => i !== buttonIndex);
+      }
+      padTable[action] = [buttonIndex];
+      return true;
+    },
+    /** Restore the default pad binding for one action. */
+    resetPadAction(action) {
+      if (!(action in DEFAULT_PAD_BINDINGS)) return false;
+      padTable[action] = DEFAULT_PAD_BINDINGS[action].slice();
+      return true;
+    },
     /** Restore every default binding. */
     resetAll() {
       table = { ...DEFAULT_BINDINGS };
@@ -272,4 +310,48 @@ export function keyLabel(code) {
     Equal: '=', Minus: '-', Tab: 'Tab', Enter: 'Enter', Backspace: 'Backspace',
   };
   return named[code] ?? code;
+}
+
+/**
+ * The names of the standard gamepad buttons, for the settings panel and the
+ * on-screen hints.
+ *
+ * The names are the ones a player would use out loud ("A", "right bumper"),
+ * because the point of the label is that the player recognises the button
+ * they just pressed.
+ */
+const PAD_LABELS = Object.freeze({
+  0: 'A',
+  1: 'B',
+  2: 'X',
+  3: 'Y',
+  4: 'left bumper',
+  5: 'right bumper',
+  6: 'left trigger',
+  7: 'right trigger',
+  8: 'Select',
+  9: 'Start',
+  10: 'left stick',
+  11: 'right stick',
+  12: 'D-pad up',
+  13: 'D-pad down',
+  14: 'D-pad left',
+  15: 'D-pad right',
+  16: 'Guide',
+});
+
+/**
+ * A human-readable label for a pad button index.
+ *
+ * An unknown index is still NAMED ('Button 17'), never left blank: a player
+ * who presses a button the standard mapping does not cover must still be
+ * told what they pressed.
+ *
+ * @param {number} buttonIndex
+ * @returns {string}
+ */
+export function padLabel(buttonIndex) {
+  const index = Number(buttonIndex);
+  if (!Number.isInteger(index) || index < 0) return '';
+  return PAD_LABELS[index] ?? `Button ${index}`;
 }

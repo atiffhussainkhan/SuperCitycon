@@ -895,6 +895,12 @@ function installInput(ctx, renderer) {
    * once from the touch service and once from here, because the browser
    * fires the pointer events for a touch as well.
    *
+   * THE HOVER GOES WITH IT. `handleHover()` below is the MOUSE's hover, and
+   * the touch service publishes the finger's hover itself (the same state
+   * write, the same `onHover` call on every domain, the same event). If
+   * this handler also hovered for touch pointers, the domains would be
+   * told about the finger's cell twice per move.
+   *
    * One owner per device.
    */
   const isTouch = (e) => isTouchPointer(e);

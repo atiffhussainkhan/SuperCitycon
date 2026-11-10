@@ -35,6 +35,7 @@ import { createHUD } from './hud.js';
 import { createCameraRig } from './camera.js';
 import { createGamepadService } from './gamepad.js';
 import { createTouchService } from './touch.js';
+import { createNavigationDebug } from './navigation-debug.js';
 import { createToastQueue } from './toasts.js';
 import { createMenu } from './menu.js';
 import { createSettingsPanel } from './settings-panel.js';
@@ -120,6 +121,16 @@ export function createUI(ctx) {
   const touch = createTouchService(ctx, {
     logger: ctx?.logger,
     camera,
+  });
+
+  // The navigation debug panel (V7). It is OFF by default and it is a
+  // developer tool: it shows the route a citizen took, what it cost, how
+  // many cells the search visited and WHY a search failed.
+  // The mount point is resolved LAZILY by the service: at this moment the
+  // HUD has no container yet, and `ctx.ui` is not assigned until this
+  // factory returns.
+  const navigationDebug = createNavigationDebug(ctx, {
+    logger: ctx?.logger,
   });
 
   let hud = null;
@@ -461,6 +472,9 @@ export function createUI(ctx) {
       // The touch clock is advanced before the camera too, for the same reason.
       touch.update(d);
       camera.update(d);
+      // The navigation overlay is redrawn AFTER the camera moved, so the
+      // route sits on the frame the player is looking at.
+      navigationDebug.update();
       toasts.tick(d);
       hud?.update(d);
       // The toast list is mirrored into the UX subtree, but only when it
@@ -541,6 +555,17 @@ export function createUI(ctx) {
     /** True while a touch gesture is in progress. */
     touchActive() { return touch.isActive(); },
 
+    /**
+     * The navigation debug panel (V7).
+     *
+     * A developer tool: off by default, switched on from the console or
+     * from a test. It shows the route a citizen took, its cost, the cells
+     * the search visited and why a search failed.
+     */
+    navigationDebug,
+    /** Switch the navigation debug panel on or off. */
+    setNavigationDebug(on) { return navigationDebug.setEnabled(on); },
+
     /** Show or hide the performance read-out. */
     togglePerformance(force) { return hud?.togglePerformance?.(force) ?? false; },
     performanceVisible() { return hud?.performanceVisible?.() ?? false; },
@@ -567,6 +592,7 @@ export function createUI(ctx) {
       settingsPanel.dispose();
       gamepad.dispose();
       touch.dispose();
+      navigationDebug.dispose();
       camera.dispose();
       toasts.clear();
       mounted = false;

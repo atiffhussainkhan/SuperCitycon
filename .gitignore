@@ -58,3 +58,8 @@ minimax-game/platformer-docs/library-packs/
 # Python bytecode cache from the design gates.
 __pycache__/
 *.pyc
+
+# A tool's ad-hoc output. `tools/profile-city.mjs --outdir verification/…`
+# writes there by default during a manual run; the report belongs in the
+# evidence directory, not in the repository.
+verification/

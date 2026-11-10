@@ -131,24 +131,24 @@ export const RIG_RATES = Object.freeze({
 /**
  * The camera shake.
  *
- * TBD: the publisher never published a shake amplitude or a decay rate, so
- * these are design values (the same class of number as `core/config.js`'s
- * TUNING table). They are marked here and proposed as TUNING additions in
- * the UI final report:
+ * The NUMBERS live in `core/config.js`'s TUNING table — `cameraShakeAmplitude`,
+ * `cameraShakeDecay`, `cameraShakeFrequency` and `cameraShakeMaxAmplitude` —
+ * so there is ONE source of truth for them. They were duplicated here once,
+ * which meant a change to one of the two was silently ignored by the other.
  *
- *   - `cameraShakeAmplitude` — the impulse of one shake, in world units.
- *   - `cameraShakeDecay`     — how fast a shake dies, in e-folds / second.
- *   - `cameraShakeFrequency` — how fast the shake oscillates, in rad/s.
+ * TBD: the publisher never published a shake amplitude or a decay rate, so
+ * these are design values. They are marked in TUNING_TBD like every other
+ * unpublished number.
  */
 export const SHAKE = Object.freeze({
   /** TBD: the impulse of one shake, in world units. */
-  amplitude: 0.9,
+  amplitude: TUNING.cameraShakeAmplitude ?? 0.9,
   /** TBD: how fast a shake dies, in e-folds per second. */
-  decay: 4.2,
+  decay: TUNING.cameraShakeDecay ?? 4.2,
   /** TBD: how fast the shake oscillates, in radians per second. */
-  frequency: 34,
+  frequency: TUNING.cameraShakeFrequency ?? 34,
   /** TBD: the ceiling of a stacked shake, in world units. */
-  maxAmplitude: 2,
+  maxAmplitude: TUNING.cameraShakeMaxAmplitude ?? 2,
   /** TBD: the impulse of each event that shakes the camera, as a multiple. */
   byEvent: Object.freeze({
     [EVENTS.BUILDING_PLACED]: 0.5,

@@ -132,12 +132,25 @@ player who has a city.
 | **Severity** | MINOR |
 | **Blocks release?** | No |
 | **Was** | V6-KI-11 |
+| **Status** | **CLOSED in the V7.1 round** |
 
-Unchanged. The machinery is in place — `createInputMap({ padBindings })`,
-`applyPadOverrides()` and `resetAll()` all work on the pad table, and the
-gamepad service reads the table every frame, so a stored override would
-take effect immediately. What is missing is the capture screen. It was not
-in the V7 scope.
+**CLOSED.** The Controls view now has a **Gamepad bindings** section: a pad
+button can be bound to an action, the binding is stored in the new
+`input.padBindings` setting, it is applied to the live pad table, it shows a
+readable button name ("A", "D-pad up", "right bumper"), it can be cancelled,
+and "RESET ALL BINDINGS" resets the pad table too.
+
+Two details make it safe rather than merely present:
+
+- **The capture never steals a menu button.** The buttons bound to
+  `menu.up` / `menu.down` / `menu.left` / `menu.right` / `menu.confirm` /
+  `menu.back` in the live table are RESERVED: the capture keeps waiting and
+  says so. A player cannot bind away their own menu.
+- **Only button EDGES count.** The capture takes a baseline when it starts,
+  so a button the player is already holding is not treated as a press.
+
+A real defect fell out of the work: the key capture used to bind **Escape**
+even though the toast promised "Esc cancels". That is fixed too.
 
 ### V7-KI-10 — LLM-driven NPC dialogue is not implemented
 
@@ -187,6 +200,6 @@ See `FINAL_VERIFICATION.md` for the exact status.
 | V7-KI-06 | 2D HUD art cannot ship | LIMITATION | No |
 | V7-KI-07 | No music / ambience / voice content | MINOR | No |
 | V7-KI-08 | Save size dominated by JSON terrain arrays | MINOR | No |
-| V7-KI-09 | Gamepad buttons cannot be rebound in the UI | MINOR | No |
+| V7-KI-09 | Gamepad buttons cannot be rebound in the UI | — | **CLOSED in V7.1** |
 | V7-KI-10 | No LLM-driven dialogue | MINOR | No |
 | V7-KI-11 | The Cursor senior review was not re-run | MAJOR | **Yes — for "complete and verified"** |

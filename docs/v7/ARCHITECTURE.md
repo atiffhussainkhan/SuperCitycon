@@ -149,12 +149,29 @@ game/src/core/touch.js           NEW  pure: the gesture recogniser
 game/src/core/touch.test.mjs     NEW  the unit suite
 game/src/ui/touch.js             NEW  the browser half: gestures -> camera + world
 game/src/ui/touch.test.mjs       NEW  the unit suite
-game/src/population/citizens.js  CHANGED  follow the pathfinder's path
-game/src/ui/camera.js            CHANGED  release the held keys when a modal opens
+game/src/ui/navigation-debug.js  NEW  the navigation debug panel (V7.1)
+game/src/ui/navigation-debug.test.mjs NEW its unit suite
+game/src/population/citizens.js  CHANGED  follow the pathfinder's path; the budget
+game/src/population/index.js     CHANGED  forward the path-search counters
+game/src/ui/camera.js            CHANGED  release the held keys; the shake table
+game/src/core/input-map.js       CHANGED  padLabel(), padRebind(), resetPadAction()
+game/src/core/settings.js        CHANGED  the input.padBindings setting
+game/src/ui/settings-panel.js    CHANGED  the pad capture screen
 game/src/content/validate.js     CHANGED  prove reachability
 game/tools/validate-content.mjs  CHANGED  report the proof
 tools/scenario-v7.mjs            NEW  the browser acceptance scenario
+tools/profile-city.mjs           NEW  the city-scene frame profiler
+tools/secret-scan.mjs            NEW  the secret scan
+tools/package-game-release.mjs   NEW  the reproducible release package
+tools/run-v7-verification.sh     NEW  the whole battery as one command
 ```
+
+**The V7.1 round kept the same shape.** The touch hover, the path budget and
+the pad capture are all in the layer that owns the behaviour — UX for the
+hover and the capture, POP for the budget, CORE for the rules. Nothing was
+pushed into a domain that does not own it, and no domain was made to know
+about another's internals: the path-search counters travel from the citizens'
+service, through the POP domain, to the page — one hop each.
 
 **Why CORE owns the rules.** A pathfinder and a gesture recogniser are both
 *rules*, not presentation. Putting them in CORE is what makes them

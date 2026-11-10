@@ -210,7 +210,11 @@ export const HUD_STYLES = `
 .sc-clock span { font-size: calc(8px * var(--sc-text-scale, 1)); color: var(--sc-dim); }
 
 .sc-speed { display: flex; gap: 4px; align-items: center; }
-.sc-speed .sc-btn { min-width: 40px; padding: 4px 6px; }
+.sc-speed .sc-btn {
+  /* 44 px, not 40: the speed buttons are the smallest controls in the HUD,
+     and a touch target under 44 px is a miss waiting to happen. */
+  min-width: 44px; padding: 4px 6px;
+}
 
 /* --- day / event ticker ------------------------------------------------- */
 .sc-ticker {
@@ -294,7 +298,12 @@ export const HUD_STYLES = `
 .sc-shop-tabs { display: flex; flex-wrap: wrap; gap: 4px; overflow: visible; pointer-events: none; }
 .sc-tab {
   pointer-events: auto;
-  min-height: 34px;
+  /*
+   * 44 px, not 34: the shop's category tabs are picked with a finger, and
+   * a 34 px tab is a miss waiting to happen. The tab keeps its compact
+   * look — the extra height is padding, not a bigger font.
+   */
+  min-height: 44px;
   padding: 3px 8px;
   background: var(--sc-panel-2);
   border: 3px solid var(--sc-edge);
@@ -346,6 +355,14 @@ export const HUD_STYLES = `
   pointer-events: auto;
   display: block;
   width: 100%;
+  /*
+   * The 44 px minimum is the platform's touch-target guidance, and the
+   * shop cards are picked with a finger more often than with a mouse: a
+   * card that is 34 px tall is a miss waiting to happen. The card keeps
+   * its compact look — the height comes from the padding, not from a
+   * bigger font.
+   */
+  min-height: 44px;
   text-align: left;
   background: var(--sc-ink);
   border: 3px solid var(--sc-edge);

@@ -7,6 +7,87 @@ and this project uses [semantic versioning](https://semver.org/spec/v2.0.0.html)
 
 ---
 
+## [7.0.0] — V7.1 — the audit round
+
+**Branch:** `development/v7`
+**Baseline:** V7 at `fa046f1`
+**Release status:** see [`docs/v7/FINAL_VERIFICATION.md`](docs/v7/FINAL_VERIFICATION.md)
+
+V7.0.0 shipped and then V7 audited itself. The audit found **seven** gaps —
+including two that V7 itself had introduced — and this round closes all of
+them. Nothing here is a version bump: every entry is a defect fixed or a
+feature finished.
+
+### Fixed — the touch path
+
+- **The cell under the finger was not highlighted.** The integrator's pointer
+  handler ignores touch pointers (so a tap cannot select twice), and that
+  also stopped the hover. The touch service now publishes the hover itself:
+  it converts the finger's position with the same conversion the mouse uses,
+  writes `state.ui.hover`, notifies every domain's `onHover` and emits
+  `HOVER_CHANGED`. The highlight clears when the last finger lifts.
+- **A pinch ended with a tap.** When two fingers were down, the finger that
+  lifted first was usually the one that never moved — so it looked exactly
+  like a tap, and a zoom placed a building. A gesture that used more than one
+  finger is now a MULTI-TOUCH gesture, and nothing in it taps.
+- **A slow frame killed the tap.** The gesture was timed with the clock at
+  the moment the event was HANDLED. On a busy main thread that gap can be a
+  whole second, so every tap became a long press. The gesture now uses the
+  browser's own `event.timeStamp` — the time the event was GENERATED.
+
+### Fixed — the tuning table kept a promise nobody kept
+
+- **`TUNING.citizenPathsPerFrame` was declared and documented but never
+  read.** The budget is now enforced: a citizen that misses it still spawns
+  and still walks (it takes the straight line and clips a corner), because a
+  frozen crowd would be a worse defect than a citizen that clips one.
+- **The camera shake had two sources of truth** — four numbers in `TUNING`
+  and four in the rig's own table, with identical values. `TUNING` is now the
+  only one.
+
+### Added — the gamepad can be rebound (closes V7-KI-09)
+
+The Controls view now has a **Gamepad bindings** section: a pad button can be
+bound to an action, the binding is stored in the new `input.padBindings`
+setting, it is applied to the live pad table, it shows a readable button name,
+it can be cancelled, and "RESET ALL BINDINGS" resets the pad table too.
+
+Two details make it safe rather than merely present: the buttons bound to
+the menu's own actions are **reserved** (the capture keeps waiting rather
+than stealing the player's menu), and only button **edges** count, so a
+button the player is already holding is not treated as a press.
+
+A real defect fell out of the work: the key capture used to bind **Escape**
+even though the toast promised "Esc cancels". That is fixed too.
+
+### Added — the navigation debug panel
+
+`game/src/ui/navigation-debug.js` — off by default, and it shows the route a
+citizen took, what it cost, how many cells the search visited and WHY a
+search failed. The route is drawn as an SVG line projected from the camera
+matrices, and the projection was verified against three.js to 3.55e-14 px.
+
+### Added — the city profiler and the narrow-viewport check
+
+- `tools/profile-city.mjs` — measures a REAL city at the maximum citizen
+  count against the boot scene in the same run. **The city at 40 citizens
+  holds 60 fps** (16.663 ms against the boot scene's 16.667 ms) on a
+  hardware GPU, and the pathfinding cost is **0.0361 ms per search**.
+- `tools/scenario-v7.mjs` now resizes the page to 390 × 844 and checks that
+  the HUD does not overflow, that **every visible control is at least
+  44 × 44 CSS pixels**, and that a touch drag still pans the camera at that
+  size. The check found two controls that were too small — the speed buttons
+  (40 px) and the shop's category tabs (34 px) — and both are fixed.
+
+### Measured
+
+- 898 unit tests, 898 pass, 0 fail (was 835).
+- 94/94 source files parse cleanly (was 91).
+- The V7 scenario: **13/13** (was 10/10).
+- The V5 acceptance scenario and the V6 gamepad scenario still pass.
+
+---
+
 ## [7.0.0] — V7
 
 **Branch:** `development/v7`

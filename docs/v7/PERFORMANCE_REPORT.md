@@ -41,6 +41,43 @@ The unit-suite assertion uses the **median**, because that suite runs nine
 files in parallel and a single sample there measures the scheduler as much
 as the code.
 
+## 1a. The city at the maximum citizen count
+
+`tools/profile-city.mjs` (new in the V7.1 round) builds a REAL city in the
+running game and measures it, against the boot scene in the same run:
+
+| | boot | city | change |
+|---|---|---|---|
+| the mean frame | 16.667 ms | 16.663 ms | **−0.004 ms** |
+| the median frame | 16.7 ms | 16.7 ms | — |
+| the 95th percentile | 18.3 ms | 18.6 ms | +0.3 ms |
+| the 99th percentile | 18.8 ms | 18.7 ms | — |
+| the frame rate | 60 fps | 60 fps | — |
+| the draw calls | 63 | 816 (peak 2083) | — |
+| the long animation frames (> 16 ms of work) | 0 | 0 | — |
+
+**The city at the maximum citizen count holds the boot frame rate.** The
+renderer is a hardware GPU (ANGLE / AMD Radeon Pro 5500M), verified against
+the WebGL context and the browser's own GPU metadata — not software
+rendering.
+
+The city in that run: 558 roads, 255 houses, 3 services, 8,676 residents and
+**40 of 40 citizens** (`TUNING.maxRenderedCitizens`).
+
+### The pathfinding cost, measured
+
+| | searches | cost |
+|---|---|---|
+| 200 spawns in ONE frame (the budget caps it at 2) | 20 searched, 180 deferred | **2.1 ms** |
+| the same 200, one per frame | 200 searched | **8.6 ms** |
+
+That is **0.0361 ms per real grid-A\* search**, and it is the number the
+per-frame budget (`TUNING.citizenPathsPerFrame`) exists to protect: without
+it, a city full of citizens would spend 8.6 ms of a 16.7 ms frame on path
+searches alone.
+
+---
+
 ## 2. The frame time — before and after
 
 `tools/profile-gpu.mjs`, 300 rendered frames, headed Chromium, the same

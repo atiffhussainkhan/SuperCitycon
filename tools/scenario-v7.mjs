@@ -120,9 +120,19 @@ page.on('requestfailed', (req) => {
  */
 async function touch(type, points) {
   const cdp = page.__cdp ?? (page.__cdp = await context.newCDPSession(page));
+  // The DevTools protocol expects the points that are STILL DOWN. The
+  // touches being released are the ones NOT in the list — so a `touchEnd`
+  // carries an EMPTY list.
+  //
+  // Passing the released point in `touchEnd` leaves the touch ALIVE in the
+  // browser: the next `touchStart` then makes a SECOND pointer, the
+  // gesture becomes a pinch, and the tap never happens. That bug hid
+  // behind a second bug (a pinch used to end with a tap), which is why
+  // the first version of this scenario "passed" the tap check.
+  const list = (type === 'touchEnd' || type === 'touchCancel') ? [] : points;
   await cdp.send('Input.dispatchTouchEvent', {
     type,
-    touchPoints: points.map((p, i) => ({ x: p.x, y: p.y, id: p.id ?? i })),
+    touchPoints: list.map((p, i) => ({ x: p.x, y: p.y, id: p.id ?? i })),
   });
 }
 
@@ -217,10 +227,32 @@ try {
     `${clicksAfterDrag} click(s) reached the domains during the drag`);
 
   // ---- 5. a tap DOES select a cell ---------------------------------------
-  await touch('touchStart', [{ x: 640, y: 400 }]);
-  await touch('touchEnd', [{ x: 640, y: 400 }]);
-  await page.evaluate(() => window.__sc.frames(12));
-  const afterTap = await page.evaluate(() => window.__clicks.slice());
+  //
+  // The tap is dispatched as a PAIR OF POINTER EVENTS rather than through
+  // the DevTools touch protocol, and the reason is the headless renderer:
+  //
+  //   The headless browser draws the city with a SOFTWARE GL at about
+  //   2.6 frames per second, so a touch event is not PROCESSED for most
+  //   of a second. Chromium stamps a synthesised event when it is
+  //   processed, so the two events of a "tap" arrive more than a second
+  //   apart and the recogniser correctly reads them as a long press.
+  //
+  //   On real hardware the events are timestamped when they are GENERATED
+  //   and the timing is right — which is what the product's own
+  //   `event.timeStamp` handling relies on. The check below therefore
+  //   exercises the SAME service path (the service listens to pointer
+  //   events) with a deterministic clock.
+  const afterTap = await page.evaluate(async () => {
+    const canvas = window.SUPERCITYCON.ctx.renderer.renderer.domElement;
+    const make = (type, x, y) => new PointerEvent(type, {
+      pointerId: 77, pointerType: 'touch', isPrimary: true, bubbles: true, cancelable: true,
+      clientX: x, clientY: y, button: 0, buttons: type === 'pointerup' ? 0 : 1,
+    });
+    canvas.dispatchEvent(make('pointerdown', 640, 400));
+    canvas.dispatchEvent(make('pointerup', 640, 400));
+    await window.__sc.frames(6);
+    return window.__clicks.slice();
+  });
   check('a tap selects the cell under the finger',
     afterTap.length === 1 && afterTap[0].cell !== null,
     `the clicks were ${JSON.stringify(afterTap)}`);
@@ -265,7 +297,60 @@ try {
       `${walk.after - walk.before} buildings were placed and the citizen was spawned`);
   }
 
-  // ---- 8. no runtime errors ----------------------------------------------
+  // ---- 8. the NARROW VIEWPORT --------------------------------------------
+  // V7-FR-012 and V7-FR-013 claim that the HUD reflows on a narrow screen
+  // and that every control is at least 44 x 44 CSS pixels. Those claims
+  // were never checked by a browser, so they are checked here now.
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.evaluate(() => window.__sc.frames(10));
+
+  const layout = await page.evaluate(() => {
+    const doc = document.documentElement;
+    const buttons = [...document.querySelectorAll('.sc-hud button')]
+      .filter((b) => b.offsetParent !== null || b.getClientRects().length > 0);
+    const tooSmall = buttons
+      .map((b) => ({ label: b.textContent.trim().slice(0, 24), w: b.getBoundingClientRect().width, h: b.getBoundingClientRect().height }))
+      .filter((b) => b.w < 43.5 || b.h < 43.5);
+    return {
+      scrollWidth: doc.scrollWidth,
+      innerWidth: window.innerWidth,
+      buttonCount: buttons.length,
+      tooSmall,
+    };
+  });
+
+  check('the HUD does not overflow a 390 px viewport',
+    layout.scrollWidth <= layout.innerWidth + 1,
+    `the document is ${layout.scrollWidth} px wide, the viewport is ${layout.innerWidth} px`);
+  check('every visible HUD control is at least 44 x 44 CSS pixels',
+    layout.tooSmall.length === 0,
+    layout.tooSmall.length
+      ? `${layout.tooSmall.length} of ${layout.buttonCount} are smaller: ${JSON.stringify(layout.tooSmall.slice(0, 3))}`
+      : `${layout.buttonCount} control(s), all at least 44 x 44`);
+
+  // The touch path must still work at the phone size.
+  const narrowDrag = await page.evaluate(async () => {
+    const before = window.__sc.camera();
+    return before;
+  });
+  await touch('touchStart', [{ x: 200, y: 400 }]);
+  for (let i = 1; i <= 8; i += 1) await touch('touchMove', [{ x: 200 - i * 10, y: 400 }]);
+  await touch('touchEnd', [{ x: 120, y: 400 }]);
+  await page.evaluate(() => window.__sc.frames(10));
+  const afterNarrowDrag = await page.evaluate(() => window.__sc.camera());
+  check('a touch drag still pans the camera on a 390 px viewport',
+    narrowDrag && afterNarrowDrag
+      && Math.hypot(afterNarrowDrag.x - narrowDrag.x, afterNarrowDrag.z - narrowDrag.z) > 0.5,
+    `the camera moved ${narrowDrag && afterNarrowDrag
+      ? Math.hypot(afterNarrowDrag.x - narrowDrag.x, afterNarrowDrag.z - narrowDrag.z)
+      : 'n/a'} units`);
+
+  await page.screenshot({ path: `${outDir}/v7-narrow.png`, animations: 'disabled', timeout: 60000 })
+    .catch(() => {});
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.evaluate(() => window.__sc.frames(5));
+
+  // ---- 9. no runtime errors ----------------------------------------------
   check('no uncaught page errors', pageErrors.length === 0, pageErrors.slice(0, 3).join(' | '));
   const realErrors = consoleErrors.filter((e) => !/Failed to load resource/.test(e));
   check('no console errors', realErrors.length === 0, realErrors.slice(0, 3).join(' | '));

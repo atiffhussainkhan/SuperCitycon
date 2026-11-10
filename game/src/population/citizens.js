@@ -39,6 +39,19 @@
  *  3. POOLING - `pool.js` (pure) keeps the rigged citizens alive between
  *     lives, so a despawn re-parents and re-positions a citizen instead of
  *     disposing its mesh and its mixer.
+ *
+ * ---------------------------------------------------------------------------
+ * WHAT THIS MODULE DOES NOW (V7)
+ * ---------------------------------------------------------------------------
+ *  4. THE PATH-SEARCH BUDGET - `TUNING.citizenPathsPerFrame` caps how many
+ *     grid searches ONE frame may start, across every citizen. The tuning
+ *     table promises that a city full of citizens cannot flood the frame
+ *     with searches; this module is where that promise is kept.
+ *
+ *     A citizen that misses the budget still walks: it takes the old
+ *     straight line and clips a corner. A frozen crowd would be a far
+ *     worse defect than a citizen that walks through a warehouse, and the
+ *     budget exists to keep the FRAME cheap, not to stop the citizens.
  */
 
 import * as THREE from 'three';
@@ -445,6 +458,52 @@ export function createCitizens(ctx) {
     return cityGrid;
   }
 
+  // ---------------------------------------------------------------------------
+  // The path-search budget of the frame
+  // ---------------------------------------------------------------------------
+
+  /**
+   * The path searches THIS frame has started.
+   *
+   * `TUNING.citizenPathsPerFrame` is the promise the tuning table makes:
+   * a city full of citizens cannot flood the frame with searches. The
+   * budget is spent by the SPAWNS, because a spawn is the only thing that
+   * starts a search.
+   */
+  let frameStarted = 0;
+  /** The searches this frame had to defer. */
+  let frameDeferred = 0;
+  /** The numbers of the frame that just finished. */
+  let lastStarted = 0;
+  let lastDeferred = 0;
+
+  /**
+   * The maximum number of path searches one frame may start.
+   *
+   * A missing or unusable value falls back to ONE search per frame: with
+   * zero the citizens would never find a route at all, so a fallback of
+   * zero would turn a mistyped number into a dead navigation system.
+   */
+  function pathsPerFrame() {
+    const value = Number(TUNING.citizenPathsPerFrame);
+    if (!Number.isFinite(value) || value < 0) return 1;
+    return Math.floor(value);
+  }
+
+  /**
+   * Close the frame and open the next one.
+   *
+   * The budget belongs to the frame, so it is spent and archived here: the
+   * numbers of the frame that just ended stay readable, and the next frame
+   * starts with a full budget again.
+   */
+  function closeFrame() {
+    lastStarted = frameStarted;
+    lastDeferred = frameDeferred;
+    frameStarted = 0;
+    frameDeferred = 0;
+  }
+
   /**
    * Build a walking path between two cells.
    *
@@ -458,16 +517,41 @@ export function createCitizens(ctx) {
    * water blocks, buildings block, a slope costs more — and the result is
    * smoothed so the citizen walks a straight line where the city allows it.
    *
+   * THE BUDGET
+   * A search is not free and a frame is not infinite: at most
+   * `TUNING.citizenPathsPerFrame` searches may start in one frame, across
+   * every citizen. A citizen that misses the budget still walks — it takes
+   * the old straight line and clips a corner.
+   *
+   * The fallback is decided AT THE SPAWN and never revised. A citizen that
+   * waited for its turn would walk a route that depends on WHEN the budget
+   * freed up, and that depends on the frame rate: two machines playing the
+   * same city with the same seed would send the citizens down different
+   * streets. A straight line that clips a corner is at least the same
+   * street everywhere.
+   *
    * If no route can be found the citizen falls back to the old straight
-   * line: a citizen that stands still because the search failed would look
-   * broken, and a citizen that clips a corner is a smaller problem than a
-   * frozen crowd.
+   * line for the same reason: a citizen that stands still because the
+   * search failed would look broken.
    *
    * @param {{x:number,z:number}} from
    * @param {{x:number,z:number}} to
    * @returns {Array<{x:number,z:number}>} world points
    */
   function buildPath(from, to) {
+    // A citizen that walks onto itself needs no search at all: the
+    // straight line is already the answer, and a wasted search would eat
+    // the budget of a frame that has citizens with somewhere to go.
+    if (from?.x === to?.x && from?.z === to?.z) return straightPath(from, to);
+
+    if (frameStarted >= pathsPerFrame()) {
+      // THE BUDGET IS SPENT. The citizen still walks: it takes the old
+      // straight line and clips a corner.
+      frameDeferred += 1;
+      return straightPath(from, to);
+    }
+
+    frameStarted += 1;
     const grid = getCityGrid();
     const result = findPath(grid, from, to, { budget: TUNING.citizenPathBudget });
     if (result.ok && result.path && result.path.length >= 2) {
@@ -798,6 +882,10 @@ export function createCitizens(ctx) {
    */
   function update(dt) {
     if (disposed) return;
+    // Every update() is ONE frame: the search budget of the frame that
+    // just ended is archived, and the next frame starts with a full
+    // budget again.
+    closeFrame();
     const step = Number(dt) || 0;
     if (step <= 0) return;
     for (const citizen of citizens) {
@@ -830,6 +918,29 @@ export function createCitizens(ctx) {
     return pool.stats();
   }
 
+  /**
+   * The path-search numbers.
+   *
+   * `started` and `deferred` are the frame in progress: the searches that
+   * were started, and the searches the spent budget turned away (a
+   * deferred search is NOT resumed later - the citizen walks the straight
+   * line, see `buildPath()`). `lastStarted` and `lastDeferred` are the
+   * frame that just finished, so a reader can watch both the live numbers
+   * and the last whole frame.
+   *
+   * @returns {{budget:number, started:number, deferred:number,
+   *            lastStarted:number, lastDeferred:number}}
+   */
+  function pathStats() {
+    return {
+      budget: pathsPerFrame(),
+      started: frameStarted,
+      deferred: frameDeferred,
+      lastStarted,
+      lastDeferred,
+    };
+  }
+
   /** Remove every citizen and release the pool. */
   function dispose() {
     disposed = true;
@@ -851,6 +962,7 @@ export function createCitizens(ctx) {
     dispose,
     availableCharacters,
     poolStats,
+    pathStats,
     skinBindingReport,
     citizens,
   };

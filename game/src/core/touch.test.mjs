@@ -206,3 +206,56 @@ test('touch: a mouse is not a touch', () => {
   assert.equal(isTouchPointer({ pointerType: 'mouse' }), false);
   assert.equal(isTouchPointer({}), false);
 });
+
+test('touch: a pinch never ends with a tap', () => {
+  const { gestures, recogniser } = recorder();
+  // Two fingers down; only the first one moves. The second one lifts first,
+  // and it never moved — so it looks exactly like a tap.
+  recogniser.down({ id: 1, x: 500, y: 400, t: 0 });
+  recogniser.down({ id: 2, x: 700, y: 400, t: 10 });
+  recogniser.move({ id: 1, x: 450, y: 400, t: 60 });
+  recogniser.up({ id: 2, x: 700, y: 400, t: 120 });
+  recogniser.up({ id: 1, x: 450, y: 400, t: 140 });
+
+  assert.equal(types(gestures).includes('tap'), false,
+    'a zoom must not also select a cell — the still finger must not fire a tap');
+  assert.equal(types(gestures).includes('pinch'), true, 'but it was a pinch');
+});
+
+test('touch: the remaining finger of a pinch does not tap either', () => {
+  const { gestures, recogniser } = recorder();
+  recogniser.down({ id: 1, x: 500, y: 400, t: 0 });
+  recogniser.down({ id: 2, x: 700, y: 400, t: 10 });
+  recogniser.move({ id: 2, x: 750, y: 400, t: 60 });
+  recogniser.up({ id: 2, x: 750, y: 400, t: 120 });
+  // The first finger is still down and never moved since the pinch began.
+  recogniser.up({ id: 1, x: 500, y: 400, t: 140 });
+  assert.equal(types(gestures).includes('tap'), false,
+    'the whole gesture was a multi-touch gesture, so nothing in it taps');
+});
+
+test('touch: a single finger still taps after a multi-touch gesture', () => {
+  const { gestures, recogniser } = recorder();
+  recogniser.down({ id: 1, x: 100, y: 100, t: 0 });
+  recogniser.up({ id: 1, x: 100, y: 100, t: 60 });
+  assert.deepEqual(types(gestures), ['tap'], 'a plain tap is still a tap');
+});
+
+test('touch: a tap still works AFTER a pinch', () => {
+  const { gestures, recogniser } = recorder();
+  // A pinch…
+  recogniser.down({ id: 1, x: 500, y: 400, t: 0 });
+  recogniser.down({ id: 2, x: 700, y: 400, t: 10 });
+  recogniser.move({ id: 1, x: 450, y: 400, t: 60 });
+  recogniser.up({ id: 2, x: 700, y: 400, t: 120 });
+  recogniser.up({ id: 1, x: 450, y: 400, t: 140 });
+
+  // …and then a plain tap, which MUST still be a tap. The multi-touch
+  // flag belongs to the GESTURE, not to the session: a pinch that kills
+  // every later tap would be a terrible bug to ship.
+  recogniser.down({ id: 1, x: 100, y: 100, t: 200 });
+  recogniser.up({ id: 1, x: 100, y: 100, t: 260 });
+
+  const taps = types(gestures).filter((t) => t === 'tap');
+  assert.equal(taps.length, 1, 'the tap after the pinch is still a tap');
+});

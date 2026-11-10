@@ -660,6 +660,23 @@ export function createPopulation(ctx) {
       return citizens.count();
     },
 
+    /**
+     * The path-search budget's numbers.
+     *
+     * The citizens' service owns the budget (it is the only thing that
+     * starts a search), so the domain forwards it: a developer watching the
+     * page can see how many searches a frame started and how many the
+     * budget turned away, without reaching into the citizens service.
+     */
+    pathStats() {
+      return citizens.pathStats();
+    },
+
+    /** The citizens' pool numbers (the live rigs, the pool's occupancy). */
+    poolStats() {
+      return citizens.poolStats();
+    },
+
     /** The character keys that actually loaded. */
     availableCharacters() {
       return citizens.availableCharacters();
