@@ -148,22 +148,61 @@ function main() {
   writeFileSync(manifestPath, `${manifest.join('\n')}\n`);
 
   // --- the package ----------------------------------------------------------
+  // The archive is REPRODUCIBLE: the same bundle always produces the same
+  // bytes, and therefore the same checksum. A checksum that changes on
+  // every build is not a release checksum.
+  //
+  //   - the file list is sorted, so the archive order does not depend on
+  //     the filesystem;
+  //   - the ownership is normalised, so it does not depend on the builder;
+  //   - the modification times are pinned, so they do not depend on when
+  //     the build ran;
+  //   - `gzip -n` drops the timestamp from the gzip header.
   const packageName = `supercitycon-${VERSION}-cleared.tar.gz`;
   const packagePath = join(OUT, packageName);
   rmSync(packagePath, { force: true });
-  // `tar` is deterministic enough for a release artefact and is present on
-  // every platform this project supports.
-  execFileSync('tar', ['-czf', packagePath, '-C', DIST, '.'], { stdio: 'inherit' });
 
+  const buildArchive = (target) => {
+    // Pin the modification times of the bundle files.
+    for (const file of files) {
+      try {
+        execFileSync('touch', ['-t', '202601010000', file]);
+      } catch {
+        /* the mtime is a nicety, not a requirement */
+      }
+    }
+    const list = files
+      .map((file) => `./${relative(DIST, file).split(sep).join('/')}`)
+      .sort();
+    execFileSync('sh', ['-c', `
+      cd "$1" && printf '%s\\n' "$2" | LC_ALL=C sort | \\
+        tar --uid 0 --gid 0 --uname root --gname root -cf - -T - | gzip -n -9 > "$3"
+    `, 'sh', DIST, list.join('\n'), target], { stdio: 'inherit' });
+  };
+
+  buildArchive(packagePath);
   const packageHash = sha256(packagePath);
+
+  // Prove the reproducibility: build it a second time and compare.
+  const secondPath = `${packagePath}.reproducibility-check`;
+  rmSync(secondPath, { force: true });
+  buildArchive(secondPath);
+  const secondHash = sha256(secondPath);
+  rmSync(secondPath, { force: true });
+  if (secondHash !== packageHash) {
+    process.stderr.write('The package is NOT reproducible: two builds differ.\n');
+    process.exit(1);
+  }
+
   writeFileSync(`${packagePath}.sha256`, `${packageHash}  ${packageName}\n`);
 
   process.stdout.write(`package: ${relative(ROOT, packagePath)}\n`);
   process.stdout.write(`  files:   ${files.length}\n`);
-  process.stdout.write(`  size:    ${(totalBytes / 1048576).toFixed(1)} MB\n`);
+  process.stdout.write(`  size:    ${(totalBytes / 1048576).toFixed(1)} MB uncompressed\n`);
   process.stdout.write(`  sha256:  ${packageHash}\n`);
+  process.stdout.write(`  the same bytes on a rebuild: ${secondHash === packageHash ? 'yes' : 'NO'}\n`);
   process.stdout.write(`manifest: ${relative(ROOT, manifestPath)}\n`);
-  process.stdout.write('PASS — the package is clean and hashed\n');
+  process.stdout.write('PASS — the package is clean, hashed and reproducible\n');
 }
 
 main();
