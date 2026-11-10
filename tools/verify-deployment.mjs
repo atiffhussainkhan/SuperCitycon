@@ -75,13 +75,32 @@ function check(name, pass, detail = '') {
   console.log(`${pass ? 'PASS' : 'FAIL'}  ${name}${detail ? `  — ${detail}` : ''}`);
 }
 
-async function head(path) {
-  try {
-    const response = await fetch(new URL(path, URL_BASE), { redirect: 'follow' });
-    return { status: response.status, type: response.headers.get('content-type') ?? '' };
-  } catch (err) {
-    return { status: 0, type: '', error: String(err?.message ?? err) };
+/**
+ * Ask the CDN for a path, retrying a TRANSIENT failure.
+ *
+ * A 503 or a network error right after a deployment is the CDN edge
+ * refreshing, not evidence about the file. Reporting it as "the uncleared
+ * art is served" would be a false alarm that trains people to ignore this
+ * tool; reporting it as "the file is absent" would be a false pass. So it is
+ * retried, and a genuinely served file still fails the check.
+ *
+ * @param {string} path
+ * @returns {Promise<{status:number, type:string}>}
+ */
+async function head(path, attempts = 4) {
+  let last = { status: 0, type: '' };
+  for (let i = 0; i < attempts; i += 1) {
+    try {
+      const response = await fetch(new URL(path, URL_BASE), { redirect: 'follow' });
+      last = { status: response.status, type: response.headers.get('content-type') ?? '' };
+      // 404 is a real answer. 503 and 5xx are the edge waking up.
+      if (last.status < 500) return last;
+    } catch (err) {
+      last = { status: 0, type: '', error: String(err?.message ?? err) };
+    }
+    await new Promise((r) => setTimeout(r, 1500 * (i + 1)));
   }
+  return last;
 }
 
 async function get(path) {
