@@ -76,8 +76,24 @@ const ROOT = resolve(HERE, '..');
 const DIST = resolve(ROOT, 'game', 'dist');
 const GAME = resolve(ROOT, 'game');
 
-const url = process.argv[2] || 'http://localhost:4210/';
-const outDir = process.argv[3] || '/tmp/sc-compat';
+// The arguments are POSITIONAL: a URL and an output folder.
+//
+// A flag-style call (`--url https://…`) used to be accepted silently, and
+// the URL was then used as the OUTPUT FOLDER — which created a directory
+// named after the URL inside the repository. A mistake in the invocation
+// must fail loudly, not litter the tree.
+const args = process.argv.slice(2);
+if (args.some((a) => a.startsWith('--'))) {
+  process.stderr.write(
+    'Usage: node tools/compat-audit.mjs [url] [outDir]\n'
+    + '  url     the served build (default http://localhost:4210/)\n'
+    + '  outDir  the evidence folder (default /tmp/sc-compat)\n'
+    + 'The arguments are POSITIONAL — there are no flags.\n',
+  );
+  process.exit(2);
+}
+const url = args[0] || 'http://localhost:4210/';
+const outDir = args[1] || '/tmp/sc-compat';
 /** How many interleaved rounds each configuration is measured over. */
 const ROUNDS = Number(process.env.SC_COMPAT_ROUNDS || 3);
 /** How long each frame sample runs, in milliseconds. */
