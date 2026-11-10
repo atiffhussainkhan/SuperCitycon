@@ -295,6 +295,19 @@ export function createTouchService(ctx, deps = {}) {
     publishHover(recogniser.pointerCount() === 0 ? null : cellUnderRemainingPointer());
   };
 
+  /**
+   * The window lost the focus.
+   *
+   * The finger is gone as far as the browser is concerned — it will never
+   * send the `pointerup` — so the gesture is abandoned and the highlight
+   * goes with it. Leaving the finger registered would keep the camera
+   * panning into a window the player is not looking at.
+   */
+  const onWindowBlur = () => {
+    recogniser.reset();
+    publishHover(null);
+  };
+
   const onPointerCancel = (e) => {
     if (!isTouchPointer(e)) return;
     recogniser.cancel(pointOf(e));
@@ -318,6 +331,14 @@ export function createTouchService(ctx, deps = {}) {
       el.addEventListener('pointermove', onPointerMove, { passive: false });
       el.addEventListener('pointerup', onPointerUp, { passive: false });
       el.addEventListener('pointercancel', onPointerCancel, { passive: false });
+      // A window that loses the focus never sends a `pointerup` for the
+      // finger that was on it — the browser simply stops delivering the
+      // events. Without this the recogniser would keep the finger forever,
+      // the camera would keep panning, and the next gesture would start
+      // from a state that was never cleaned up.
+      if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+        window.addEventListener('blur', onWindowBlur);
+      }
       return true;
     },
 
@@ -344,6 +365,9 @@ export function createTouchService(ctx, deps = {}) {
         element.removeEventListener('pointermove', onPointerMove);
         element.removeEventListener('pointerup', onPointerUp);
         element.removeEventListener('pointercancel', onPointerCancel);
+      }
+      if (typeof window !== 'undefined' && typeof window.removeEventListener === 'function') {
+        window.removeEventListener('blur', onWindowBlur);
       }
       element = null;
     },

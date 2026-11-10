@@ -343,7 +343,12 @@ export function createGestureRecogniser(options = {}) {
   function cancel(point) {
     const p = normalise(point);
     if (!p) return;
+    // The gesture is OVER when the last finger is cancelled, so the
+    // multi-touch flag is cleared here too — exactly as `up()` does.
+    // Without it, a pinch that the browser cancelled would swallow the
+    // NEXT tap as well, and the player would have to tap twice.
     pointers.delete(p.id);
+    if (pointers.size === 0) multiTouch = false;
     if (pointers.size < 2) {
       if (pinch) {
         emit({ type: 'pinch', phase: 'end', scale: 1, rotation: 0, cx: p.x, cy: p.y, dx: 0, dy: 0, time: p.t });

@@ -700,6 +700,11 @@ export function createCameraRig(ctx, options = {}) {
   function onBlur() {
     keys.clear();
     dragging = null;
+    // The analogue axes too. A stick that is still pushed when the window
+    // loses focus would keep driving the camera with nothing on screen to
+    // show for it, and the camera would drift away while the player is
+    // looking at another window.
+    padAxes = { panX: 0, panY: 0, rotate: 0, zoom: 0 };
   }
 
   if (listen && canvas && typeof canvas.addEventListener === 'function') {

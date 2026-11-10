@@ -328,6 +328,46 @@ try {
       ? `${layout.tooSmall.length} of ${layout.buttonCount} are smaller: ${JSON.stringify(layout.tooSmall.slice(0, 3))}`
       : `${layout.buttonCount} control(s), all at least 44 x 44`);
 
+  // A control can be the right size and still be UNREACHABLE: the HUD
+  // clips its overflow, so a chip past the edge of a phone screen is not
+  // scrolled out of sight — it cannot be tapped at all. The document's
+  // scrollWidth does not show this, because the HUD hides the evidence.
+  const unreachable = await page.evaluate(() => {
+    // A control outside the viewport is only UNREACHABLE when nothing can
+    // scroll it into view. A rail with `overflow-x: auto` can: the player
+    // swipes it. So the test asks whether the control has a scrollable
+    // ancestor, not merely whether it is on screen.
+    const scrollable = (el) => {
+      let node = el?.parentElement;
+      while (node) {
+        const ox = getComputedStyle(node).overflowX;
+        if (ox === 'auto' || ox === 'scroll') return true;
+        node = node.parentElement;
+      }
+      return false;
+    };
+    const buttons = [...document.querySelectorAll('.sc-hud button')]
+      .filter((b) => b.getClientRects().length > 0);
+    return buttons
+      .map((b) => {
+        const r = b.getBoundingClientRect();
+        const outside = r.left < -1 || r.right > window.innerWidth + 1;
+        return {
+          label: b.textContent.trim().slice(0, 20),
+          left: Math.round(r.left),
+          right: Math.round(r.right),
+          outside,
+          scrollable: scrollable(b),
+        };
+      })
+      .filter((b) => b.outside && !b.scrollable);
+  });
+  check('every visible HUD control can be reached on a 390 px viewport',
+    unreachable.length === 0,
+    unreachable.length
+      ? `${unreachable.length} control(s) sit outside the viewport: ${JSON.stringify(unreachable.slice(0, 4))}`
+      : 'every control is inside the viewport');
+
   // The touch path must still work at the phone size.
   const narrowDrag = await page.evaluate(async () => {
     const before = window.__sc.camera();

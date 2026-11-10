@@ -337,7 +337,10 @@ export function createHUD(ctx, deps = {}) {
   searchInput.className = 'sc-search';
   searchInput.placeholder = 'SEARCH';
   searchInput.setAttribute('aria-label', 'Search the building shop');
-  searchInput.style.cssText = 'pointer-events:auto;min-height:34px;background:var(--sc-ink);border:3px solid var(--sc-edge);color:var(--sc-text);padding:3px 6px;font-family:inherit;font-size:9px;';
+  // The styling lives in the stylesheet, under `.sc-search`. It used to be
+  // an inline style, and an inline style beats a stylesheet rule — so the
+  // search box kept its 34 px height even after the stylesheet gave it the
+  // project's 44 px touch target.
   shopEl.append(tabsEl, cardsEl, searchInput);
 
   // --- camera cluster ---

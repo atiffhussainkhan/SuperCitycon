@@ -89,6 +89,8 @@ export function createGamepadService(ctx, deps = {}) {
   let previous = null;
   let state = null;
   let disposed = false;
+  /** True while the window does not have the focus. */
+  let windowBlurred = false;
   /** True on the frame the menu was opened, so that press cannot act on it. */
   let openedMenuThisFrame = false;
   let frame = 0;
@@ -219,11 +221,28 @@ export function createGamepadService(ctx, deps = {}) {
    */
   function applyAxes(st) {
     if (!camera || typeof camera.setPadAxes !== 'function') return;
-    if (modalOpen() || capturing()) {
+    if (modalOpen() || capturing() || blurred()) {
       camera.setPadAxes({ panX: 0, panY: 0, rotate: 0, zoom: 0 });
       return;
     }
     camera.setPadAxes(st.axes);
+  }
+
+  /**
+   * True while the window does not have the focus.
+   *
+   * A pad that is still pushed while the player is looking at another
+   * window would keep driving the camera — the camera rig clears its own
+   * copy of the axes when it loses the focus, but the service pushes them
+   * again on the very next frame. The service has to let go too.
+   *
+   * The flag follows the window's `blur` and `focus` EVENTS rather than
+   * `document.hasFocus()`: the event is what actually tells the page that
+   * it lost the focus, and it is the only signal that works when the focus
+   * change is delivered by the browser rather than by the page.
+   */
+  function blurred() {
+    return windowBlurred;
   }
 
   // ---- the connection events ------------------------------------------------
@@ -244,6 +263,15 @@ export function createGamepadService(ctx, deps = {}) {
   }
 
   // ---- the public surface --------------------------------------------------
+
+  // The window's focus state. A pad that is still pushed while the player
+  // is looking at another window must not keep driving the camera.
+  const onWindowBlur = () => { windowBlurred = true; };
+  const onWindowFocus = () => { windowBlurred = false; };
+  if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+    window.addEventListener('blur', onWindowBlur);
+    window.addEventListener('focus', onWindowFocus);
+  }
 
   return {
     /**
@@ -289,6 +317,10 @@ export function createGamepadService(ctx, deps = {}) {
       disposed = true;
       previous = null;
       state = null;
+      if (typeof window !== 'undefined' && typeof window.removeEventListener === 'function') {
+        window.removeEventListener('blur', onWindowBlur);
+        window.removeEventListener('focus', onWindowFocus);
+      }
       // The camera must not keep the last axes after the service is gone.
       try { camera?.setPadAxes?.({ panX: 0, panY: 0, rotate: 0, zoom: 0 }); } catch { /* ignore */ }
     },

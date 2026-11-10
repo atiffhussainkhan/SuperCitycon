@@ -71,6 +71,25 @@ export const HUD_STYLES = `
     min-height: 44px;
     padding: 4px 6px;
   }
+
+  /*
+   * The demand + usage row is a RAIL: six chips at 96 px each need about
+   * 570 px, and a phone is 390 px wide. The HUD clips its overflow, so
+   * without this the chips past the edge are not merely scrolled out of
+   * sight — they are UNREACHABLE. The rail scrolls instead, and the row
+   * takes the pointer events it needs to be scrolled.
+   */
+  .sc-statusrow {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    pointer-events: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .sc-statusrow::-webkit-scrollbar { display: none; }
+  .sc-statusrow > .sc-stats { flex: 0 0 auto; }
+  .sc-statusrow .sc-stat { min-width: 88px; }
 }
 
 #ui-root > .sc-hud * { box-sizing: border-box; }
@@ -601,10 +620,16 @@ export const HUD_STYLES = `
 }
 .sc-palette { display: flex; gap: 3px; flex-wrap: wrap; }
 .sc-swatch {
-  width: 28px;
-  height: 28px;
-  min-width: 28px;
-  min-height: 28px;
+  /*
+   * 44 px, not 28: a palette swatch is picked with a finger like any other
+   * control, and 28 px is smaller than the project's own touch-target
+   * claim. The swatch keeps its square look — the extra size is the hit
+   * area, not a bigger colour chip.
+   */
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   border: 3px solid var(--sc-edge);
   padding: 0;
   cursor: pointer;
@@ -755,11 +780,55 @@ export const HUD_STYLES = `
 .sc-setbtn:hover { border-color: var(--sc-dim); }
 .sc-setbtn[aria-pressed="true"] { border-color: var(--sc-gold); color: var(--sc-gold); }
 .sc-setbtn-wide { width: 100%; margin-top: 4px; min-height: 44px; }
+
 .sc-setrange {
   pointer-events: auto;
   width: 130px;
   min-height: 24px;
   accent-color: var(--sc-gold);
+}
+
+/*
+ * The settings rows.
+ *
+ * The stepper buttons were 32 px and the slider 24 px, both under the
+ * project's own 44 px touch-target claim. The slider keeps its thin track
+ * — a range input's thumb is centred in its box — but its BOX is now
+ * 44 px tall, so the finger has room to land.
+ *
+ * These rules come AFTER the ones above on purpose: with the same
+ * specificity, the later rule wins.
+ */
+.sc-setbtn { min-height: 44px; }
+.sc-setrange { min-height: 44px; }
+
+/*
+ * The search box.
+ *
+ * It had NO rule at all, so it fell back to the browser's default input —
+ * 17 px tall, in the browser's own font, sitting in the middle of a
+ * pixel-art panel. That is smaller than a finger and smaller than the
+ * project's own 44 px touch-target claim, and it looked like a mistake
+ * because it was one.
+ */
+.sc-search {
+  pointer-events: auto;
+  min-width: 0;
+  min-height: 44px;
+  padding: 4px 8px;
+  background: var(--sc-ink);
+  border: 3px solid var(--sc-edge);
+  border-radius: 0;
+  color: var(--sc-text);
+  font-family: inherit;
+  font-size: calc(10px * var(--sc-text-scale, 1));
+  text-transform: uppercase;
+  letter-spacing: .02em;
+}
+.sc-search::placeholder { color: var(--sc-dim); text-transform: none; }
+.sc-search:focus-visible {
+  outline: 2px solid var(--sc-gold);
+  outline-offset: 2px;
 }
 
 /* ==========================================================================

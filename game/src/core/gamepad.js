@@ -118,11 +118,11 @@ export function applyDeadZone(value, deadZone = DEFAULT_DEAD_ZONE) {
  * @param {object|null} pad a `Gamepad` from `navigator.getGamepads()`
  * @param {object} [opts]
  * @param {number} [opts.deadZone]
- * @returns {{connected:boolean,id:string|null,index:number|null,buttons:boolean[],axes:number[]}}
+ * @returns {{connected:boolean,id:string|null,index:number|null,mapping:string,buttons:boolean[],axes:number[]}}
  */
 export function readPad(pad, { deadZone = DEFAULT_DEAD_ZONE } = {}) {
   if (!pad || !pad.connected) {
-    return { connected: false, id: null, index: null, buttons: [], axes: [] };
+    return { connected: false, id: null, index: null, mapping: '', buttons: [], axes: [] };
   }
   const rawButtons = Array.isArray(pad.buttons) ? pad.buttons : [];
   const buttons = rawButtons.map((b) => {
@@ -137,6 +137,12 @@ export function readPad(pad, { deadZone = DEFAULT_DEAD_ZONE } = {}) {
     connected: true,
     id: typeof pad.id === 'string' ? pad.id : null,
     index: Number.isFinite(pad.index) ? pad.index : null,
+    // The mapping is the browser's name for the pad's button layout.
+    // It is copied so that a consumer can TELL a standard pad from a
+    // non-standard one: the button indices of a non-standard pad do not
+    // mean what they mean on a standard one, and silently reading them as
+    // standard is how a player ends up with the wrong control bound.
+    mapping: typeof pad.mapping === 'string' ? pad.mapping : '',
     buttons,
     axes,
   };

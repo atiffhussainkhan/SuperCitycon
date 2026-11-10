@@ -261,7 +261,17 @@ export function createRenderer(container) {
       const h = container.clientHeight || window.innerHeight;
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
+      // `setSize(w, h, false)` updates the DRAWING BUFFER but leaves the
+      // canvas ELEMENT at its old size. On a fresh load the element is
+      // already right, so the bug hides — but after a resize (a phone
+      // rotating, a window dragged narrow) the canvas kept its boot size
+      // and overflowed the page by hundreds of pixels.
       renderer.setSize(w, h, false);
+      const canvas = renderer.domElement;
+      if (canvas) {
+        canvas.style.width = `${w}px`;
+        canvas.style.height = `${h}px`;
+      }
       postfx?.resize();
     },
     start() {

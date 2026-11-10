@@ -141,7 +141,12 @@ async function main() {
   // The user's settings: audio levels, display options, accessibility
   // options and the key bindings. They are a user preference, so they live
   // in their own localStorage record and never inside a save.
-  const settings = createSettings({ storage: globalThis.localStorage ?? null, logger });
+  // The storage may be THROWN, not merely missing: a browser with cookies
+  // blocked makes `globalThis.localStorage` raise on ACCESS, and `??` cannot
+  // guard a throwing getter. Reading it unguarded meant the game showed a
+  // fatal pane and never booted at all — the settings are a preference, not
+  // a requirement, so a browser that refuses them still gets a game.
+  const settings = createSettings({ storage: safeLocalStorage(), logger });
   settings.load();
 
   // One table of key bindings for the whole game, so a key can be rebound
@@ -879,6 +884,24 @@ function installPlacementGate(ctx) {
  *   - the dispatch of that cell to every domain's `onHover` / `onClick`,
  *   - the speed / pause keyboard shortcuts, routed through CORE.
  */
+/**
+ * The browser's local storage, or null when there is none.
+ *
+ * The access can THROW — a browser with cookies blocked, or a sandboxed
+ * frame, raises on ACCESS rather than returning null — and a throw here
+ * would stop the game from booting at all. The settings are a preference,
+ * so a browser that refuses them still gets a game.
+ *
+ * @returns {Storage|null}
+ */
+function safeLocalStorage() {
+  try {
+    return globalThis.localStorage ?? null;
+  } catch {
+    return null;
+  }
+}
+
 function installInput(ctx, renderer) {
   const el = renderer.renderer.domElement;
   let dragging = false;
