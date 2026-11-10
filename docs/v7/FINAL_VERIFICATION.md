@@ -34,6 +34,29 @@ verified with evidence.
 
 ---
 
+## 1a. The publication state
+
+**The V7 work is on GitHub as `origin/development/v7`. It is NOT on `main`,
+and it is NOT deployed.**
+
+| | |
+|---|---|
+| The branch on the remote | `origin/development/v7` = `71de37f486b7b2a5dacca88cb5dbf44e6def8f96` |
+| The default branch | `main` = `69b6579` — **unchanged** |
+| The live site | https://atiffhussainkhan.github.io/SuperCitycon/ — still serving the `main` build |
+| The GitHub Pages source branch | `main` — so a merge into `main` **deploys V7 live** |
+| The decision | **The V7 branch was deliberately NOT merged into `main`.** |
+
+This is deliberate. V7 is a **release candidate**, not a completed release:
+the senior-review gate is open and the platform verification is partial.
+Publishing a release candidate to the production default branch is exactly
+the action the release rules reserve for an approved release. The V6 and V5
+branches are likewise preserved intact, and no tag has been created — the
+repository has no tag or GitHub-release convention to follow, and starting
+one is a separate decision.
+
+---
+
 ## 2. The gate-by-gate table
 
 | # | Gate | Evidence | Result |
