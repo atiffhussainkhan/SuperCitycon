@@ -17,6 +17,7 @@
 
 import * as THREE from 'three';
 import { createRenderer, cellCenter } from './render/renderer.js';
+import { isTouchPointer } from './core/touch.js';
 import { createState, setState, resetState, state as liveState } from './core/state.js';
 
 // --- the ten domains, imported STATICALLY --------------------------------
@@ -885,14 +886,30 @@ function installInput(ctx, renderer) {
   let lastY = 0;
   let moved = 0;
 
+  /**
+   * Is this pointer a finger?
+   *
+   * V7: the TOUCH service owns the touch path — the gesture recogniser
+   * decides what a tap and a drag mean — so this handler must NOT also act
+   * on a touch pointer. Without this a single tap selected the cell twice:
+   * once from the touch service and once from here, because the browser
+   * fires the pointer events for a touch as well.
+   *
+   * One owner per device.
+   */
+  const isTouch = (e) => isTouchPointer(e);
+
   const pointerDown = (e) => {
+    if (isTouch(e)) return;
     dragging = true; moved = 0; lastX = e.clientX; lastY = e.clientY;
   };
   const pointerUp = (e) => {
+    if (isTouch(e)) return;
     dragging = false;
     if (moved < 6) handleClick(ctx, e);
   };
   const pointerMove = (e) => {
+    if (isTouch(e)) return;
     moved += Math.abs(e.clientX - lastX) + Math.abs(e.clientY - lastY);
     lastX = e.clientX; lastY = e.clientY;
     handleHover(ctx, e);

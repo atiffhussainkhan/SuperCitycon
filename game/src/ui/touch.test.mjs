@@ -23,12 +23,19 @@ import { createTouchService } from './touch.js';
  */
 function fakeCamera() {
   const calls = [];
+  // The rig has TWO values: the TARGET it is moving towards and the damped
+  // value it is showing. The fake keeps both, so a test can tell them
+  // apart — and so a consumer that compounds against the wrong one is
+  // caught.
+  const state = { distance: 66, x: 0, z: 0, yaw: 0, pitch: 55 };
+  const target = { ...state };
   return {
     calls,
-    state: { distance: 66, x: 0, z: 0, yaw: 0, pitch: 55 },
+    state,
+    target,
     panBy(dx, dz) { calls.push(['pan', dx, dz]); return { x: dx, z: dz }; },
-    zoomTo(d) { calls.push(['zoom', d]); return d; },
-    rotate(d) { calls.push(['rotate', d]); return d; },
+    zoomTo(d) { calls.push(['zoom', d]); target.distance = d; return d; },
+    rotate(d) { calls.push(['rotate', d]); target.yaw += d; return d; },
   };
 }
 
@@ -224,4 +231,46 @@ test('touch: a mouse pointerdown on the canvas is ignored', () => {
     pointerId: 3, pointerType: 'mouse', clientX: 10, clientY: 20, preventDefault() { },
   });
   assert.equal(service.pointerCount(), 0, 'the mouse is not a finger');
+});
+
+test('touch: a pinch reported many times zooms ONCE, not once per event', () => {
+  const camera = fakeCamera();
+  const { ctx } = makeCtx();
+  const service = createTouchService(ctx, { camera });
+
+  // Two fingers, spread a little further on every move event.
+  service.recogniser.down({ id: 1, x: 500, y: 400, t: 0 });
+  service.recogniser.down({ id: 2, x: 700, y: 400, t: 5 });
+  for (let i = 1; i <= 10; i += 1) {
+    service.recogniser.move({ id: 1, x: 500 - (i * 10), y: 400, t: 10 + (i * 5) });
+    service.recogniser.move({ id: 2, x: 700 + (i * 10), y: 400, t: 10 + (i * 5) });
+  }
+
+  const zooms = camera.calls.filter((c) => c[0] === 'zoom');
+  assert.ok(zooms.length >= 1, 'the camera was zoomed');
+  // The fingers spread from 200 to 400 — a factor of two. The camera must
+  // zoom by that factor, not by it raised to the number of events.
+  const zoomed = camera.target.distance;
+  assert.ok(Math.abs(zoomed - (camera.state.distance / 2)) < 0.5,
+    `the camera zoomed once by a factor of two (${zoomed}, expected about ${camera.state.distance / 2})`);
+});
+
+test('touch: a pinch that turns rotates ONCE, not once per event', () => {
+  const camera = fakeCamera();
+  const { ctx } = makeCtx();
+  const service = createTouchService(ctx, { camera });
+
+  service.recogniser.down({ id: 1, x: 500, y: 400, t: 0 });
+  service.recogniser.down({ id: 2, x: 700, y: 400, t: 5 });
+  for (let i = 1; i <= 8; i += 1) {
+    service.recogniser.move({ id: 1, x: 500, y: 400 - (i * 5), t: 10 + (i * 5) });
+    service.recogniser.move({ id: 2, x: 700, y: 400 + (i * 5), t: 10 + (i * 5) });
+  }
+
+  const rotations = camera.calls.filter((c) => c[0] === 'rotate');
+  const total = rotations.reduce((sum, c) => sum + Math.abs(c[1]), 0);
+  // The fingers turned by well under a radian. The cumulative bug applied
+  // the whole angle again on every event, which came to several radians.
+  assert.ok(total > 0.05, `the camera rotated (${total})`);
+  assert.ok(total < 1, `the rotation is the ANGLE, not the angle times the event count (${total})`);
 });

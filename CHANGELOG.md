@@ -7,6 +7,98 @@ and this project uses [semantic versioning](https://semver.org/spec/v2.0.0.html)
 
 ---
 
+## [7.0.0] — V7
+
+**Branch:** `development/v7`
+**Baseline:** V6 at `ecc30fc`
+**Engine:** Three.js 0.169 · Vite 7.3.7 (bundler only) · ES modules · no framework
+**Release status:** **V7 RELEASE CANDIDATE** — 835 tests pass, the build is
+verified, and two gates are not fully closed: there was no independent senior
+review of the V7 diff, and the platform verification is limited to Chromium on
+macOS x86_64. See
+[`docs/v7/FINAL_VERIFICATION.md`](docs/v7/FINAL_VERIFICATION.md).
+
+V7 adds to the game and changes **nothing** about the player's saved cities.
+The save schema stays at **version 2**, so a V5 or a V6 city opens in V7
+exactly as it was.
+
+### Added — the citizens navigate
+
+The citizens used to walk in a straight line from A to B: the path was
+`from → midpoint + a random offset → to`, with no knowledge of the terrain,
+the water or the buildings. A citizen walked through a warehouse, and on
+`high-water` through the flood.
+
+- **`game/src/core/navigation.js`** — a grid A* over the 64 × 64 city grid
+  with the octile heuristic, so the first route found is the cheapest one.
+  The search is **deterministic** (a fixed neighbour order and a total order
+  over the open set), **budgeted** (a walled-off destination returns the best
+  path found so far instead of stalling the frame), and it never cuts a
+  corner between two blocked cells.
+- The obstacle model is a **view over the live city**, not a copy of it:
+  water blocks, buildings block, a slope costs more, and a building placed a
+  moment ago changes the routes immediately.
+- The path is **smoothed**, so a citizen walks a straight line where the city
+  allows it.
+- Measured: a median of **0.202 ms** and a 95th percentile of **1.350 ms**
+  per search, against a 2 ms budget.
+
+### Added — touch input
+
+V6 had no touch support at all. Now a **one-finger drag pans the city**, a
+**pinch zooms it**, a **two-finger drag rotates it**, and a **tap selects the
+cell** — through the same dispatcher the mouse uses.
+
+- **`game/src/core/touch.js`** — the gesture rules, pure and Node-testable:
+  tap, double-tap, long press, drag with a velocity, and pinch with a scale
+  and a rotation. Every threshold is in milliseconds or pixels, so the same
+  physical gesture produces the same gesture at 30 Hz and at 144 Hz.
+- **`game/src/ui/touch.js`** — the browser half.
+- The HUD respects the **safe areas** of a notched device and reflows on a
+  narrow viewport.
+
+### Added — the content pipeline proves its own levels
+
+V5 and V6 said: *"Reachability beyond the declared progression links is not
+proven by this validator."* V7 **proves** it — it generates the level's
+terrain from its own seed, with the world's own functions, and asks the
+pathfinder whether a route exists to every exit, checkpoint and collectible.
+An unreachable target is now an **error**. The three shipped levels are all
+proven: 3/3, 5/5 and 7/7 targets reachable.
+
+### Added — the toolchain
+
+- **`tools/secret-scan.mjs`** — scans the tree and the bundle for
+  credential-shaped values, and refuses to flag a placeholder.
+- **`tools/profile-navigation.mjs`** — measures the new hot path on a quiet
+  machine.
+- **`tools/scenario-v7.mjs`** — the V7 browser acceptance scenario.
+- **`tools/package-game-release.mjs`** — packages the cleared bundle with a
+  SHA-256 for every file, and refuses to ship a leak.
+
+### Fixed
+
+- **A held movement key kept panning the camera behind the menu.** The key
+  handler returns early when the menu is open, but the held-key set was never
+  cleared. The gamepad path already had that rule; the keyboard now has it
+  too. The regression test fails on the V6 baseline and passes on V7.
+- **A touch tap selected the cell twice** — once from the touch service and
+  once from the pointer handler. The integrator's pointer handler now ignores
+  touch pointers: one owner per device.
+- **A pinch zoomed and rotated cumulatively.** The zoom was multiplied once
+  per move event. The pinch now carries a phase, and the camera applies the
+  change since the last event.
+
+### Not changed
+
+- The **save schema** stays at version 2.
+- The **V5 and V6 acceptance scenarios** are untouched, and both still pass
+  against the V7 build.
+- The **studio editor** — its undo / redo already existed.
+- The **dependencies** — `three` and nothing else.
+
+---
+
 ## [6.0.0] — V6
 
 **Branch:** `v6/upgrade-Zehe03`
@@ -266,6 +358,7 @@ images.
 
 ---
 
+[7.0.0]: https://github.com/atiffhussainkhan/SuperCitycon/releases/tag/v7.0.0
 [6.0.0]: https://github.com/atiffhussainkhan/SuperCitycon/releases/tag/v6.0.0
 [5.0.0]: https://github.com/atiffhussainkhan/SuperCitycon/releases/tag/v5.0.0
 [4.x]: https://github.com/atiffhussainkhan/SuperCitycon/releases

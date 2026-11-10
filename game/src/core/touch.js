@@ -170,7 +170,22 @@ export function createGestureRecogniser(options = {}) {
         startAngle: angle(a, b),
         lastCx: (a.x + b.x) / 2,
         lastCy: (a.y + b.y) / 2,
+        phase: 'move',
       };
+      // The pinch STARTS here, with the reference scale of 1 and no
+      // rotation. The consumer records that reference and then applies the
+      // CHANGE on every move, so the gesture is applied once in total.
+      emit({
+        type: 'pinch',
+        phase: 'start',
+        scale: 1,
+        rotation: 0,
+        cx: pinch.lastCx,
+        cy: pinch.lastCy,
+        dx: 0,
+        dy: 0,
+        time: p.t,
+      });
     } else if (pointers.size > 2) {
       // Three fingers is not a gesture this game acts on.
       pinch = null;
@@ -212,8 +227,14 @@ export function createGestureRecogniser(options = {}) {
         const rotation = angle(a, b) - pinch.startAngle;
         const cx = (a.x + b.x) / 2;
         const cy = (a.y + b.y) / 2;
+        // The PHASE matters: the scale and the rotation are ABSOLUTE values
+        // measured from the start of the pinch. A consumer that applies them
+        // as they are would zoom by the scale once per move event, which
+        // compounds. The 'start' event carries the reference; every 'move'
+        // carries the change since the last one.
         emit({
           type: 'pinch',
+          phase: 'move',
           scale: Number.isFinite(scale) ? scale : 1,
           rotation: Number.isFinite(rotation) ? rotation : 0,
           cx,
@@ -259,7 +280,13 @@ export function createGestureRecogniser(options = {}) {
     const held = pointers.get(p.id);
     if (!held) return;
     pointers.delete(p.id);
-    if (pointers.size < 2) pinch = null;
+    if (pointers.size < 2) {
+      // The pinch is over: say so, so a consumer can drop its reference.
+      if (pinch) {
+        emit({ type: 'pinch', phase: 'end', scale: 1, rotation: 0, cx: p.x, cy: p.y, dx: 0, dy: 0, time: p.t });
+      }
+      pinch = null;
+    }
 
     const duration = p.t - held.startTime;
     const drift = Math.hypot(p.x - held.startX, p.y - held.startY);
@@ -293,7 +320,12 @@ export function createGestureRecogniser(options = {}) {
     const p = normalise(point);
     if (!p) return;
     pointers.delete(p.id);
-    if (pointers.size < 2) pinch = null;
+    if (pointers.size < 2) {
+      if (pinch) {
+        emit({ type: 'pinch', phase: 'end', scale: 1, rotation: 0, cx: p.x, cy: p.y, dx: 0, dy: 0, time: p.t });
+      }
+      pinch = null;
+    }
   }
 
   /**

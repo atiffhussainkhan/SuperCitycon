@@ -74,6 +74,16 @@ export function createTouchService(ctx, deps = {}) {
   }
 
   /**
+   * The reference of the current pinch.
+   *
+   * The recogniser reports the scale and the rotation of a pinch as
+   * ABSOLUTE values, measured from the start of the gesture. The camera
+   * must move by the CHANGE since the last event, or a pinch reported
+   * ten times would zoom ten times over.
+   */
+  const pinchReference = { scale: null, rotation: null };
+
+  /**
    * Handle one gesture.
    * @param {object} gesture
    */
@@ -88,20 +98,41 @@ export function createTouchService(ctx, deps = {}) {
         return;
       }
       case 'pinch': {
-        // The pinch carries the scale, the rotation and the movement of the
-        // centre of the two fingers.
-        if (gesture.scale && Number.isFinite(gesture.scale) && gesture.scale > 0) {
-          const distance = Number(camera?.state?.distance ?? 0);
-          if (Number.isFinite(distance) && distance > 0) {
-            camera?.zoomTo?.(distance / gesture.scale);
-          }
+        // The pinch's scale and rotation are ABSOLUTE values measured from
+        // the start of the gesture. They are applied as DELTAS — the change
+        // since the last event — so a pinch that is reported ten times
+        // zooms once, not ten times over.
+        if (gesture.phase === 'end') {
+          pinchReference.scale = null;
+          pinchReference.rotation = null;
+          return;
         }
-        if (gesture.rotation && Number.isFinite(gesture.rotation)) {
-          camera?.rotate?.(gesture.rotation);
+        if (gesture.phase === 'start') {
+          pinchReference.scale = gesture.scale;
+          pinchReference.rotation = gesture.rotation;
+          return;
+        }
+        const scale = Number(gesture.scale);
+        if (Number.isFinite(scale) && scale > 0 && pinchReference.scale) {
+          const change = pinchReference.scale / scale;
+          // The zoom compounds against the camera's TARGET, not against the
+          // damped value the camera is showing: the damped value has not
+          // caught up yet, so using it would lose every step but the last.
+          const distance = Number(camera?.target?.distance ?? camera?.state?.distance ?? 0);
+          if (Number.isFinite(distance) && distance > 0) {
+            camera?.zoomTo?.(distance * change);
+          }
+          pinchReference.scale = scale;
+        }
+        const rotation = Number(gesture.rotation);
+        if (Number.isFinite(rotation) && pinchReference.rotation !== null) {
+          const change = rotation - pinchReference.rotation;
+          if (Math.abs(change) > 0.0001) camera?.rotate?.(change);
+          pinchReference.rotation = rotation;
         }
         if (gesture.dx || gesture.dy) {
-          const scale = panScale();
-          camera?.panBy?.(-gesture.dx * scale, -gesture.dy * scale);
+          const scale2 = panScale();
+          camera?.panBy?.(-gesture.dx * scale2, -gesture.dy * scale2);
         }
         return;
       }
