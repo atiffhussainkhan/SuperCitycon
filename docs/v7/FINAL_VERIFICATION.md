@@ -21,7 +21,7 @@ gates are not fully closed, and they are named exactly:
 | Gate | Status | Why |
 |---|---|---|
 | **GATE 9 — Platform verification** | **PARTIAL** | Chromium is the only engine and macOS x86_64 the only platform that could be built and tested. Windows, Linux, Firefox, Safari and ARM64 could not be verified in this environment. The touch support is proven with synthetic events, not on a device. |
-| **GATE 12 — Final quality review** | **OPEN** | The Cursor senior review was **not** run for the V7 diff. The V7 review policy states that Cursor is optional and must not block the primary development, so the review was performed with the native tools instead — but an independent external senior review is not something this session can substitute for. |
+| **GATE 12 — Final quality review** | **OPEN** | The Cursor senior review was **not** run for the V7 diff. The V7 review policy states that Cursor is optional and must not block the primary development, so the review was performed with the native tools instead — but an independent external senior review is not something this session can substitute for. **The V7.1 round added an independent audit of the release's own claims**: eighteen behavioural claims checked one by one against the source, and all 79 TUNING keys checked against the whole tree. Both are clean. |
 
 Under the release rules, a release is called "complete and verified" only
 when **every** gate passes. V7 is therefore a **release candidate**, and the
@@ -98,6 +98,24 @@ one is a separate decision.
 
 ---
 
+## 3a. The V7.1 round — the audit found seven more
+
+The V7 release audited itself, and the audit found seven gaps — two of them
+introduced by V7. All seven are closed, and the round found three more real
+defects while it was fixing them.
+
+| The defect | The proof |
+|---|---|
+| The cell under the finger was not highlighted | `ui/touch.test.mjs` — 8 new tests; the negative check (the hover disabled) fails six of them |
+| A pinch ended with a tap, so a zoom placed a building | `core/touch.test.mjs` — 4 new tests |
+| A slow frame turned every tap into a long press | `ui/touch.test.mjs` — the event-time test |
+| The multi-touch flag killed every tap for the rest of the session | `core/touch.test.mjs` — "a tap still works AFTER a pinch" |
+| `TUNING.citizenPathsPerFrame` was never read | `population/citizens.test.mjs` — the budget is proven |
+| The camera shake had two sources of truth | `ui/camera.js` — `SHAKE` reads `TUNING` |
+| The path-search counters were unreachable from the page | `population/index.js` forwards them |
+| The speed buttons (40 px) and the shop tabs (34 px) were below the touch target | `tools/scenario-v7.mjs` — the 44 × 44 check |
+| The key capture bound Escape even though the toast promised "Esc cancels" | `ui/settings-panel.test.mjs` |
+
 ## 4. The defects this release fixed, and the proof
 
 | Defect | The proof |
@@ -158,6 +176,8 @@ native tools:
 | the defects | each defect was **reproduced before it was fixed**, and two of them carry a test that fails on the V6 baseline | `TEST_RESULTS.md` §4 |
 | the code | the unit suite, the syntax check, three browser scenarios, the benchmark, the secret scan | §3 |
 | the packaging | the package builds, hashes and refuses to ship a leak | §6 |
+| the claims | eighteen behavioural claims from this folder checked against the source, one by one | all eighteen backed |
+| the tuning table | all 79 TUNING keys checked against the whole source tree | none is unread |
 
 **What that is not:** an independent senior review by a party outside this
 session. Gate 12 stays **OPEN** for that reason.
