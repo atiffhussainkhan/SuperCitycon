@@ -20,7 +20,7 @@ gates are not fully closed, and they are named exactly:
 
 | Gate | Status | Why |
 |---|---|---|
-| **GATE 9 — Platform verification** | **PARTIAL** | Chromium is the only engine and macOS x86_64 the only platform that could be built and tested. Windows, Linux, Firefox, Safari and ARM64 could not be verified in this environment. The touch support is proven with synthetic events, not on a device. |
+| **GATE 9 — Platform verification** | **PARTIAL** | The BUNDLE half is now audited and measured: `tools/compat-audit.mjs` checks 15 cross-engine hazards against the shipped bundle, runs six degraded configurations (no `getGamepads`, a throwing `getGamepads`, no `PointerEvent`, no `ResizeObserver`) and sweeps six viewports, fresh and resized — 43/43. The ENGINE half cannot be closed here: Chromium is the only engine installed, and Windows, Linux, Firefox, Safari and ARM64 could not be built or tested. The real browser floor is **WebGL 2** (three.js r169 has no WebGL 1 fallback), so Safari 15 / iOS 15 / Chrome 56 / Firefox 51. The touch path is proven with simulated devices, never on hardware. |
 | **GATE 12 — Final quality review** | **OPEN** | The Cursor senior review was **not** run for the V7 diff. The V7 review policy states that Cursor is optional and must not block the primary development, so the review was performed with the native tools instead — but an independent external senior review is not something this session can substitute for. **The V7.1 round added an independent audit of the release's own claims**: eighteen behavioural claims checked one by one against the source, and all 79 TUNING keys checked against the whole tree. Both are clean. |
 
 Under the release rules, a release is called "complete and verified" only
@@ -89,7 +89,9 @@ one is a separate decision.
 | The build identity | `grep 7.0.0 dist/assets/index-*.js` | the bundle carries **7.0.0** |
 | The V5 acceptance scenario | `node tools/scenario.mjs` | **40/41 passed, 1 skipped** |
 | The V6 gamepad scenario | `node tools/scenario-gamepad.mjs` | **19/19 passed** |
-| The V7 scenario | `node tools/scenario-v7.mjs` | **13/13 passed** |
+| The V7 scenario | `node tools/scenario-v7.mjs` | **14/14 passed** |
+| The device scenario | `node tools/scenario-devices.mjs` | **32/32 passed** |
+| The compatibility audit | `node tools/compat-audit.mjs` | **43/43 passed** |
 | The production verification | `npm run verify:production -- --profile cleared` | **PRODUCTION BUILD VERIFIED** |
 | The navigation benchmark | `node tools/profile-navigation.mjs` | median 0.202 ms, p95 1.350 ms, budget 2 ms — **PASS** |
 | The city profile | `node tools/profile-city.mjs` | the city at 40 citizens holds 60 fps — **PASS** |

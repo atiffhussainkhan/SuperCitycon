@@ -56,24 +56,34 @@ The product is a web build. No installer, no native executable and no
 application bundle exist. The cleared bundle in `game/dist` is the only
 artefact.
 
-### V7-KI-04 — The touch path was verified with synthetic touch events
+### V7-KI-04 — The touch path was verified with simulated devices, not hardware
 
 | | |
 |---|---|
 | **Severity** | LIMITATION |
 | **Blocks release?** | No |
-| **Evidence** | `tools/scenario-v7.mjs` — 10/10 with real Chromium touch events through the DevTools protocol |
+| **Evidence** | `tools/scenario-devices.mjs` — **32/32**; `tools/compat-audit.mjs` — **43/43** |
 
-**No physical touch device was attached to the build machine.** The
-gestures are real browser events — Chromium was run with `hasTouch: true`
-and the gestures were dispatched with `Input.dispatchTouchEvent` — but the
-**feel** of a real finger was never put in front of a human:
+**No physical touch device was attached to the build machine.** What the
+V7.2 round did instead was test the paths under the conditions a device
+creates and a synthetic test does not: a phone profile with touch
+emulation, a pen, a browser-delivered `pointercancel`, a lost window
+focus, and a resize. That found and fixed **six real defects** — the game
+did not boot with cookies blocked, the canvas did not follow a resize, the
+HUD's demand rail was unreachable on a phone, the search box had no style at
+all, the recogniser kept its finger after a blur, and a cancelled pinch
+swallowed the next tap.
+
+What is still unverified is the **feel**:
 
 - whether the pan rate is right for a thumb;
-- whether the pinch is sensitive enough;
-- whether the 44 px touch targets are big enough in a hand;
+- whether the pinch is sensitive enough for two thumbs;
+- whether the 44 px touch targets are usable in a hand;
 - whether the safe-area insets are honoured on the device they were written
-  for.
+  for;
+- real pen pressure, tilt and palm rejection;
+- touch latency under load;
+- notches and foldables.
 
 Treat the touch support as **functionally verified, ergonomically
 unverified**. The pan rate in particular (`RIG_RATES.dragPan`, the same
@@ -87,8 +97,14 @@ scale the mouse uses) is a reasonable default and not a measured one.
 | **Blocks release?** | No |
 | **Was** | V6-KI-10 |
 
-Unchanged from V6. No physical controller was available. The logic is
-verified; the feel on real hardware is not.
+Unchanged from V6, except that the V7.2 round closed two more gaps in it: a
+pad unplugged **mid-press** now releases the button instead of leaving a
+phantom press for the menu, and the camera stops when the window loses the
+focus. The pad's **mapping** is now carried into the snapshot, so a
+non-standard pad can at least be TOLD apart from a standard one.
+
+No physical controller was available. The logic is verified; the feel on
+real hardware is not.
 
 ### V7-KI-06 — The 2D HUD art cannot ship
 
@@ -112,18 +128,33 @@ quarantined and **none of them ships**. The cleared build strips them and
 
 Unchanged. Every sound is synthesised at runtime; no audio file ships.
 
-### V7-KI-08 — The save file is dominated by JSON-encoded terrain arrays
+### V7-KI-08 — The save file's size: MEASURED, and the premise was wrong
 
 | | |
 |---|---|
 | **Severity** | MINOR |
 | **Blocks release?** | No |
-| **Was** | V6-KI-08 / KI-08 |
+| **Was** | V6-KI-08 / KI-08 — carried on an ASSUMPTION |
+| **Evidence** | `tools/save-size-report.mjs` and [`SAVE_SIZE.md`](SAVE_SIZE.md) |
 
-Unchanged. **Deliberately not fixed in V7**: the save schema stays at
-version 2 so that every existing city opens. A smaller save format would
-have to come with a migration, and a migration is a promise to every
-player who has a city.
+V5 and V6 recorded this issue as "the save file is dominated by
+JSON-encoded terrain arrays". **That was never measured, and it is not
+true.** The V7.2 round measured it:
+
+| | |
+|---|---|
+| A typical city (533 buildings, 884 roads, 15,968 residents) | **778,418 bytes** |
+| The largest city the game can hold (1,988 buildings, 56,844 residents) | **1,405,068 bytes** |
+| The terrain arrays' share of that | **2.25%** |
+| The JSON scaffolding's share | **69.5%** |
+| The **avoidable** part of a re-encoded terrain | **0.30%** — and lossless base64 would be *bigger*, because the terrain holds 14 distinct short decimals, not arbitrary floats |
+| The genuinely avoidable block (the static catalogue, republished in every save) | **41.9%** of the worst save — droppable with **no migration at all** |
+| The save / load time for the worst city | 39–50 ms to write, 87 ms to read |
+
+**The decision stands and is now evidence-based:** the schema stays at
+version 2, because a migration for 0.30% is not worth asking every player
+to accept. But the real win — trimming the static catalogue and the derived
+caches — is 41.9% and needs no migration. That belongs in V8.
 
 ### V7-KI-09 — Gamepad buttons cannot be REBOUND in the UI
 

@@ -17,7 +17,9 @@
 | The cleared build | `npm run build:cleared` | 218 files, 72.7 MB, licence policy **CLEARED** | **PASS** |
 | The V5 acceptance scenario | `node tools/scenario.mjs` | **40/41 passed, 1 skipped** | **PASS** |
 | The V6 gamepad scenario | `node tools/scenario-gamepad.mjs` | **19/19 passed** | **PASS** |
-| The V7 scenario | `node tools/scenario-v7.mjs` | **13/13 passed** | **PASS** |
+| The V7 scenario | `node tools/scenario-v7.mjs` | **14/14 passed** | **PASS** |
+| The device scenario | `node tools/scenario-devices.mjs` | **32/32 passed** | **PASS** |
+| The compatibility audit | `node tools/compat-audit.mjs` | **43/43 passed** | **PASS** |
 | The production verification | `npm run verify:production -- --profile cleared` | **PRODUCTION BUILD VERIFIED** | **PASS** |
 | The navigation benchmark | `node tools/profile-navigation.mjs` | p95 **1.350 ms** against a 2 ms budget | **PASS** |
 | The secret scan | `node tools/secret-scan.mjs` | 274 files, **0 findings** | **PASS** |

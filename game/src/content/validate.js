@@ -35,10 +35,14 @@
  * a pass.
  */
 
-import { GRID } from '../core/config.js';
+import { GRID, TUNING } from '../core/config.js';
 import { createGrid, findPath } from '../core/navigation.js';
-import { generateHeightmap } from '../world/heightfield.js';
-import { waterLevelFor } from '../world/water.js';
+// The terrain generators are PURE modules, so the validator — which is pure
+// too — can use them. `waterLevelFor` from `world/water.js` is a one-line
+// delegate for `seaLevelFor`, and `world/water.js` is a VIEW module, so the
+// pure one is used here instead: a pure module must never import a view
+// module, even when the view module happens not to reach for `three` today.
+import { generateHeightmap, seaLevelFor } from '../world/heightfield.js';
 
 // ---------------------------------------------------------------------------
 // Vocabulary
@@ -707,7 +711,7 @@ export function proveReachability(level, resources = {}) {
 
   // The terrain, exactly as the world domain generates it.
   const heightmap = generateHeightmap(level.seed, size);
-  const waterLevel = waterLevelFor(heightmap);
+  const waterLevel = seaLevelFor(heightmap, TUNING.waterFraction);
   const water = waterDepthMap(heightmap, size, waterLevel);
 
   // The obstacles: the buildings the level places.

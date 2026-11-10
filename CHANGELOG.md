@@ -7,6 +7,99 @@ and this project uses [semantic versioning](https://semver.org/spec/v2.0.0.html)
 
 ---
 
+## [7.0.0] — V7.2 — the device and compatibility round
+
+**Branch:** `development/v7`
+**Baseline:** V7.1
+**Release status:** see [`docs/v7/FINAL_VERIFICATION.md`](docs/v7/FINAL_VERIFICATION.md)
+
+V7.1 audited the release against the source. **V7.2 audits it against the
+conditions a device creates and a synthetic test cannot** — a phone profile,
+a pen, a cancelled pointer, a lost window focus, a pad unplugged mid-press, a
+blocked-cookies context, a resize. That found **nine more real defects**, and
+all nine are fixed here.
+
+### Fixed — the game did not boot with cookies blocked
+
+`main.js` read `globalThis.localStorage ?? null`. The `??` guards a MISSING
+value, not a THROWING getter — and a browser with cookies blocked makes
+`localStorage` throw on ACCESS. The game showed a fatal pane and never
+booted at all. The settings are a preference, not a requirement, so a
+browser that refuses them still gets a game.
+
+### Fixed — the canvas did not follow a resize
+
+`renderer.setSize(w, h, false)` updates the drawing buffer but leaves the
+canvas ELEMENT at its old size. A fresh load is already right, so the bug
+hides; after a phone rotation the canvas kept its boot size and overflowed
+the page by hundreds of pixels.
+
+### Fixed — the HUD was unreachable on a phone
+
+The demand and usage row is a six-chip rail that needs about 570 px in a
+390 px viewport, and the HUD clips its overflow: the chips past the edge
+were not scrolled out of sight, they were UNREACHABLE. The rail scrolls
+now, and the scenario's overflow check was replaced by a reachability check
+that would have caught it.
+
+### Fixed — 44 controls were under the touch target
+
+The search box had **no style rule at all** (and an inline style that beat
+the stylesheet anyway); the settings sliders were 24 px, the settings
+buttons 32 px and the studio's palette swatches 28 px. All are now at least
+44 × 44, at every viewport from 320 px up.
+
+### Fixed — the input kept its finger after the window lost the focus
+
+A window that loses the focus never sends a `pointerup`, so the recogniser
+held the finger forever and the camera kept panning into a window the
+player was not looking at. The touch service and the gamepad service now
+both let go.
+
+### Fixed — a cancelled pinch swallowed the next tap
+
+`cancel()` did not clear the multi-touch flag — only `up()` did. A pinch the
+browser cancelled (a call came in) would swallow the next tap as well.
+
+### Fixed — the pad's mapping was dropped
+
+A pad that reports a non-standard mapping was read as a standard one,
+silently. The mapping is now carried into the snapshot, so the game can
+tell the difference.
+
+### Measured — the save-size premise was wrong
+
+V5 and V6 recorded the save file as "dominated by JSON-encoded terrain
+arrays". **That was never measured, and it is not true.** A typical city
+saves 778,418 bytes and the largest city 1,405,068 — and the terrain is
+**2.25%** of that. A re-encoded terrain would win **0.30%** (and lossless
+base64 would be *bigger*). The genuinely avoidable block is the static
+catalogue: **41.9%**, droppable with no migration at all. The schema stays
+at version 2 — now on evidence rather than on an assumption.
+
+### Added — the audits and the runbook
+
+- `tools/compat-audit.mjs` — 15 cross-engine hazards against the shipped
+  bundle, six degraded configurations, six viewports, fresh and resized.
+- `tools/scenario-devices.mjs` — the device profiles.
+- `tools/save-size-report.mjs` — the save-size measurement.
+- `tools/verify-deployment.mjs` — proves the LIVE site serves what was
+  intended.
+- `tools/run-v7-verification.sh` — the whole battery as one command.
+- `docs/v7/SENIOR_REVIEW.md`, `docs/v7/DEPLOYMENT.md`,
+  `docs/v7/RELEASE_CHECKLIST.md`, `docs/v7/COMPATIBILITY_AUDIT.md`,
+  `docs/v7/DEVICE_COVERAGE.md`, `docs/v7/SAVE_SIZE.md`.
+
+### Verification
+
+- 898 tests, 898 pass, 0 fail.
+- The V7 scenario 14/14 · the device scenario 32/32 · the compatibility
+  audit 43/43 · the V5 acceptance 40/41 · the V6 gamepad 19/19.
+- Every visible control is at least 44 × 44 at 320, 390, 768, 1280 and
+  1920 pixels.
+
+---
+
 ## [7.0.0] — V7.1 — the audit round
 
 **Branch:** `development/v7`
