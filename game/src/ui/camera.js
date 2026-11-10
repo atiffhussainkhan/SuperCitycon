@@ -459,6 +459,20 @@ export function createCameraRig(ctx, options = {}) {
     return padAxes;
   }
 
+  /**
+   * Pan the focus by a delta in camera-relative space.
+   *
+   * The mouse drag and the touch drag both end up here, so the two feel
+   * the same. `panRelative` does the work; this is the public name.
+   *
+   * @param {number} dx
+   * @param {number} dz
+   * @returns {{x:number,z:number}} the world-space movement
+   */
+  function panBy(dx, dz) {
+    return panRelative(dx, dz);
+  }
+
   // ---- per-frame ---------------------------------------------------------
 
   /**
@@ -514,6 +528,11 @@ export function createCameraRig(ctx, options = {}) {
     const menuOwnsFocus = !!ctx?.ui?.menu?.isOpen?.();
     if (menuOwnsFocus) {
       padAxes = { panX: 0, panY: 0, rotate: 0, zoom: 0 };
+      // V7: the KEYBOARD has the same rule. The key handler returns early
+      // when the menu is open, so a key held as the menu opened stayed in
+      // the held-key set and kept panning the camera behind the menu until
+      // the player let go. Releasing the held keys here closes that hole.
+      keys.clear();
     } else {
       const px = padAxes.panX;
       const pz = padAxes.panY;
@@ -742,6 +761,8 @@ export function createCameraRig(ctx, options = {}) {
     reset,
     snap,
     update,
+    /** Pan the focus by a delta in camera-relative space. */
+    panBy,
     /** Push the analogue gamepad axes for this frame (null releases them). */
     setPadAxes,
     /** The analogue axes the rig is currently following. */

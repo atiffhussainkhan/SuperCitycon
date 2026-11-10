@@ -1074,3 +1074,48 @@ test('the camera does not move while the menu has the focus', () => {
   assert.deepEqual(rig.padAxes, { panX: 0, panY: 0, rotate: 0, zoom: 0 },
     'the axes were released');
 });
+
+test('a held movement key does not pan the camera while the menu is open', () => {
+  const ctx = makeCtx();
+  let menuOpen = false;
+  const renderer = makeRenderer();
+  const rig = createCameraRig({
+    ...ctx,
+    renderer,
+    ui: { menu: { isOpen: () => menuOpen } },
+  }, { listen: true });
+
+  // The player holds "W" and then opens the menu.
+  globalThis.window.dispatchEvent({ type: 'keydown', code: 'KeyW', target: globalThis.window, preventDefault() { } });
+  rig.update(0.05);
+  const moving = rig.target.z;
+  assert.ok(moving < 0, `the camera panned north first (z=${moving})`);
+
+  menuOpen = true;
+  rig.update(0.05);
+  const afterOpen = rig.target.z;
+  rig.update(0.5);            // half a second under the menu
+  const afterWaiting = rig.target.z;
+
+  assert.equal(afterWaiting, afterOpen,
+    `the camera kept panning under the menu (${afterOpen} -> ${afterWaiting})`);
+});
+
+test('the camera resumes panning after the menu closes', () => {
+  const ctx = makeCtx();
+  let menuOpen = true;
+  const rig = createCameraRig({
+    ...ctx,
+    renderer: makeRenderer(),
+    ui: { menu: { isOpen: () => menuOpen } },
+  }, { listen: true });
+
+  globalThis.window.dispatchEvent({ type: 'keydown', code: 'KeyW', target: globalThis.window, preventDefault() { } });
+  rig.update(0.05);
+  const whileOpen = rig.target.z;
+
+  menuOpen = false;
+  globalThis.window.dispatchEvent({ type: 'keydown', code: 'KeyW', target: globalThis.window, preventDefault() { } });
+  rig.update(0.05);
+  assert.ok(rig.target.z < whileOpen, 'the camera pans again once the menu is closed');
+});

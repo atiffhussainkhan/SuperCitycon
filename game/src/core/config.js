@@ -154,6 +154,29 @@ export const TUNING = Object.freeze({
   citizenCityShare: 0.8,
   /** TBD: the default cross-fade between two citizen animations, in seconds. */
   citizenCrossfadeSeconds: 0.25,
+  /**
+   * TBD: how expensive it is to cross one world unit of height difference,
+   * as a multiplier on the step cost. A flat street costs 1; a steep slope
+   * costs more, so a citizen prefers the long way round a hill.
+   */
+  citizenSlopeCost: 0.35,
+  /**
+   * TBD: how deep the water may be before a citizen refuses to cross it,
+   * in world units. The flood boundary is a wall the citizens route around.
+   */
+  citizenWadeDepth: 0.05,
+  /**
+   * TBD: the maximum number of grid cells one citizen path search may
+   * visit. The search stops there and returns the best path it found, so a
+   * walled-off destination can never stall a frame.
+   */
+  citizenPathBudget: 4096,
+  /**
+   * TBD: the maximum number of path searches started in one frame, across
+   * every citizen. A city full of citizens cannot flood the frame with
+   * searches.
+   */
+  citizenPathsPerFrame: 2,
   /** TBD: maximum residential levels per building. */
   maxLevels: 3,
   /** TBD: happiness ceiling and floor (0..100). */
@@ -421,6 +444,10 @@ export const TUNING_TBD = Object.freeze(new Set([
   'citizenCheerCooldown',
   'citizenCityShare',
   'citizenCrossfadeSeconds',
+  'citizenSlopeCost',
+  'citizenWadeDepth',
+  'citizenPathBudget',
+  'citizenPathsPerFrame',
   'maxLevels',
   'happinessMin',
   'happinessMax',

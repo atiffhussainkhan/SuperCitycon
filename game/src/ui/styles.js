@@ -36,6 +36,41 @@ export const HUD_STYLES = `
   text-transform: uppercase;
   -webkit-user-select: none;
   user-select: none;
+  /*
+   * V7: the SAFE AREAS of a notched device.
+   *
+   * A phone with a notch or a home indicator reserves those strips of
+   * screen. Without this the top bar sits under the notch and the bottom
+   * controls sit under the home indicator. The env() function is zero on a
+   * desktop, so this changes nothing there.
+   */
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+}
+
+/*
+ * V7: the NARROW VIEWPORT.
+ *
+ * A phone is 390 CSS pixels wide. The HUD is laid out for a desktop, so
+ * on a narrow screen the panels are scaled down to fit rather than
+ * overflowing off the side of the screen.
+ */
+@media (max-width: 520px) {
+  #ui-root > .sc-hud {
+    font-size: calc(10px * var(--sc-text-scale, 1));
+  }
+
+  .sc-panelbox {
+    padding: 4px;
+  }
+
+  .sc-hud .sc-btn {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 4px 6px;
+  }
 }
 
 #ui-root > .sc-hud * { box-sizing: border-box; }

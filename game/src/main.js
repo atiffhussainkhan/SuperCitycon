@@ -164,6 +164,22 @@ async function main() {
     domains: {},
     ui: null,
     core: {},
+    /**
+     * Send a click on a world cell to every domain.
+     *
+     * The MOUSE path has always done this in `installInput()`. V7 gives the
+     * TOUCH path the same dispatcher, so a tap and a click cannot drift
+     * apart: the same domain receives the same cell and the same button.
+     *
+     * @param {{x:number,z:number}} cell
+     * @param {number} [button] 0 = the primary button
+     * @returns {boolean} true when the cell was dispatched
+     */
+    dispatchWorldClick(cell, button = 0) {
+      if (!cell) return false;
+      for (const svc of Object.values(ctx.domains)) svc?.onClick?.(cell, button);
+      return true;
+    },
   };
   // `ctx.state` must ALWAYS point at the live state tree. `setState()`
   // (used by save/load and mode switching) replaces the tree, so a captured
@@ -914,7 +930,7 @@ function handleHover(ctx, e) {
 function handleClick(ctx, e) {
   const cell = cellFromEvent(ctx, e);
   if (!cell) return;
-  for (const svc of Object.values(ctx.domains)) svc?.onClick?.(cell, e.button);
+  ctx.dispatchWorldClick?.(cell, e.button);
 }
 
 /**

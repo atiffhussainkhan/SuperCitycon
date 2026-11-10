@@ -36,6 +36,9 @@
  */
 
 import { GRID } from '../core/config.js';
+import { createGrid, findPath } from '../core/navigation.js';
+import { generateHeightmap } from '../world/heightfield.js';
+import { waterLevelFor } from '../world/water.js';
 
 // ---------------------------------------------------------------------------
 // Vocabulary
@@ -632,13 +635,149 @@ export function validateLevel(level, resources = {}) {
     }
   }
 
-  // -- what the validator cannot prove ------------------------------------
-  addIssue(report, 'info', 'level.not-checked',
-    'Reachability beyond the declared progression links is not proven by this validator; '
-    + 'it cannot tell whether the terrain allows a route to the exit.',
-    { path: '' });
+  // -- reachability ---------------------------------------------------------
+  // V7 REPLACED THE "NOT CHECKED" NOTE WITH A PROOF.
+  //
+  // V5 and V6 could only read what a level *declared*, so they said so:
+  // "reachability beyond the declared progression links is not proven by this
+  // validator". V7 generates the level's terrain from its own seed — the
+  // same terrain the game will generate — and asks the pathfinder whether
+  // a route exists to every exit, checkpoint and collectible.
+  const reachability = proveReachability(level, resources);
+  if (reachability.checked) {
+    for (const target of reachability.targets) {
+      if (target.reachable) continue;
+      if (target.reason === 'budget') {
+        addIssue(report, 'warning', 'level.reachability-unknown',
+          `The route to ${target.kind} "${target.id}" could not be resolved within the search budget; `
+          + 'it is NOT known to be reachable.',
+          { path: target.path });
+        continue;
+      }
+      addIssue(report, 'error', 'level.unreachable-target',
+        `The ${target.kind} "${target.id}" cannot be reached from the city centre: `
+        + `${target.reason}.`,
+        { path: target.path });
+    }
+    addIssue(report, 'info', 'level.reachability-proven',
+      `${reachability.reachable}/${reachability.total} target(s) are reachable from the city centre `
+      + `on the terrain generated from seed ${level.seed}.`,
+      { path: '' });
+  } else {
+    addIssue(report, 'info', 'level.not-checked',
+      'Reachability could not be checked: the level has no usable seed, so its terrain '
+      + 'cannot be generated.',
+      { path: '' });
+  }
 
   return finaliseReport(report);
+}
+
+/**
+ * Prove that the level's targets can be reached.
+ *
+ * The terrain is generated from the level's own seed with the SAME functions
+ * the world domain uses, so the proof is about the world the player will
+ * actually walk into — not about a guess.
+ *
+ * The obstacles are the water of that terrain and the footprints of the
+ * buildings the level places.
+ *
+ * The start is the city centre: the camera opens on the world origin, so
+ * that is where the player is.
+ *
+ * The verdict is one of three, and it is never a guess:
+ *
+ *   reachable   — the pathfinder found a route
+ *   unreachable — the search exhausted the space without finding one
+ *   budget      — the search hit its budget; NOT the same as reachable
+ *
+ * @param {object} level the level definition
+ * @param {object} [resources] the resource table (the footprints matter)
+ * @returns {{checked:boolean, start:object|null, targets:Array, reachable:number, total:number}}
+ */
+export function proveReachability(level, resources = {}) {
+  const empty = { checked: false, start: null, targets: [], reachable: 0, total: 0 };
+  if (!isPlainObject(level) || !isFiniteNumber(level.seed)) return empty;
+
+  const size = Number.isInteger(resources.gridSize) ? resources.gridSize : GRID.size;
+  const budget = Number.isInteger(resources.pathBudget) && resources.pathBudget > 0
+    ? resources.pathBudget
+    : 4096;
+
+  // The terrain, exactly as the world domain generates it.
+  const heightmap = generateHeightmap(level.seed, size);
+  const waterLevel = waterLevelFor(heightmap);
+  const water = waterDepthMap(heightmap, size, waterLevel);
+
+  // The obstacles: the buildings the level places.
+  const blocked = new Set();
+  const spawns = Array.isArray(level.spawns) ? level.spawns : [];
+  for (const spawn of spawns) {
+    if (!isPlainObject(spawn) || spawn.type !== 'building') continue;
+    const footprint = footprintOf(resources.footprints, spawn.key);
+    for (const cell of spawnCells(spawn, footprint)) {
+      blocked.add(`${cell.x},${cell.z}`);
+    }
+  }
+
+  const wadeDepth = Number.isFinite(resources.wadeDepth) ? resources.wadeDepth : 0.05;
+  const grid = createGrid({
+    size,
+    isBlocked: (x, z) => (
+      blocked.has(`${x},${z}`) || (Number(water[(z * size) + x]) || 0) > wadeDepth
+    ),
+  });
+
+  const start = { x: Math.floor(size / 2), z: Math.floor(size / 2) };
+
+  const targets = [];
+  const collect = (list, kind, path) => {
+    for (const entry of Array.isArray(list) ? list : []) {
+      if (!isPlainObject(entry)) continue;
+      const x = Math.trunc(Number(entry.x));
+      const z = Math.trunc(Number(entry.z));
+      if (!Number.isFinite(x) || !Number.isFinite(z)) continue;
+      targets.push({
+        id: String(entry.id ?? `${kind}-${targets.length}`),
+        kind,
+        path,
+        cell: { x, z },
+      });
+    }
+  };
+  collect(level.exits, 'exit', 'exits');
+  collect(level.checkpoints, 'checkpoint', 'checkpoints');
+  collect(level.collectibles, 'collectible', 'collectibles');
+
+  let reachable = 0;
+  for (const target of targets) {
+    const result = findPath(grid, start, target.cell, { budget });
+    target.reachable = result.ok === true;
+    target.reason = result.reason;
+    target.cost = result.cost;
+    if (target.reachable) reachable += 1;
+  }
+
+  return { checked: true, start, targets, reachable, total: targets.length };
+}
+
+/**
+ * The water depth per cell for a heightmap, exactly as the world domain
+ * computes it.
+ *
+ * @param {Float32Array} heightmap
+ * @param {number} size
+ * @param {number} level the water level
+ * @returns {Float32Array}
+ */
+function waterDepthMap(heightmap, size, level) {
+  const water = new Float32Array(size * size);
+  for (let i = 0; i < water.length; i += 1) {
+    const h = Number(heightmap[i]);
+    water[i] = Number.isFinite(h) && level > h ? level - h : 0;
+  }
+  return water;
 }
 
 /**

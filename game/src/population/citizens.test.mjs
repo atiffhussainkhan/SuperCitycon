@@ -32,6 +32,7 @@ import {
   skinBindingReport,
 } from './citizens.js';
 import { STATE_CLIP_CANDIDATES, createAnimationMachine } from './animation.js';
+import { worldToCellInt } from '../core/config.js';
 
 /** The manifest, read from disk (Node needs an import attribute for JSON). */
 const manifest = JSON.parse(
@@ -532,4 +533,120 @@ test('disposing the citizens tears everything down', async (t) => {
   assert.equal(citizens.count(), 0);
   assert.equal(actors.children.length, 0, 'nothing is left in the scene');
   assert.equal(citizens.spawn({ from: { x: 1, z: 1 } }), null, 'a disposed manager spawns nothing');
+});
+
+// ===========================================================================
+// V7: the citizens navigate the city
+// ===========================================================================
+//
+// V6 shipped a straight-line path: `from → midpoint + a random offset → to`.
+// A citizen walked through a warehouse, and on `high-water` through the
+// flood. These tests are the regression proof for that.
+
+/**
+ * A context whose city has buildings and a flat terrain.
+ */
+function makeCityCtx({ size = 32, buildings = [] } = {}) {
+  const instances = new Map();
+  for (const [i, b] of buildings.entries()) {
+    instances.set(`b${i}`, { id: `b${i}`, type: 'res.house', x: b.x, z: b.z, rot: 0, level: 1 });
+  }
+  return {
+    config: { GRID: { size, cell: 4 } },
+    state: {
+      population: { happiness: 60 },
+      world: {
+        heightmap: new Float32Array(size * size),
+        water: new Float32Array(size * size),
+        types: new Uint8Array(size * size),
+        waterLevel: 0,
+      },
+      buildings: { instances },
+    },
+  };
+}
+
+/** The cells a citizen's path crosses. */
+function pathCells(path) {
+  return path.map((point) => worldToCellInt(point.x, point.z));
+}
+
+test('a citizen walks AROUND a building instead of through it', async (t) => {
+  const { gltf } = await makeCtx();
+  if (!gltf) {
+    t.skip('Knight.glb is not available in this checkout');
+    return;
+  }
+  // A wall of buildings with gaps at both ends, so a route exists.
+  const buildings = [];
+  for (let z = 6; z < 26; z += 1) buildings.push({ x: 15, z });
+  const ctx = makeCityCtx({ size: 32, buildings });
+  ctx.renderer = { actors: new THREE.Group() };
+  ctx.assets = { loadCharacter: async () => ({ model: gltf.scene, clips: gltf.animations }) };
+  ctx.rng = () => 0.5;
+  ctx.bus = fakeBus();
+  ctx.domains = { wld: { heightAt: () => 0 } };
+
+  const citizens = createCitizens(ctx);
+  await citizens.preload();
+  const citizen = citizens.spawn({ from: { x: 5, z: 16 }, to: { x: 25, z: 16 } });
+  assert.ok(citizen, 'the citizen is spawned');
+
+  const cells = pathCells(citizen.path);
+  const blocked = new Set(buildings.map((b) => `${b.x},${b.z}`));
+  for (const cell of cells) {
+    assert.equal(blocked.has(`${cell.x},${cell.z}`), false,
+      `the path went through the building at ${cell.x},${cell.z}`);
+  }
+  assert.ok(cells.some((cell) => cell.x > 15), 'the path reached the far side of the wall');
+});
+
+test('a citizen walks AROUND the flood', async (t) => {
+  const { gltf } = await makeCtx();
+  if (!gltf) {
+    t.skip('Knight.glb is not available in this checkout');
+    return;
+  }
+  const size = 32;
+  const ctx = makeCityCtx({ size });
+  // A strip of deep water across the middle, with a gap at one end.
+  for (let z = 1; z < 30; z += 1) ctx.state.world.water[(z * size) + 16] = 2;
+  ctx.renderer = { actors: new THREE.Group() };
+  ctx.assets = { loadCharacter: async () => ({ model: gltf.scene, clips: gltf.animations }) };
+  ctx.rng = () => 0.5;
+  ctx.bus = fakeBus();
+  ctx.domains = { wld: { heightAt: () => 0 } };
+
+  const citizens = createCitizens(ctx);
+  await citizens.preload();
+  const citizen = citizens.spawn({ from: { x: 8, z: 16 }, to: { x: 24, z: 16 } });
+  assert.ok(citizen, 'the citizen is spawned');
+
+  for (const cell of pathCells(citizen.path)) {
+    const depth = ctx.state.world.water[(cell.z * size) + cell.x];
+    assert.ok(!(depth > 0.05), `the path went through the flood at ${cell.x},${cell.z}`);
+  }
+});
+
+test('a citizen still arrives when no route exists', async (t) => {
+  const { gltf } = await makeCtx();
+  if (!gltf) {
+    t.skip('Knight.glb is not available in this checkout');
+    return;
+  }
+  // A wall of buildings with NO gap: the destination cannot be reached.
+  const buildings = [];
+  for (let z = 0; z < 32; z += 1) buildings.push({ x: 15, z });
+  const ctx = makeCityCtx({ size: 32, buildings });
+  ctx.renderer = { actors: new THREE.Group() };
+  ctx.assets = { loadCharacter: async () => ({ model: gltf.scene, clips: gltf.animations }) };
+  ctx.rng = () => 0.5;
+  ctx.bus = fakeBus();
+  ctx.domains = { wld: { heightAt: () => 0 } };
+
+  const citizens = createCitizens(ctx);
+  await citizens.preload();
+  const citizen = citizens.spawn({ from: { x: 5, z: 16 }, to: { x: 25, z: 16 } });
+  assert.ok(citizen, 'the citizen is still spawned');
+  assert.ok(citizen.path.length >= 2, 'and it still has a path to walk');
 });

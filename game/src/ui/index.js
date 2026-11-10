@@ -34,6 +34,7 @@ import { EVENTS } from '../core/events.js';
 import { createHUD } from './hud.js';
 import { createCameraRig } from './camera.js';
 import { createGamepadService } from './gamepad.js';
+import { createTouchService } from './touch.js';
 import { createToastQueue } from './toasts.js';
 import { createMenu } from './menu.js';
 import { createSettingsPanel } from './settings-panel.js';
@@ -112,6 +113,13 @@ export function createUI(ctx) {
     menu,
     camera,
     settingsPanel,
+  });
+
+  // The touch input (V7). The GESTURES are recognised by CORE's pure
+  // recogniser; this service binds them to the camera and the world.
+  const touch = createTouchService(ctx, {
+    logger: ctx?.logger,
+    camera,
   });
 
   let hud = null;
@@ -450,6 +458,8 @@ export function createUI(ctx) {
       // The pad is read BEFORE the camera, so the axes it pushed are the ones
       // this frame's camera update applies.
       gamepad.update(d);
+      // The touch clock is advanced before the camera too, for the same reason.
+      touch.update(d);
       camera.update(d);
       toasts.tick(d);
       hud?.update(d);
@@ -471,6 +481,9 @@ export function createUI(ctx) {
       hud.mount(el);
       // The menu overlay lives beside the HUD in the same container.
       menu.mount(el);
+      // The touch listeners go on the CANVAS, not on the HUD.
+      const canvas = ctx?.renderer?.renderer?.domElement ?? null;
+      if (canvas) touch.install(canvas);
       mounted = true;
       return true;
     },
@@ -523,6 +536,11 @@ export function createUI(ctx) {
     /** True while a gamepad is connected. */
     gamepadConnected() { return gamepad.isConnected(); },
 
+    /** The touch input service (V7). */
+    touch,
+    /** True while a touch gesture is in progress. */
+    touchActive() { return touch.isActive(); },
+
     /** Show or hide the performance read-out. */
     togglePerformance(force) { return hud?.togglePerformance?.(force) ?? false; },
     performanceVisible() { return hud?.performanceVisible?.() ?? false; },
@@ -548,6 +566,7 @@ export function createUI(ctx) {
       menu.dispose();
       settingsPanel.dispose();
       gamepad.dispose();
+      touch.dispose();
       camera.dispose();
       toasts.clear();
       mounted = false;

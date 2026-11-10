@@ -43,7 +43,8 @@
 
 import * as THREE from 'three';
 import { clone as cloneSkeleton } from 'three/examples/jsm/utils/SkeletonUtils.js';
-import { cellToWorld, worldToCellInt } from '../core/config.js';
+import { TUNING, cellToWorld, worldToCellInt } from '../core/config.js';
+import { createCityGrid, findPath, smoothPath } from '../core/navigation.js';
 import {
   createAnimationMachine,
   createHazardWatch,
@@ -432,12 +433,57 @@ export function createCitizens(ctx) {
   }
 
   /**
+   * The navigation grid for the live city.
+   *
+   * The grid is a VIEW over the state, not a copy of it, so it is built
+   * once and kept. It refreshes itself when the city changes.
+   */
+  let cityGrid = null;
+
+  function getCityGrid() {
+    if (!cityGrid) cityGrid = createCityGrid(ctx);
+    return cityGrid;
+  }
+
+  /**
    * Build a walking path between two cells.
    *
-   * The path has three points so the citizens cut across the block instead
-   * of walking in a dead straight line.
+   * V7 REPLACED THE OLD STRAIGHT LINE.
+   *
+   * The V6 path was `from → midpoint + a random lateral offset → to`: three
+   * points with no knowledge of the city, so a citizen walked in a straight
+   * line through a warehouse and, on `high-water`, through the flood.
+   *
+   * The V7 path is a real route: CORE's grid A* searches the live city —
+   * water blocks, buildings block, a slope costs more — and the result is
+   * smoothed so the citizen walks a straight line where the city allows it.
+   *
+   * If no route can be found the citizen falls back to the old straight
+   * line: a citizen that stands still because the search failed would look
+   * broken, and a citizen that clips a corner is a smaller problem than a
+   * frozen crowd.
+   *
+   * @param {{x:number,z:number}} from
+   * @param {{x:number,z:number}} to
+   * @returns {Array<{x:number,z:number}>} world points
    */
   function buildPath(from, to) {
+    const grid = getCityGrid();
+    const result = findPath(grid, from, to, { budget: TUNING.citizenPathBudget });
+    if (result.ok && result.path && result.path.length >= 2) {
+      const smoothed = smoothPath(result.path, (x, z) => grid.isBlocked(x, z));
+      return smoothed.map((cell) => worldOf(cell.x, cell.z));
+    }
+    return straightPath(from, to);
+  }
+
+  /**
+   * The old straight-line path, kept as the fallback.
+   *
+   * It has three points so the citizens cut across the block instead of
+   * walking in a dead straight line.
+   */
+  function straightPath(from, to) {
     const a = worldOf(from.x, from.z);
     const b = worldOf(to.x, to.z);
     const mx = (a.x + b.x) / 2;

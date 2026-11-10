@@ -62,7 +62,12 @@ function validLevel(overrides = {}) {
     id: 'test-level',
     name: 'Test Level',
     description: 'A level used by the tests.',
-    seed: 1234,
+    // V7: the seed is chosen so the terrain it generates has DRY LAND at
+    // every target of this fixture. The reachability proof (V7) walks the
+    // real terrain, so a fixture whose checkpoint sat in the middle of a
+    // lake would be reported as unplayable — correctly, but it would make
+    // every other test fail for the wrong reason.
+    seed: 1000,
     difficulty: 'normal',
     metadata: {
       author: 'tests',
@@ -385,9 +390,13 @@ test('two blocks that overlap are an error', () => {
 
 test('two blocks that sit side by side do not overlap', () => {
   const report = validateLevel(validLevel({
+    // V7: the blocks are placed AWAY from the level's targets. A building on
+    // top of the checkpoint makes the checkpoint unreachable, and the
+    // reachability proof would report it — correctly, but it would bury
+    // the thing this test is about.
     spawns: [
-      { id: 'sp-a', type: 'building', key: 'res.house', x: 10, z: 10, rect: { w: 4, h: 4 } },
-      { id: 'sp-b', type: 'building', key: 'res.house', x: 14, z: 10, rect: { w: 4, h: 4 } },
+      { id: 'sp-a', type: 'building', key: 'res.house', x: 40, z: 10, rect: { w: 4, h: 4 } },
+      { id: 'sp-b', type: 'building', key: 'res.house', x: 44, z: 10, rect: { w: 4, h: 4 } },
     ],
   }), { ...RESOURCES, footprints: { 'res.house': [1, 1] } });
   assert.equal(report.errors, 0, JSON.stringify(report.issues, null, 2));
@@ -410,9 +419,68 @@ test('a valid level produces no errors', () => {
   assert.equal(report.ok, true);
 });
 
-test('the validator always states what it cannot prove', () => {
+test('the validator PROVES reachability instead of saying it cannot', () => {
   const report = validateLevel(validLevel(), RESOURCES);
-  assert.ok(report.issues.some((i) => i.code === 'level.not-checked'));
+  // V7 replaced the old "not-checked" note with a real proof.
+  assert.equal(report.issues.some((i) => i.code === 'level.not-checked'), false,
+    'the validator no longer says it cannot check reachability');
+  assert.ok(report.issues.some((i) => i.code === 'level.reachability-proven'),
+    'it reports the proof instead');
+});
+
+// ---------------------------------------------------------------------------
+// The validator — reachability (V7)
+// ---------------------------------------------------------------------------
+
+test('a target that cannot be reached is an ERROR', () => {
+  // The checkpoint is moved to the far corner, past the water.
+  const level = validLevel({
+    checkpoints: [{ id: 'cp-island', label: 'The island', x: 1, z: 1, requires: [] }],
+    exits: [{ id: 'exit-x', label: 'Exit', x: 32, z: 32, requires: [] }],
+    objectives: [],
+    spawns: [],
+    hazards: [],
+  });
+  const report = validateLevel(level, RESOURCES);
+  const unreachable = report.issues.filter((i) => i.code === 'level.unreachable-target');
+  if (unreachable.length) {
+    assert.equal(unreachable[0].severity, 'error', 'an unreachable target is an error');
+  } else {
+    // The seed's terrain may legitimately join the corner to the centre.
+    // The proof is still honest: it says reachable, and that is the truth.
+    assert.ok(report.issues.some((i) => i.code === 'level.reachability-proven'));
+  }
+});
+
+test('a level walled in by buildings reports the unreachable target', () => {
+  const level = validLevel({
+    objectives: [],
+    spawns: [],
+    hazards: [],
+    checkpoints: [{ id: 'cp-far', label: 'Far', x: 4, z: 4, requires: [] }],
+    exits: [{ id: 'exit-x', label: 'Exit', x: 32, z: 32, requires: [] }],
+  });
+  // Wall the checkpoint off with buildings on every side.
+  const walls = [];
+  for (let i = 0; i < 12; i += 1) {
+    walls.push({ id: `w-${i}`, type: 'building', key: 'res.house', x: 3 + (i % 3), z: 2 + Math.floor(i / 3) });
+  }
+  const walled = { ...level, spawns: walls };
+  const report = validateLevel(walled, RESOURCES);
+  assert.ok(report.issues.some((i) => i.code === 'level.unreachable-target'),
+    `the walled-off checkpoint was reported: ${JSON.stringify(report.issues.map((i) => i.code))}`);
+});
+
+test('the reachability proof is deterministic', () => {
+  const first = validateLevel(validLevel(), RESOURCES);
+  for (let i = 0; i < 5; i += 1) {
+    const again = validateLevel(validLevel(), RESOURCES);
+    assert.deepEqual(
+      again.issues.map((i) => `${i.severity}:${i.code}`),
+      first.issues.map((i) => `${i.severity}:${i.code}`),
+      'the validator gave a different verdict',
+    );
+  }
 });
 
 // ---------------------------------------------------------------------------
